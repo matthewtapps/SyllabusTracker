@@ -1,0 +1,304 @@
+{
+    "techniques": [
+        {
+            "techniqueId": 1,
+            "name": "Shoulder Walk",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 2,
+            "name": "Defensive Set",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 3,
+            "name": "Defensive Set Switch Base",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 4,
+            "name": "Rising Hip Escape & Sprawl",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 5,
+            "name": "Hip Switch",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 6,
+            "name": "Bridge Up",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 7,
+            "name": "Bridge Over Left & Right To Posture",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 8,
+            "name": "Bridge To Rising Hip Escape & Butt Scoot",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 9,
+            "name": "Back Step",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 10,
+            "name": "Forward Roll",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 11,
+            "name": "Back Roll",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 12,
+            "name": "Tie Belt",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 13,
+            "name": "Back Escape Underhook Side",
+            "section": "Escapes",
+            "subSection": "Back Escapes",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 14,
+            "name": "Back Escape Overhook Side",
+            "section": "Escapes",
+            "subSection": "Back Escapes",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 15,
+            "name": "Back Escape Triple Threat",
+            "section": "Escapes",
+            "subSection": "Back Escapes",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 16,
+            "name": "Shoulder Walk",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 17,
+            "name": "Defensive Set",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 18,
+            "name": "Defensive Set Switch Base",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 19,
+            "name": "Rising Hip Escape & Sprawl",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 20,
+            "name": "Hip Switch",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 21,
+            "name": "Bridge Up",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 22,
+            "name": "Bridge Over Left & Right To Posture",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 23,
+            "name": "Bridge To Rising Hip Escape & Butt Scoot",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 24,
+            "name": "Back Step",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 25,
+            "name": "Forward Roll",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 26,
+            "name": "Back Roll",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 27,
+            "name": "Tie Belt",
+            "section": "Basic Movements",
+            "subSection": "Basic Movements",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 28,
+            "name": "Back Escape Underhook Side",
+            "section": "Escapes",
+            "subSection": "Back Escapes",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 29,
+            "name": "Back Escape Overhook Side",
+            "section": "Escapes",
+            "subSection": "Back Escapes",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        },
+        {
+            "techniqueId": 30,
+            "name": "Back Escape Triple Threat",
+            "section": "Escapes",
+            "subSection": "Back Escapes",
+            "videoSrc": "",
+            "imageSrc": "",
+            "description": "",
+            "globalNotes": ""
+        }
+    ]
+}

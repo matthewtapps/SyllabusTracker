@@ -1,5 +1,5 @@
 interface StudentTechnique {
-    studentId: number;
+    userId: number;
     techniqueId: number;
     status: TechniqueStatus;
     studentNotes: string;

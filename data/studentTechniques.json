@@ -1,0 +1,214 @@
+{
+    "studentTechniques": [
+        {
+            "userId": 1,
+            "techniqueId": 1,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 2,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 3,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 4,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 5,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 6,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 7,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 8,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 9,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 10,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 11,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 12,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 13,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 14,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 15,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 16,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 17,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 18,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 19,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 20,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 21,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 22,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 23,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 24,
+            "status": "Not Yet Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 25,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 26,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 27,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 28,
+            "status": "Started",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 29,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        },
+        {
+            "userId": 1,
+            "techniqueId": 30,
+            "status": "Passed",
+            "studentNotes": "",
+            "coachNotes": ""
+        }
+    ]
+}

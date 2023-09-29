@@ -1,0 +1,28 @@
+{
+    "users": [
+        {
+            "userId": 1,
+            "role": "Student",
+            "firstName": "Liam",
+            "lastName": "Heaver",
+            "dateOfBirth": "1995-01-24",
+            "email": "hwheaver@gmail.com"
+        },
+        {
+            "userId": 2,
+            "role": "Coach",
+            "firstName": "Dave",
+            "lastName": "Hart",
+            "dateOfBirth": "1985-05-15",
+            "email": "dave@dominance.com.au"
+        },
+        {
+            "userId": 3,
+            "role": "Admin",
+            "firstName": "Matthew",
+            "lastName": "Tapps",
+            "dateOfBirth": "1997-08-12",
+            "email": "matt.tapps@gmail.com"
+        }        
+    ]
+}

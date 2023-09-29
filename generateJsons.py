@@ -60,3 +60,26 @@ formatted_json = json.dumps(techniques_json, indent=4)
 file_path = r"C:\Users\mattt\Documents\Programming\syllabustracker\data\techniques.json"
 with open(file_path, 'w') as file:
     file.write(formatted_json)
+    
+import random
+
+statuses = ["Passed", "Started", "Not Yet Started"]
+
+student_techniques_list = []
+for technique in techniques_json["techniques"]:
+    student_technique = {
+        "userId": 1,
+        "techniqueId": technique["techniqueId"],
+        "status": random.choice(statuses),
+        "studentNotes": "",
+        "coachNotes": ""
+    }
+    student_techniques_list.append(student_technique)
+
+student_techniques_json = {
+    "studentTechniques": student_techniques_list
+}
+
+student_techniques_file_path = r"C:\Users\mattt\Documents\Programming\syllabustracker\data\studentTechniques.json"
+with open(student_techniques_file_path, 'w') as file:
+    file.write(json.dumps(student_techniques_json, indent=4))

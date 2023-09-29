@@ -1,4 +1,4 @@
-interface Technique {
+export interface Technique {
     techniqueId: number;
     name: string;
     section: string;

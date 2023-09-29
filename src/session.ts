@@ -1,0 +1,1 @@
+const techniques: Array<Object> = []

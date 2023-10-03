@@ -13,6 +13,6 @@ export function validateTechniques(obj: any): Technique[] {
     if (Array.isArray(obj) && obj.every(isValidTechnique)) {
         return obj;
     } else {
-        throw new Error("Invalid technique data")
+        throw new Error("Invalid global technique data")
     }
 }

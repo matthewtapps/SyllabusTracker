@@ -1,9 +1,9 @@
-import { Technique } from '../backend/types/Technique';
-import { StudentTechnique } from '../backend/types/StudentTechnique';
-import { InstanceTechnique } from '../backend/types/InstanceTechnique';
-import { retrieveGlobalTechniques } from '../backend/utils/retrieveGlobalTechniques';
-import { retrieveStudentTechniques } from '../backend/utils/retrieveStudentTechniques';
-import { retrieveInstanceTechniques } from '../backend/utils/retrieveInstanceTechniques';
+import { Technique } from './types/Technique';
+import { StudentTechnique } from './types/StudentTechnique';
+import { InstanceTechnique } from './types/InstanceTechnique';
+import { retrieveGlobalTechniques } from './utils/retrieveGlobalTechniques';
+import { retrieveStudentTechniques } from './utils/retrieveStudentTechniques';
+import { retrieveInstanceTechniques } from './utils/retrieveInstanceTechniques';
 
 const userId = 1; // User ID for testing purposes
 

@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/node": "^20.7.1"
+  },
+  "dependencies": {
+    "create-react-app": "^5.0.1"
   }
 }

@@ -8,12 +8,11 @@ import { retrieveInstanceTechniques } from './utils/retrieveInstanceTechniques';
 const userId = 1; // User ID for testing purposes
 
 const techniques: Technique[] = retrieveGlobalTechniques();
-const studentTechniques: StudentTechnique[] = retrieveStudentTechniques();
+const studentTechniques: StudentTechnique[] = retrieveStudentTechniques(userId);
 
 const instanceTechniques: InstanceTechnique[] = retrieveInstanceTechniques(
     techniques, 
     studentTechniques,
-    userId
     );
 
 console.log(instanceTechniques);

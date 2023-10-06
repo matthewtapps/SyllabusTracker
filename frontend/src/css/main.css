@@ -1,0 +1,37 @@
+:root {
+    --text-primary: #fbf1c7;
+    --bg-primary: #3c3836;
+    --bg-link-hover: #fbf1c7;
+    --text-link-hover: #689d6a;
+    --text-secondary: #d79921;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+}
+
+body {
+    font-family: CommitMono;
+    font-weight: 200;
+    font-size: 16px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}

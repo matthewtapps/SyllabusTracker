@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button'
-import '../css/main.css'
 import { Navigate } from 'react-router';
 
 const LoginPage: React.FC = () => {

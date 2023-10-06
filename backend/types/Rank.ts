@@ -1,4 +1,4 @@
-interface Rank {
+export interface Rank {
     belt: Belt;
     stripes: Stripes;
 }

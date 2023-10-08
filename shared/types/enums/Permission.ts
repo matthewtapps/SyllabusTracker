@@ -1,4 +1,4 @@
-enum Permission {
+export enum Permission {
     ViewOwnProgress = "View Own Progress",
     ViewAllProgress = "View All Progress",
     EditTechnique = "Edit Technique", // Allows changing the description, image/video links, names, and global notes of a technique

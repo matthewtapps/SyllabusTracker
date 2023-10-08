@@ -1,7 +1,7 @@
 import { User } from '../types/User'
 import { Role } from '../types/enums/Role'
 
-export function fetchUser(username: string, password: string): User {
+export function fetchUser(): User {
     let user: User = {
         userId: 1,
         role: Role.Student,

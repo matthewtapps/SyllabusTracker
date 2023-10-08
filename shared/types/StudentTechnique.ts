@@ -1,4 +1,4 @@
-import { TechniqueStatus } from "./enums/TechniqueStatus";
+import { TechniqueStatus } from "./Types";
 
 export interface StudentTechnique {
     userId: number;

@@ -1,5 +1,5 @@
-import { Technique } from './Technique'
-import { TechniqueStatus, stringToTechniqueStatus } from './enums/TechniqueStatus';
+import { Technique } from './Types'
+import { TechniqueStatus, stringToTechniqueStatus } from './Types';
 
 export interface InstanceTechnique extends Technique {
     status: TechniqueStatus;

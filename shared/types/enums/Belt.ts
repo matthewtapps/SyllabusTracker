@@ -1,4 +1,4 @@
-enum Belt {
+export enum Belt {
     White = "White belt",
     Blue = "Blue belt",
     Purple = "Purple belt",

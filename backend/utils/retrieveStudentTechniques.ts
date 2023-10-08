@@ -4,7 +4,7 @@ import { stringToTechniqueStatus } from "../../shared/types/enums/TechniqueStatu
 import { validateStudentTechniques } from '../../shared/validators/validateStudentTechniques';
 import { filterStudentTechniques } from './filterStudentTechniques';
 
-let studentTechniquesPath = "./data/studentTechniques.json";
+let studentTechniquesPath = "./dummy_data/studentTechniques.json";
 
 export function retrieveStudentTechniques(
     userId: number

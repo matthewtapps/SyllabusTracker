@@ -1,6 +1,6 @@
-import { Technique } from './types/Technique';
-import { StudentTechnique } from './types/StudentTechnique';
-import { InstanceTechnique } from './types/InstanceTechnique';
+import { Technique } from '../shared/types/Technique';
+import { StudentTechnique } from '../shared/types/StudentTechnique';
+import { InstanceTechnique } from '../shared/types/InstanceTechnique';
 import { retrieveGlobalTechniques } from './utils/retrieveGlobalTechniques';
 import { retrieveStudentTechniques } from './utils/retrieveStudentTechniques';
 import { retrieveInstanceTechniques } from './utils/retrieveInstanceTechniques';

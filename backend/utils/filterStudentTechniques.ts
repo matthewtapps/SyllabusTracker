@@ -1,4 +1,4 @@
-import { StudentTechnique } from "../types/StudentTechnique"
+import { StudentTechnique } from "../../shared/types/StudentTechnique"
 
 export function filterStudentTechniques(
     studentTechniques: StudentTechnique[],

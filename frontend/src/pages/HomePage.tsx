@@ -1,6 +1,6 @@
 import React from 'react';
-import { User, Role } from 'shared/types/Types'
-import { fetchUser }  from '../../../shared/utils/Functions'
+import { User, Role, fetchUser } from 'common'
+import { studentDashboard } from './student/StudentDashboard';
 
 const HomePage: React.FC = () => {
     const user: User = fetchUser()
@@ -8,13 +8,9 @@ const HomePage: React.FC = () => {
     let content: React.ReactNode
     switch(user.role) {
         case Role.Student:
-        content = (
-            <div>
-                <p>Hello Student!</p>
-                <p>Dashboard goes here</p>
-            </div>
-        ) 
+        content = studentDashboard(user)
         break;
+        
         case Role.Coach:
             content = (
                 <div>
@@ -23,6 +19,7 @@ const HomePage: React.FC = () => {
                 </div>
         )
         break;
+        
         case Role.Admin:
             content = (
                 <div>

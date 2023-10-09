@@ -1,4 +1,5 @@
 import { fetchUser } from './utils/Utilities'
+import { validateStudentTechniques, validateTechniques } from './validators/Validators'
 import { 
     User, 
     Technique, 
@@ -25,5 +26,7 @@ export {
     TechniqueStatus,
     stringToTechniqueStatus,
     fetchUser,
-    StudentTechnique
+    StudentTechnique,
+    validateStudentTechniques,
+    validateTechniques
 }

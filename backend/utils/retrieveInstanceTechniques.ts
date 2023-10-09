@@ -1,6 +1,4 @@
-import { StudentTechnique } from "../../shared/types/StudentTechnique";
-import { Technique } from "../../shared/types/Technique";
-import { InstanceTechnique } from "../../shared/types/InstanceTechnique";
+import { StudentTechnique, Technique, InstanceTechnique } from "common";
 
 export function retrieveInstanceTechniques(
     globalTechniques: Technique[], 

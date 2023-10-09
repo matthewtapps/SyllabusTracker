@@ -1,7 +1,5 @@
 import * as fs from 'fs';
-import { StudentTechnique } from "../../shared/types/StudentTechnique";
-import { stringToTechniqueStatus } from "../../shared/types/enums/TechniqueStatus";
-import { validateStudentTechniques } from '../../shared/validators/validateStudentTechniques';
+import { StudentTechnique, stringToTechniqueStatus, validateStudentTechniques } from "common";
 import { filterStudentTechniques } from './filterStudentTechniques';
 
 let studentTechniquesPath = "./dummy_data/studentTechniques.json";

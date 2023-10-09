@@ -3,7 +3,9 @@ import { User, Role, fetchUser } from 'common'
 import { studentDashboard } from './student/StudentDashboard';
 
 const HomePage: React.FC = () => {
-    const user: User = fetchUser()
+    const user: User = fetchUser() // Could be moved to login page logic
+                                   // once auth is implemented and hoisted to 
+                                   // higher app state for easy referring
     
     let content: React.ReactNode
     switch(user.role) {

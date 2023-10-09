@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button'
-import { Navigate } from 'react-router';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -8,7 +7,9 @@ const LoginPage: React.FC = () => {
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
-        <Navigate to="/"></Navigate>
+        // Send username & password for auth to backend.
+        // Upon passing auth, fill User instance and ensure this is hoisted to upper 
+        // app logic to be easily referred to.
         };
 
     return (

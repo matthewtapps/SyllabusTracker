@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, Role, fetchUser } from 'common'
-import { studentDashboard } from './student/StudentDashboard';
+import { StudentDashboard } from './student/Dashboard';
 import { ThemeProvider } from '@emotion/react';
 import Theme from '../theme/Theme';
 
@@ -12,9 +12,9 @@ const HomePage: React.FC = () => {
     let content: React.ReactNode
     switch(user.role) {
         case Role.Student:
-        content = studentDashboard(user)
+        content = StudentDashboard(user)
         break;
-        
+
         case Role.Coach:
             content = (
                 <div>

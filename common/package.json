@@ -12,7 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "class-validator": "^0.14.0"
+    "class-validator": "^0.14.0",
+    "fs": "^0.0.1-security"
   },
   "devDependencies": {
     "@types/node": "^20.8.3",

@@ -5,8 +5,9 @@ export function fetchUser(): User {
     let user: User = {
         userId: 1,
         role: Role.Student,
-        firstName: 'Example',
-        lastName: 'Student',
+        username: 'Liam',
+        firstName: 'Liam',
+        lastName: 'Heaver',
         dateOfBirth: new Date(1963, 1, 24),
         email: 'example@example.com',
         mobile: '0400000000'

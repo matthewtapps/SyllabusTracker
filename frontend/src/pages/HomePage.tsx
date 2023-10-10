@@ -1,6 +1,8 @@
 import React from 'react';
 import { User, Role, fetchUser } from 'common'
 import { studentDashboard } from './student/StudentDashboard';
+import { ThemeProvider } from '@emotion/react';
+import Theme from '../theme/Theme';
 
 const HomePage: React.FC = () => {
     const user: User = fetchUser() // Could be moved to login page logic
@@ -33,9 +35,11 @@ const HomePage: React.FC = () => {
     }
 
     return (
-        <div className="home-container">
-            {content}
-        </div>
+        <ThemeProvider theme={Theme}>
+            <div className="home-container">
+                {content}
+            </div>
+        </ThemeProvider>
     );
 };
 

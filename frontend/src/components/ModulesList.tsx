@@ -5,7 +5,6 @@ import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import Divider from '@mui/material/Divider/Divider'
 import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutlined';
 import { styled } from '@mui/material/styles'
 import { Technique } from 'common'
@@ -35,23 +34,15 @@ function ModulesList(props: ModulesListProps): JSX.Element {
         setSelectedIndex(index);
     };
 
-    let content = []
-    
-    content.push(
-        <div>
-            <StyledPaper elevation={0} square={true}>
-                <Typography variant="h3" marginLeft={2}>Hi, {props.firstName}!</Typography>
-                <Typography variant="h4" marginLeft={2}>{props.title}</Typography>
-            </StyledPaper>
-        </div>
-    )
-
-    for (let prop of props.listItems) {
-        let i = 0
-        let key = 'technique-' + prop.techniqueId 
-        content.push(
+    return (
+    <div>
+        <StyledPaper elevation={0} square={true}>
+            <Typography variant="h3" marginLeft={2}>Hi, {props.firstName}!</Typography>
+            <Typography variant="h4" marginLeft={2}>{props.title}</Typography>
+        </StyledPaper>
+    {props.listItems.map((prop, index) => (
             <React.Fragment>
-                <List key={key}
+                <List key={'technique-' + prop.techniqueId}
                 sx={{backgroundColor: "#3c3836", 
                 color: "#fbf1c7", 
                 marginX: 2,
@@ -64,8 +55,8 @@ function ModulesList(props: ModulesListProps): JSX.Element {
                 component="nav"
                 >
                     <ListItemButton
-                    selected={selectedIndex === i}
-                    onClick={(event) => handleListItemClick(event, i)}
+                    selected={selectedIndex === index}
+                    onClick={(event) => handleListItemClick(event, index)}
                     >
                         <ListItemText primary={prop.name}/>
                         <ListItemIcon sx={{justifyContent: 'right'}}>
@@ -74,10 +65,8 @@ function ModulesList(props: ModulesListProps): JSX.Element {
                     </ListItemButton>
                 </List>
             </React.Fragment>
-        );
-        i++
-    };
-    return <div>{content}</div>
-};
+        ))};
+    </div>
+    )};
 
 export default ModulesList

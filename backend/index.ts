@@ -1,7 +1,6 @@
 import express, {NextFunction, Request, RequestHandler, Response} from "express";
 import cors from "cors";
-import router from "./src/Routes";
-import { User } from "./src/entities/User";
+import router from "./src/Router";
 import { AppDataSource } from "./src/data-source";
 
 const app = express();
@@ -11,21 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post('/api', router);
-
-app.post('/user', async (req, res) => {
-    const user = new User();
-    user.role = req.body.role;
-    user.username = req.body.username;
-    user.firstName = req.body.firstName;
-    user.lastName = req.body.lastName;
-    user.dateOfBirth = req.body.dateOfBirth;
-    user.email = req.body.email;
-    user.mobile = req.body.mobile;
-
-    await AppDataSource.manager.save(user);
-    res.json({ message: 'User saved!', userId: user.userId})
-})
+app.use('/api', router)
 
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error(err.stack);

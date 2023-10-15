@@ -45,5 +45,12 @@ export class TechniqueService {
         technique._openGuard = openGuard;
 
         return await techniqueRepo.save(technique);
-    } 
-}
+    };
+
+    async fetchAllTechniques(): Promise<Technique[]> {
+        const techniqueRepo = AppDataSource.getRepository(Technique);
+        const techniques = techniqueRepo.find()
+
+        return techniques
+    };
+};

@@ -4,7 +4,7 @@ exports.fetchUser = void 0;
 var Role_1 = require("../types/enums/Role");
 function fetchUser() {
     var user = {
-        userId: 1,
+        userId: '1',
         role: Role_1.Role.Student,
         username: 'Liam',
         firstName: 'Liam',

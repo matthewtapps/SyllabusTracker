@@ -11,7 +11,9 @@ import {
     Stripes, 
     TechniqueStatus,
     stringToTechniqueStatus,
-    StudentTechnique
+    StudentTechnique,
+    Gi,
+    Hierarchy
 } from './types/Types'
 
 export { 
@@ -28,5 +30,7 @@ export {
     fetchUser,
     StudentTechnique,
     validateStudentTechniques,
-    validateTechniques
+    validateTechniques,
+    Gi,
+    Hierarchy
 }

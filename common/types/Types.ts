@@ -8,6 +8,8 @@ import {Role} from './enums/Role'
 import {Stripes} from './enums/Stripes'
 import { TechniqueStatus, stringToTechniqueStatus } from './enums/TechniqueStatus'
 import { StudentTechnique } from './StudentTechnique'
+import { Gi } from './enums/Gi'
+import { Hierarchy } from './enums/Hierarchies'
 
 export {
     User, 
@@ -20,5 +22,7 @@ export {
     Stripes, 
     TechniqueStatus,
     stringToTechniqueStatus,
-    StudentTechnique
+    StudentTechnique,
+    Gi,
+    Hierarchy,
 }

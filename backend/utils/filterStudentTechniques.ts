@@ -1,8 +1,8 @@
-import { StudentTechnique } from "../../shared/types/StudentTechnique"
+import { StudentTechnique } from "common"
 
 export function filterStudentTechniques(
     studentTechniques: StudentTechnique[],
-    userId: number
+    userId: string
     ): StudentTechnique[] {
         return studentTechniques.filter(technique => technique.userId = userId)
     }

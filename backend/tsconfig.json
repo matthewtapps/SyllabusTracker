@@ -1,14 +1,16 @@
 {
-    "compilerOptions": {
+   "compilerOptions": {
+      "lib": [
+         "es5",
+         "es6"
+      ],
+      "target": "es5",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "outDir": "./build",
+      "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true // If you disable this, you'll get an error:
-      // TypeError: (0 , s.default) is not a function
-    },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules"],
-    "target": "es2017",
-    "module": "commonjs",
-    "lib": ["es2017"]
-  }
-  
+      "sourceMap": true,
+      "esModuleInterop": true
+   }
+}

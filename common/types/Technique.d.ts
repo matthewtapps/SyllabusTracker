@@ -1,10 +1,14 @@
+import { Hierarchy } from "./Types";
+import { Gi } from "./enums/Gi";
 export interface Technique {
-    techniqueId: number;
-    name: string;
-    section: string;
-    subSection: string;
+    techniqueId: string;
+    title: string;
     videoSrc: string;
-    imageSrc: string;
     description: string;
     globalNotes: string;
+    gi: Gi;
+    hierarchy: Hierarchy;
+    type: string;
+    position: string;
+    openGuard: string | null;
 }

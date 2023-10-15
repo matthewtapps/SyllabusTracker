@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateTechniques = exports.validateStudentTechniques = exports.fetchUser = exports.stringToTechniqueStatus = exports.TechniqueStatus = exports.Stripes = exports.Role = exports.Permission = exports.Belt = void 0;
+exports.Hierarchy = exports.Gi = exports.validateTechniques = exports.validateStudentTechniques = exports.fetchUser = exports.stringToTechniqueStatus = exports.TechniqueStatus = exports.Stripes = exports.Role = exports.Permission = exports.Belt = void 0;
 var Utilities_1 = require("./utils/Utilities");
 Object.defineProperty(exports, "fetchUser", { enumerable: true, get: function () { return Utilities_1.fetchUser; } });
 var Validators_1 = require("./validators/Validators");
@@ -13,3 +13,5 @@ Object.defineProperty(exports, "Role", { enumerable: true, get: function () { re
 Object.defineProperty(exports, "Stripes", { enumerable: true, get: function () { return Types_1.Stripes; } });
 Object.defineProperty(exports, "TechniqueStatus", { enumerable: true, get: function () { return Types_1.TechniqueStatus; } });
 Object.defineProperty(exports, "stringToTechniqueStatus", { enumerable: true, get: function () { return Types_1.stringToTechniqueStatus; } });
+Object.defineProperty(exports, "Gi", { enumerable: true, get: function () { return Types_1.Gi; } });
+Object.defineProperty(exports, "Hierarchy", { enumerable: true, get: function () { return Types_1.Hierarchy; } });

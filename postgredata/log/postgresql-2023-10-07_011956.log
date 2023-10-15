@@ -1,3 +1,0 @@
-2023-10-07 01:19:56.370 GMT [7604] LOG:  database system was shut down at 2023-10-07 01:19:09 GMT
-2023-10-07 01:24:56.378 GMT [7588] LOG:  checkpoint starting: time
-2023-10-07 01:24:56.413 GMT [7588] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.008 s, total=0.035 s; sync files=2, longest=0.004 s, average=0.004 s; distance=0 kB, estimate=0 kB; lsn=0/15D9E90, redo lsn=0/15D9E58

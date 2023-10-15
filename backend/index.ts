@@ -1,65 +1,46 @@
 import express, {NextFunction, Request, RequestHandler, Response} from "express";
-import {Length, IsString, validate} from "class-validator";
 import cors from "cors";
-import {plainToClass} from "class-transformer";
-import path from 'path';
+import router from "./src/Routes";
+import { User } from "./src/entities/User";
+import { AppDataSource } from "./src/data-source";
+
 const app = express();
-
-class RequestBody {
-    @Length(1, 30)
-    @IsString()
-    name: string;
-
-    constructor(name: string) {
-        this.name = name;
-    }
-}
-
-class ResponseBody {
-    @IsString()
-    message: string;
-    constructor(message: string) {
-        this.message = message;
-    }
-}
 
 // Enable cors to be able to reach the backend on localhost:8080 while running React.js in dev mode on localhost:3000
 // You might want to disbale this on production.
 app.use(cors());
-app.use(express.json() as RequestHandler);
+app.use(express.json());
 
-app.post('/api', async function(req: Request, res: Response) {
-    let body = plainToClass(RequestBody, req.body as Object);
-    let validationErrors = await validate(body);
-    if (validationErrors.length == 0) {
-        const responseBody: ResponseBody = new ResponseBody("Hello, " + body.name);
-        res.contentType('application/json');
-        res.status(200);
-        res.send(responseBody);
-    } else {
-        res.sendStatus(400);
-    }
+app.post('/api', router);
+
+app.post('/user', async (req, res) => {
+    const user = new User();
+    user.role = req.body.role;
+    user.username = req.body.username;
+    user.firstName = req.body.firstName;
+    user.lastName = req.body.lastName;
+    user.dateOfBirth = req.body.dateOfBirth;
+    user.email = req.body.email;
+    user.mobile = req.body.mobile;
+
+    await AppDataSource.manager.save(user);
+    res.json({ message: 'User saved!', userId: user.userId})
+})
+
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
 });
-
-// This code makes sure that any request that does not matches a static file
-// in the build folder, will just serve index.html. Client side routing is
-// going to make sure that the correct content will be loaded.
-app.use((req: Request, res: Response, next: NextFunction) => {
-    if (/(.ico|.js|.css|.jpg|.png|.map)$/i.test(req.path)) {
-        next();
-    } else {
-        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-        res.header('Expires', '-1');
-        res.header('Pragma', 'no-cache');
-        res.sendFile(path.join(__dirname, 'build', 'index.html'));
-    }
-});
-
-app.use(express.static(path.join(__dirname, 'build')));
 
 // Start the server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`App listening on port ${PORT}`);
-    console.log('Press Ctrl+C to quit.');
-});
+const PORT = process.env.PORT || 3000;
+AppDataSource.initialize()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server started on http://localhost:${PORT}`);
+        });
+    })
+    .catch(error => {
+        console.log('Error initializing database:', error);
+        process.exit(1);
+    });

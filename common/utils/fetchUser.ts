@@ -3,7 +3,7 @@ import { Role } from '../types/enums/Role'
 
 export function fetchUser(): User {
     let user: User = {
-        userId: 1,
+        userId: '1',
         role: Role.Student,
         username: 'Liam',
         firstName: 'Liam',

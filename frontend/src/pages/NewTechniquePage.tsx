@@ -19,15 +19,23 @@ const NewTechniquePage: React.FC = () => {
         hierarchy: '',
         type: '',
         position: '',
-        openGuard: ''
+        openGuard: '',
+        typeDescription: '',
+        positionDescription: '',
     })
-
+    
+    // Autocomplete suggestions
     const [titleSuggestions, setTitleSuggestions] = React.useState<string[]>([]);
     const [giSuggestions, setGiSuggestions] = React.useState<string[]>([]);
     const [hierarchySuggestions, setHierarchySuggestions] = React.useState<string[]>([]);
     const [typeSuggestions, setTypeSuggestions] = React.useState<string[]>([]);
     const [positionSuggestions, setPositionSuggestions] = React.useState<string[]>([]);
     const [openGuardSuggestions, setOpenGuardSuggestions] = React.useState<string[]>([]);
+
+    // Technique field displays
+    const [showTypeDescription, setShowTypeDescription] = React.useState(false)
+    const [showPositionDescription, setShowPositionDescription] = React.useState(false)
+    const [showOpenGuardField, setShowOpenGuardField] = React.useState(false)
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -55,11 +63,15 @@ const NewTechniquePage: React.FC = () => {
                     fetch('http://localhost:3000/api/technique/positions'),
                     fetch('http://localhost:3000/api/technique/openGuards')
                 ]);
+
+                interface TitleObject {
+                    title: string
+                }
     
-                const types = await typeResponse.json();
-                const titles = await titleResponse.json();
-                const positions = await positionResponse.json();
-                const openGuards = await openGuardResponse.json();
+                const types = (await typeResponse.json()).map((typeObj: TitleObject) => typeObj.title);
+                const titles = (await titleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
+                const positions = (await positionResponse.json()).map((positionObj: TitleObject) => positionObj.title);
+                const openGuards = (await openGuardResponse.json()).map((openGuardObj: TitleObject) => openGuardObj.title);
     
                 setTypeSuggestions(types);
                 setTitleSuggestions(titles);
@@ -196,6 +208,10 @@ const NewTechniquePage: React.FC = () => {
                             inputValue={technique.type}
                             onInputChange={(event, newValue) => {
                                 setTechnique(prevType => ({ ...prevType, type: newValue }));
+                                const matchingSuggestions = typeSuggestions.filter(option => 
+                                    option.toLowerCase().includes(newValue.toLowerCase())
+                                );
+                                setShowTypeDescription(matchingSuggestions.length === 0);
                             }}
                             renderInput={(params) => (
                                 <TextField
@@ -210,6 +226,20 @@ const NewTechniquePage: React.FC = () => {
                         />
                     </Grid>
 
+                    {showTypeDescription && (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Type Description"
+                                name="typeDescription"
+                                value={technique.typeDescription}
+                                onChange={handleInputChange}
+                                variant="outlined"
+                                InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
+                            />
+                        </Grid>
+                    )}
+
                     <Grid item xs={12}>
                         <Autocomplete
                             freeSolo
@@ -217,6 +247,10 @@ const NewTechniquePage: React.FC = () => {
                             inputValue={technique.position}
                             onInputChange={(event, newValue) => {
                                 setTechnique(prevPosition => ({ ...prevPosition, position: newValue }));
+                                const matchingSuggestions = positionSuggestions.filter(option => 
+                                    option.toLowerCase().includes(newValue.toLowerCase())
+                                );
+                                setShowPositionDescription(matchingSuggestions.length === 0);
                             }}
                             renderInput={(params) => (
                                 <TextField
@@ -231,26 +265,42 @@ const NewTechniquePage: React.FC = () => {
                         />
                     </Grid>
 
-                    <Grid item xs={12}>
-                        <Autocomplete
-                            options={openGuardSuggestions}
-                            freeSolo
-                            inputValue={technique.openGuard}
-                            onInputChange={(event, newValue) => {
-                                setTechnique(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Open Guards"
-                                    variant="outlined"
-                                    color="primary"
-                                    InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
-                                />
-                            )}
-                        />
-                    </Grid>
+                    {showPositionDescription && (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Position Description"
+                                name="positionDescription"
+                                value={technique.positionDescription}
+                                onChange={handleInputChange}
+                                variant="outlined"
+                                InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
+                            />
+                        </Grid>
+                    )}
+                    
+                    {showOpenGuardField && (
+                        <Grid item xs={12}>
+                            <Autocomplete
+                                options={openGuardSuggestions}
+                                freeSolo
+                                inputValue={technique.openGuard}
+                                onInputChange={(event, newValue) => {
+                                    setTechnique(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Open Guards"
+                                        variant="outlined"
+                                        color="primary"
+                                        InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
+                                    />
+                                )}
+                            />
+                        </Grid>
+                    )}
 
                     <Grid item xs={12}>
                         <Button variant="contained" color="primary" type="submit">
@@ -274,7 +324,7 @@ const transformTechniqueForBackend = (technique: any): Technique | null => {
       alert('Invalid Hierarchy value');
       return null;
     }
-  
+
     return {
       ...technique,
       gi: technique.gi as Gi,

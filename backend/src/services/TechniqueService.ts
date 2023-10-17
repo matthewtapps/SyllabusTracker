@@ -12,14 +12,14 @@ export class TechniqueService {
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
       
         let type = await typeRepo.findOne({ where: { title: data.type }});
-        if (!type) {
-            type = typeRepo.create({ title: data.type });
+        if (!type && data.typeDescription) {
+            type = typeRepo.create({ title: data.type, description: data.typeDescription });
             await typeRepo.save(type);
         }
 
         let position = await positionRepo.findOne({ where: { title: data.position }});
-        if (!position) {
-            position = positionRepo.create({ title: data.position });
+        if (!position && data.positionDescription) {
+            position = positionRepo.create({ title: data.position, description: data.positionDescription });
             await positionRepo.save(position);
         }
 

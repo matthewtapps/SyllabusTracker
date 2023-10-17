@@ -32,7 +32,6 @@ export class TechniqueService {
             }
         }
 
-        // Create or update Technique
         let technique = new Technique();
         technique.title = data.title;
         technique.videoSrc = data.videoSrc;
@@ -47,10 +46,32 @@ export class TechniqueService {
         return await techniqueRepo.save(technique);
     };
 
-    async fetchAllTechniques(): Promise<Technique[]> {
+    async getAllTechniqueTitles(): Promise<Technique[]> {
+        const techniqueRepo = AppDataSource.getRepository(Technique);
+        const techniques = techniqueRepo.find({ select: ["title"]})
+
+        return techniques
+    };
+
+    async getAllTechniques(): Promise<Technique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const techniques = techniqueRepo.find()
 
         return techniques
+    };
+
+    async getAllTechniqueTypes(): Promise<TechniqueType[]> {
+        const typeRepo = AppDataSource.getRepository(TechniqueType);
+        return typeRepo.find({ select: ["title"]})
+    };
+
+    async getAllTechniquePositions(): Promise<Position[]> {
+        const typeRepo = AppDataSource.getRepository(Position);
+        return typeRepo.find({ select: ["title"]})
+    };
+
+    async getAllTechniqueOpenGuards(): Promise<OpenGuard[]> {
+        const typeRepo = AppDataSource.getRepository(OpenGuard);
+        return typeRepo.find({ select: ["title"]})
     };
 };

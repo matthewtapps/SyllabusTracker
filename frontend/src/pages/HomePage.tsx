@@ -2,7 +2,7 @@ import React from 'react';
 import { User, Role, fetchUser } from 'common'
 import { StudentDashboard } from '../components/student/Dashboard';
 import { ThemeProvider } from '@emotion/react';
-import Theme from '../theme/Theme';
+import Theme from '../theme/theme';
 
 const HomePage: React.FC = () => {
     const user: User = fetchUser() // Could be moved to login page logic

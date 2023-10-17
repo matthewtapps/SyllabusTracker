@@ -2,7 +2,7 @@ import React from 'react';
 import { User, Role, fetchUser } from 'common'
 import { StudentDashboard } from '../components/student/Dashboard';
 import { ThemeProvider } from '@emotion/react';
-import Theme from '../theme/theme';
+import theme from '../theme/Theme';
 
 const HomePage: React.FC = () => {
     const user: User = fetchUser() // Could be moved to login page logic
@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
     }
 
     return (
-        <ThemeProvider theme={Theme}>
+        <ThemeProvider theme={theme}>
             <div className="home-container">
                 {content}
             </div>

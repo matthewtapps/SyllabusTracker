@@ -5,7 +5,7 @@ import './css/main.css'
 import './css/login.css'
 import NewTechniquePage from "./pages/NewTechniquePage";
 import { ThemeProvider } from "@mui/material/styles";
-import theme from "./theme/theme";
+import theme from "./theme/Theme";
 
 function App() {
   return (

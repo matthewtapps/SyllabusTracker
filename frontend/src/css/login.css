@@ -47,7 +47,6 @@
     border: 1px solid;
     color: var(--text-primary);
     border-color: var(--text-primary);
-    font-family: CommitMono;
     font-weight: 200;
     text-transform: none;
 }

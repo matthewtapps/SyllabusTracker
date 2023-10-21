@@ -128,7 +128,7 @@ function TechniquesList(): JSX.Element {
     };
 
     const filteredTechniques = techniquesList.filter(technique => {
-        return (!filters.title || technique.title.includes(filters.title)) &&
+        return (!filters.title.toLowerCase() || technique.title.includes(filters.title.toLowerCase())) &&
                (!filters.hierarchy || technique.hierarchy.includes(filters.hierarchy)) &&
                (!filters.type || technique._type.title.includes(filters.type)) &&
                (!filters.position || technique._position.title.includes(filters.position)) &&
@@ -151,10 +151,9 @@ function TechniquesList(): JSX.Element {
                     <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color: "#fbf1c7"}}/>}>
                         <TextField
                             fullWidth
-                            label="Filter by Title"
+                            label="Title"
                             value={filters.title}
                             onChange={e => setFilters(prev => ({ ...prev, title: e.target.value }))}
-                            sx={{borderColor: "#3c3836"}}
                         />
                     </AccordionSummary>
                     <AccordionDetails>
@@ -167,7 +166,7 @@ function TechniquesList(): JSX.Element {
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Gi or No Gi"
+                                    label="Yes Gi or No Gi"
                                     variant="outlined"
                                 />
                             )}
@@ -181,9 +180,9 @@ function TechniquesList(): JSX.Element {
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Filter by Hierarchy"
+                                    label="Hierarchy"
                                     variant="outlined"
-                                    sx={{marginTop: "8px"}}
+                                    sx={{marginTop: "10px"}}
                                 />
                             )}
                         />
@@ -196,9 +195,9 @@ function TechniquesList(): JSX.Element {
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Filter by Type"
+                                    label="Type"
                                     variant="outlined"
-                                    sx={{marginTop: "8px"}}
+                                    sx={{marginTop: "10px"}}
                                 />
                             )}
                         />
@@ -211,9 +210,9 @@ function TechniquesList(): JSX.Element {
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Filter by Position"
+                                    label="Position"
                                     variant="outlined"
-                                    sx={{marginTop: "8px"}}
+                                    sx={{marginTop: "10px"}}
                                 />
                             )}
                         />
@@ -227,9 +226,9 @@ function TechniquesList(): JSX.Element {
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Filter by Open Guards"
+                                    label="Open Guard"
                                     variant="outlined"
-                                    sx={{marginTop: "8px"}}
+                                    sx={{marginTop: "10px"}}
                                 />
                             )}
                         />

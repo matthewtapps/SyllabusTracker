@@ -55,7 +55,9 @@ export class TechniqueService {
 
     async getAllTechniques(): Promise<Technique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
-        const techniques = techniqueRepo.find()
+        const techniques = await techniqueRepo.find({
+            relations: ["_type", "_position", "_openGuard"]
+        })
 
         return techniques
     };

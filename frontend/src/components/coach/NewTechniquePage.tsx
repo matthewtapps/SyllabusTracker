@@ -1,12 +1,19 @@
 import React from 'react'
 import Card from "@mui/material/Card"
-import TextField from '@mui/material/TextField'
+import MuiTextField, { TextFieldProps} from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Autocomplete from '@mui/material/Autocomplete'
-import NavBar from '../components/NavBar'
-import theme from '../theme/Theme'
+import NavBar from '../NavBar'
+import { styled } from '@mui/material/styles'
+import theme from '../../theme/Theme'
 import { Technique, Gi, Hierarchy } from 'common'
+
+const TextField = styled((props: TextFieldProps) => (
+    <MuiTextField {...props} />
+))(({ theme }) => ({
+    backgroundColor: '#3c3836'
+}))
 
 const NewTechniquePage: React.FC = () => {
     
@@ -251,6 +258,7 @@ const NewTechniquePage: React.FC = () => {
                                     option.toLowerCase().includes(newValue.toLowerCase())
                                 );
                                 setShowPositionDescription(matchingSuggestions.length === 0);
+                                setShowOpenGuardField(newValue.toLowerCase() === "open guard");
                             }}
                             renderInput={(params) => (
                                 <TextField
@@ -278,7 +286,7 @@ const NewTechniquePage: React.FC = () => {
                             />
                         </Grid>
                     )}
-                    
+
                     {showOpenGuardField && (
                         <Grid item xs={12}>
                             <Autocomplete
@@ -292,7 +300,8 @@ const NewTechniquePage: React.FC = () => {
                                     <TextField
                                         {...params}
                                         fullWidth
-                                        label="Open Guards"
+                                        label="Open Guard"
+                                        name="openGuard"
                                         variant="outlined"
                                         color="primary"
                                         InputLabelProps={{ style: { color: theme.palette.secondary.main }}}

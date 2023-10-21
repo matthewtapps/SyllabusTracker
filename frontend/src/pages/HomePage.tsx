@@ -3,6 +3,7 @@ import { User, Role, fetchUser } from 'common'
 import { StudentDashboard } from '../components/student/Dashboard';
 import { ThemeProvider } from '@emotion/react';
 import theme from '../theme/Theme';
+import TechniquesList from '../components/student/TechniquesList';
 
 const HomePage: React.FC = () => {
     const user: User = fetchUser() // Could be moved to login page logic
@@ -12,7 +13,7 @@ const HomePage: React.FC = () => {
     let content: React.ReactNode
     switch(user.role) {
         case Role.Student:
-        content = StudentDashboard(user)
+        content = TechniquesList()
         break;
 
         case Role.Coach:

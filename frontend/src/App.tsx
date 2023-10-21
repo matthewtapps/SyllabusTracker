@@ -3,7 +3,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import './css/main.css'
 import './css/login.css'
-import NewTechniquePage from "./pages/NewTechniquePage";
+import NewTechniquePage from "./components/coach/NewTechniquePage";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/Theme";
 

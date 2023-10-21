@@ -2,59 +2,32 @@ import { createTheme } from '@mui/material/styles'
 
 const theme = createTheme({
     palette: {
+        mode: 'dark',
         primary: {
-            light: '#928374',
-            main: '#282828',
-            dark: '#1d2021',
-            contrastText: '#ebdbb2',
+            main: '#fabd2f',
         },
         secondary: {
-            light: '#f9f5d7',
-            main: '#fbf1c7',
-            dark: '#928374',
-            contrastText: '#3c3836',
+            main: '#689d6a',
+        },
+        background: {
+            default: '#282828',
+        },
+        text: {
+            primary: '#ebdbb2',
+        },
+        error: {
+            main: '#cc241d',
+        },
+        warning: {
+            main: '#d65d0e',
+        },
+        info: {
+            main: '#458588',
+        },
+        success: {
+            main: '#b8bb26',
         },
     },
-    components: {
-        MuiOutlinedInput: {
-            styleOverrides: {
-                root: {
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#928374',
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#fbf1c7',
-                    }
-                },
-                notchedOutline: {
-                    borderColor: '#928374',
-                },
-                input: {
-                    color: '#fbf1c7'
-                }
-            }
-        },
-        MuiInputLabel: {
-            styleOverrides: {
-                root: {
-                    color: '#fbf1c7',
-                    '&.Mui-focused': {
-                        color: '#282828',
-                    }
-                }
-            }
-        },
-        MuiButton: {
-            styleOverrides: {
-                containedPrimary: {
-                    backgroundColor: '#282828',
-                    '&:hover': {
-                        backgroundColor: '#1d2021',
-                    }
-                }
-            }
-        }
-    }
 });
 
 export default theme;

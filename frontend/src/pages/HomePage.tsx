@@ -1,6 +1,5 @@
 import React from 'react';
 import { User, Role, fetchUser } from 'common'
-import { StudentDashboard } from '../components/student/Dashboard';
 import { ThemeProvider } from '@emotion/react';
 import theme from '../theme/Theme';
 import TechniquesList from '../components/student/TechniquesList';

@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid'
 import Autocomplete from '@mui/material/Autocomplete'
 import NavBar from '../NavBar'
 import { styled } from '@mui/material/styles'
-import theme from '../../theme/Theme'
 import { Technique, Gi, Hierarchy } from 'common'
 
 const TextField = styled((props: TextFieldProps) => (
@@ -126,7 +125,6 @@ const NewTechniquePage: React.FC = () => {
                                     fullWidth
                                     label="Technique Title"
                                     variant="outlined"
-                                    InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                                 />
                             )}
                         />
@@ -140,7 +138,6 @@ const NewTechniquePage: React.FC = () => {
                             value={technique.videoSrc}
                             onChange={handleInputChange}
                             variant="outlined"
-                            InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                         />
                     </Grid>
 
@@ -152,7 +149,6 @@ const NewTechniquePage: React.FC = () => {
                             value={technique.description}
                             onChange={handleInputChange}
                             variant="outlined"
-                            InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                         />
                     </Grid>
 
@@ -164,7 +160,6 @@ const NewTechniquePage: React.FC = () => {
                             value={technique.globalNotes}
                             onChange={handleInputChange}
                             variant="outlined"
-                            InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                         />
                     </Grid>
 
@@ -182,7 +177,6 @@ const NewTechniquePage: React.FC = () => {
                                     label="Gi or No Gi"
                                     variant="outlined"
                                     color="primary"
-                                    InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                                 />
                             )}
                         />
@@ -202,7 +196,6 @@ const NewTechniquePage: React.FC = () => {
                                     label="Hierarchy"
                                     variant="outlined"
                                     color="primary"
-                                    InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                                 />
                             )}
                         />
@@ -227,7 +220,6 @@ const NewTechniquePage: React.FC = () => {
                                     label="Type"
                                     variant="outlined"
                                     color="primary"
-                                    InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                                 />
                             )}
                         />
@@ -242,7 +234,6 @@ const NewTechniquePage: React.FC = () => {
                                 value={technique.typeDescription}
                                 onChange={handleInputChange}
                                 variant="outlined"
-                                InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                             />
                         </Grid>
                     )}
@@ -267,7 +258,6 @@ const NewTechniquePage: React.FC = () => {
                                     label="Position"
                                     variant="outlined"
                                     color="primary"
-                                    InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                                 />
                             )}
                         />
@@ -282,7 +272,6 @@ const NewTechniquePage: React.FC = () => {
                                 value={technique.positionDescription}
                                 onChange={handleInputChange}
                                 variant="outlined"
-                                InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                             />
                         </Grid>
                     )}
@@ -304,7 +293,6 @@ const NewTechniquePage: React.FC = () => {
                                         name="openGuard"
                                         variant="outlined"
                                         color="primary"
-                                        InputLabelProps={{ style: { color: theme.palette.secondary.main }}}
                                     />
                                 )}
                             />

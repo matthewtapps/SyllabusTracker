@@ -72,11 +72,11 @@ const ListItemText = styled((props: ListItemTextProps) => (
 
 function TechniquesList(): JSX.Element {
     const [techniquesList, setTechniquesList] = React.useState<FrontendTechnique[]>([])
-    const [hierarchyOptions, setHierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
+    const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
     const [positionOptions, setPositionOptions] = React.useState<string[]>([]);
     const [openGuardOptions, setOpenGuardOptions] = React.useState<string[]>([]);
-    const [giOptions, setGiOptions] = React.useState<string[]>(['Yes Gi', 'No Gi']);
+    const [giOptions] = React.useState<string[]>(['Yes Gi', 'No Gi']);
     const [filters, setFilters] = React.useState({
         title: '',
         hierarchy: '',
@@ -100,7 +100,7 @@ function TechniquesList(): JSX.Element {
                 const positions: string[] = []
                 const openGuards: string[] = []
                 
-                techniques.map(technique => {
+                techniques.forEach(technique => {
                     if (!types.includes(technique._type.title)) {
                         types.push(technique._type.title);
                     }
@@ -115,7 +115,6 @@ function TechniquesList(): JSX.Element {
                 setTypeOptions(types)
                 setPositionOptions(positions)
                 setOpenGuardOptions(openGuards)
-
 
             } catch (error) {
                 alert(`Error fetching data: ${error}`);
@@ -295,9 +294,9 @@ function TechniquesList(): JSX.Element {
                             </ListItem>
                             
                             {technique.globalNotes && (
-                            <ListItem>
-                                <ListItemText primary="Global Notes" secondary={technique.globalNotes} />
-                            </ListItem>
+                                <ListItem>
+                                    <ListItemText primary="Global Notes" secondary={technique.globalNotes} />
+                                </ListItem>
                             )}
 
                         </AccordionDetails>

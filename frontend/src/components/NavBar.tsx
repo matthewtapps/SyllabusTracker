@@ -1,6 +1,5 @@
 import { AppBar, Toolbar, IconButton, Typography } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
-import theme from "../theme/Theme";
 
 const NavBar = (props: any) => {
     return (

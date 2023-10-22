@@ -1,20 +1,21 @@
 import React from 'react';
-import { User, Role } from 'common'
+import { Role, Belt, Stripes } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../theme/Theme';
 import StudentDashboard from './student/Home';
 
 
 const HomePage: React.FC = () => {
-    const user: User = {
-        userId: 'test',
+    const user = {
+        userId: '1',
         role: Role.Student,
         username: 'Liam',
         firstName: 'Liam',
         lastName: 'Heaver',
-        dateOfBirth: new Date(1995, 0, 24),
-        email: 'test@example.com',
-        mobile: '+61400000000'
+        dateOfBirth: new Date(1963, 1, 24),
+        email: 'example@example.com',
+        mobile: '0400000000',
+        rank: {belt: Belt.White, stripes: Stripes.Four}
     }           // Could be moved to login page logic
                                    // once auth is implemented and hoisted to 
                                    // higher app state for easy referring
@@ -29,7 +30,7 @@ const HomePage: React.FC = () => {
             content = (
                 <div>
                     <p>Hello Coach!</p>
-                    <p>Dashboard goes here</p>
+                    <p>Home page placeholder</p>
                 </div>
         )
         break;
@@ -38,7 +39,7 @@ const HomePage: React.FC = () => {
             content = (
                 <div>
                     <p>Hello Admin!</p>
-                    <p>Dashboard goes here</p>
+                    <p>Home page placeholder</p>
                 </div>
         )
         break;

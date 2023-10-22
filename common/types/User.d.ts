@@ -1,4 +1,4 @@
-import { Role } from './Types';
+import { Role, Rank } from './Types';
 export interface User {
     userId: string;
     role: Role;
@@ -8,4 +8,5 @@ export interface User {
     dateOfBirth: Date;
     email: string;
     mobile: string;
+    rank: Rank;
 }

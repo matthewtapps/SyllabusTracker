@@ -1,8 +1,9 @@
-import { TechniqueStatus } from "./Types";
+import { TechniqueStatus, User, Technique } from "./Types";
 
 export interface StudentTechnique {
-    userId: string;
-    techniqueId: string;
+    studentTechniqueId: string;
+    user: User;
+    technique: Technique;
     status: TechniqueStatus;
     studentNotes: string;
     coachNotes: string;

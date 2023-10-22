@@ -10,4 +10,5 @@ import { TechniqueStatus, stringToTechniqueStatus } from './enums/TechniqueStatu
 import { StudentTechnique } from './StudentTechnique';
 import { Gi } from './enums/Gi';
 import { Hierarchy } from './enums/Hierarchies';
-export { User, Technique, InstanceTechnique, Rank, Belt, Permission, Role, Stripes, TechniqueStatus, stringToTechniqueStatus, StudentTechnique, Gi, Hierarchy, };
+import { Module } from './Module';
+export { User, Technique, InstanceTechnique, Rank, Belt, Permission, Role, Stripes, TechniqueStatus, stringToTechniqueStatus, StudentTechnique, Gi, Hierarchy, Module };

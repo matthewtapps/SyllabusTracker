@@ -1,7 +1,9 @@
+import { User, Technique } from './Types'
+
 export interface StudentTechnique {
-    id: string
-    userId: string;
-    techniqueId: string;
+    studentModuleId: string
+    user: User;
+    technique: Technique;
     studentNotes: string;
     coachNotes: string;
 };

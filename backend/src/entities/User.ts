@@ -1,5 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column, Generated } from "typeorm"
-import { User as UserInterface, Role } from 'common'
+import { User as UserInterface, Role, Rank, Belt, Stripes } from 'common'
+
+class EmbeddableRank {
+    @Column()
+    belt: Belt;
+
+    @Column()
+    stripes: Stripes;
+}
 
 @Entity()
 export class User implements UserInterface {
@@ -8,10 +16,7 @@ export class User implements UserInterface {
     @Generated('uuid')
     userId: string;
 
-    @Column({
-        type: "enum",
-        enum: Role
-    })
+    @Column()
     role: Role;
 
     @Column()
@@ -32,4 +37,6 @@ export class User implements UserInterface {
     @Column()
     mobile: string;
 
+    @Column(() => EmbeddableRank)
+    rank: Rank;
 }

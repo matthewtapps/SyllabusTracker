@@ -6,7 +6,7 @@ import MuiButton from '@mui/material/Button'
 import Autocomplete from '@mui/material/Autocomplete'
 import NavBar from '../../components/NavBar'
 import { styled } from '@mui/material/styles'
-import { Technique, Gi, Hierarchy } from 'common'
+import { Technique, Module, Gi, Hierarchy } from 'common'
 
 const TextField = styled((props: TextFieldProps) => (
     <MuiTextField {...props} />
@@ -30,77 +30,70 @@ const Button = styled(MuiButton)({
         marginTop: "10px"
     }
 })
-
-const NewTechnique: React.FC = () => {
+const NewModule: React.FC = () => {
     
-    const [technique, setTechnique] = React.useState({
+    const [module, setModule] = React.useState({
         title: '',
-        videoSrc: '',
         description: '',
         globalNotes: '',
         gi: '',
-        hierarchy: '',
         type: '',
-        typeDescription: '',
         position: '',
-        positionDescription: '',
         openGuard: '',
-        openGuardDescription: '',
+        hierarchy: ''
     })
     
     // Autocomplete suggestions
+    const [techniques, setTechniques] = React.useState<Technique[]>([]);
     const [titleSuggestions, setTitleSuggestions] = React.useState<string[]>([]);
     const [giSuggestions, setGiSuggestions] = React.useState<string[]>([]);
-    const [hierarchySuggestions, setHierarchySuggestions] = React.useState<string[]>([]);
     const [typeSuggestions, setTypeSuggestions] = React.useState<string[]>([]);
     const [positionSuggestions, setPositionSuggestions] = React.useState<string[]>([]);
     const [openGuardSuggestions, setOpenGuardSuggestions] = React.useState<string[]>([]);
+    const [hierarchySuggestions, setHierarchySuggestions] = React.useState<string[]>([]);
 
-    // Technique field displays
-    const [showTypeDescription, setShowTypeDescription] = React.useState(false)
-    const [showPositionDescription, setShowPositionDescription] = React.useState(false)
+    // Module field displays
     const [showOpenGuardField, setShowOpenGuardField] = React.useState(false)
-    const [showOpenGuardDescription, setShowOpenGuardDescription] = React.useState(false)
-
-    // Errors
-    const [titleError, setTitleError] = React.useState(false);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setTechnique(prevTechnique => ({ ...prevTechnique, [name]: value }));
+        setModule(prevTechnique => ({ ...prevTechnique, [name]: value }));
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        const validTechnique = transformTechniqueForBackend(technique);
-        if (!validTechnique) {
+        const validModule = transformModuleForBackend(module);
+        if (!validModule) {
             alert('Not a valid technique posted')
             return
         };
         
-        await postTechnique(validTechnique);
+        await postModule(validModule);
         }
 
     React.useEffect(() => {
         (async () => {
             try {
-                const [typeResponse, titleResponse, positionResponse, openGuardResponse] = await Promise.all([
+                const [titleResponse, techniqueResponse, typeResponse, positionResponse, openGuardResponse] = await Promise.all([
+                    fetch('http://localhost:3000/api/module/titles'),
+                    fetch('http://localhost:3000/api/technique'),
                     fetch('http://localhost:3000/api/technique/types'),
-                    fetch('http://localhost:3000/api/technique/titles'),
                     fetch('http://localhost:3000/api/technique/positions'),
-                    fetch('http://localhost:3000/api/technique/openGuards')
+                    fetch('http://localhost:3000/api/technique/openGuards'),
                 ]);
 
                 interface TitleObject {
                     title: string
                 }
-    
+                
+                const techniques = (await techniqueResponse.json())
                 const types = (await typeResponse.json()).map((typeObj: TitleObject) => typeObj.title);
                 const titles = (await titleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
                 const positions = (await positionResponse.json()).map((positionObj: TitleObject) => positionObj.title);
                 const openGuards = (await openGuardResponse.json()).map((openGuardObj: TitleObject) => openGuardObj.title);
     
+                setTechniques(techniques)
                 setTypeSuggestions(types);
                 setTitleSuggestions(titles);
                 setPositionSuggestions(positions);
@@ -115,17 +108,16 @@ const NewTechnique: React.FC = () => {
 
     return (
         <div>
-        <NavBar text="New Technique"/>
+        <NavBar text="New Module"/>
         <Card>
             <CardContent>
                 <form onSubmit={handleSubmit}>
                     <Autocomplete
                         options={titleSuggestions}
                         freeSolo
-                        inputValue={technique.title}
+                        inputValue={module.title}
                         onInputChange={(event, newValue) => {
-                            setTechnique(prevTechnique => ({ ...prevTechnique, title: newValue }));
-                            setTitleError(titleSuggestions.includes(newValue));
+                            setModule(prevTechnique => ({ ...prevTechnique, title: newValue }));
                         }}
                         openOnFocus={false}
                         filterOptions={(options, { inputValue }) => {
@@ -137,160 +129,123 @@ const NewTechnique: React.FC = () => {
                             <TextField
                                 {...params}
                                 fullWidth
-                                label="Technique Title"
+                                label="Module Title"
                                 variant="outlined"
-                                error={titleError}
-                                helperText={titleError ? "Technique already exists" : ''}
                             />
                         )}
                     />
 
                     <TextField
                         fullWidth
-                        label="Video Source"
-                        name="videoSrc"
-                        value={technique.videoSrc}
-                        onChange={handleInputChange}
-                        variant="outlined"
-                    />
-                    <TextField
-                        fullWidth
-                        label="Technique Description"
+                        label="Module Description"
                         name="description"
-                        value={technique.description}
+                        value={module.description}
                         onChange={handleInputChange}
                         variant="outlined"
                     />
                     <TextField
                         fullWidth
-                        label="Global Notes"
+                        label="Optional: Global Notes"
                         name="globalNotes"
-                        value={technique.globalNotes}
+                        value={module.globalNotes}
                         onChange={handleInputChange}
                         variant="outlined"
                     />
                     <Autocomplete
                         options={giSuggestions}
-                        inputValue={technique.gi}
+                        inputValue={module.gi}
                         onInputChange={(event, newValue) => {
-                            setTechnique(prevGi => ({ ...prevGi, gi: newValue }));
+                            setModule(prevGi => ({ ...prevGi, gi: newValue }));
                         }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
                                 fullWidth
-                                label="Gi or No Gi"
+                                label="Optional: Gi or No Gi"
                                 variant="outlined"
+                                name="gi"
                             />
                         )}
                     />
                     <Autocomplete
                         options={hierarchySuggestions}
-                        inputValue={technique.hierarchy}
+                        inputValue={module.hierarchy}
                         onInputChange={(event, newValue) => {
-                            setTechnique(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
+                            setModule(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
                         }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
                                 fullWidth
-                                label="Hierarchy"
+                                label="Optional: Hierarchy"
                                 variant="outlined"
+                                name="hierarchy"
                             />
                         )}
                     />
                     <Autocomplete
                         freeSolo
                         options={typeSuggestions}
-                        inputValue={technique.type}
+                        inputValue={module.type}
                         onInputChange={(event, newValue) => {
-                            setTechnique(prevType => ({ ...prevType, type: newValue }));
+                            setModule(prevType => ({ ...prevType, type: newValue }));
                             const matchingSuggestions = typeSuggestions.filter(option => 
                                 option.toLowerCase().includes(newValue.toLowerCase())
                             );
-                            setShowTypeDescription(matchingSuggestions.length === 0);
                         }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
                                 fullWidth
-                                label="Type"
+                                label="Optional: Type"
                                 variant="outlined"
+                                name="type"
                             />
                         )}
                     />
-                    {showTypeDescription && (
-                        <TextField
-                            fullWidth
-                            label="Type Description"
-                            name="typeDescription"
-                            value={technique.typeDescription}
-                            onChange={handleInputChange}
-                            variant="outlined"
-                        />
-                    )}
+
                     <Autocomplete
                         freeSolo
                         options={positionSuggestions}
-                        inputValue={technique.position}
+                        inputValue={module.position}
                         onInputChange={(event, newValue) => {
-                            setTechnique(prevPosition => ({ ...prevPosition, position: newValue }));
+                            setModule(prevPosition => ({ ...prevPosition, position: newValue }));
                             const matchingSuggestions = positionSuggestions.filter(option => 
                                 option.toLowerCase().includes(newValue.toLowerCase())
                             );
-                            setShowPositionDescription(matchingSuggestions.length === 0);
                             setShowOpenGuardField(newValue.toLowerCase() === "open guard");
                         }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
                                 fullWidth
-                                label="Position"
+                                label="Optional: Position"
                                 variant="outlined"
+                                name="position"
                             />
                         )}
                     />
-                    {showPositionDescription && (
-                        <TextField
-                            fullWidth
-                            label="Position Description"
-                            name="positionDescription"
-                            value={technique.positionDescription}
-                            onChange={handleInputChange}
-                            variant="outlined"
-                        />
-                    )}
+
                     {showOpenGuardField && (
                         <Autocomplete
                             options={openGuardSuggestions}
                             freeSolo
-                            inputValue={technique.openGuard}
+                            inputValue={module.openGuard}
                             onInputChange={(event, newValue) => {
-                                setTechnique(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
+                                setModule(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
                                 const matchingSuggestions = openGuardSuggestions.filter(option => 
                                     option.toLowerCase().includes(newValue.toLowerCase())
                                 );
-                                setShowOpenGuardDescription(matchingSuggestions.length === 0);
                             }}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Open Guard"
+                                    label="Optional: Open Guard"
                                     name="openGuard"
                                     variant="outlined"
                                 />
                             )}
-                        />
-                    )}
-                    {showOpenGuardDescription && showOpenGuardField && (
-                        <TextField
-                            fullWidth
-                            label="Open Guard Description"
-                            name="openGuardDescription"
-                            value={technique.openGuardDescription}
-                            onChange={handleInputChange}
-                            variant="outlined"
                         />
                     )}
                     <Button variant="contained" color="primary" type="submit">
@@ -303,33 +258,32 @@ const NewTechnique: React.FC = () => {
 );
 };
 
-const transformTechniqueForBackend = (technique: any): Technique | null => {
-    if (!Object.values(Gi).includes(technique.gi)) {
+const transformModuleForBackend = (module: any): Module | null => {
+    if (!Object.values(Gi).includes(module.gi)) {
       alert('Invalid Gi value');
       return null;
     }
   
-    if (!Object.values(Hierarchy).includes(technique.hierarchy)) {
+    if (!Object.values(Hierarchy).includes(module.hierarchy)) {
       alert('Invalid Hierarchy value');
       return null;
     }
 
     return {
-      ...technique,
-      gi: technique.gi as Gi,
-      hierarchy: technique.hierarchy as Hierarchy,
+      ...module,
+      gi: module.gi as Gi,
+      hierarchy: module.hierarchy as Hierarchy,
     };
   }
 
-const postTechnique = async (technique: Technique) => {
-    console.log(technique)
+const postModule = async (module: Module) => {
     try {
-        const response = await fetch('http://localhost:3000/api/technique', {
+        const response = await fetch('http://localhost:3000/api/module', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(technique),
+            body: JSON.stringify(module),
         });
   
         if (!response.ok) {
@@ -344,4 +298,4 @@ const postTechnique = async (technique: Technique) => {
         }
 };
 
-export default NewTechnique;
+export default NewModule;

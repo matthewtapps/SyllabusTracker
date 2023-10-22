@@ -13,7 +13,8 @@ import {
     stringToTechniqueStatus,
     StudentTechnique,
     Gi,
-    Hierarchy
+    Hierarchy,
+    Module
 } from './types/Types'
 
 export { 
@@ -32,5 +33,6 @@ export {
     validateStudentTechniques,
     validateTechniques,
     Gi,
-    Hierarchy
+    Hierarchy,
+    Module
 }

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, Generated } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated } from "typeorm";
 import { Technique } from "./Technique";
 import { StudentTechnique as StudentTechniqueInterface } from "common";
 import { User } from "./User";
@@ -11,18 +11,10 @@ export class StudentTechnique implements StudentTechniqueInterface {
     studentTechniqueId: string;
 
     @ManyToOne(() => User)
-    _userId: User;
-
-    get userId(): string {
-        return this._userId.userId
-    }
+    user: User;
 
     @ManyToOne(() => Technique)
-    _techniqueId: Technique;
-
-    get techniqueId(): string {
-        return this._techniqueId.techniqueId
-    }
+    technique: Technique;
 
     @Column()
     status: TechniqueStatus;

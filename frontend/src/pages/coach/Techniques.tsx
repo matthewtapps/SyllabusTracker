@@ -47,7 +47,7 @@ const Card = styled(MuiCard)({
     }
 });
 
-function StudentTechniques(): JSX.Element {
+function CoachTechniques(): JSX.Element {
     const [loading, setLoading] = React.useState(true);
     const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
     const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
@@ -274,4 +274,4 @@ function StudentTechniques(): JSX.Element {
         </div>
         );};
 
-export default StudentTechniques
+export default CoachTechniques

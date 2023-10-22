@@ -34,6 +34,6 @@ export class Technique implements TechniqueInterface {
     @ManyToOne(() => Position)
     position: Position;
 
-    @ManyToOne(() => OpenGuard, { nullable: true})
-    openGuard: OpenGuard | null;
+    @ManyToOne(() => OpenGuard)
+    openGuard: OpenGuard;
 }

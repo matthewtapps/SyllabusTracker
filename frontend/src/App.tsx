@@ -5,6 +5,7 @@ import NewTechniquePage from "./pages/coach/NewTechnique";
 import TechniquesPage from "./pages/TechniquesPage";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/Theme";
+import NewModulePage from "./pages/NewModulePage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" Component={HomePage} />
           <Route path="/newtechnique" Component={NewTechniquePage} />
           <Route path="/techniques" Component={TechniquesPage} />
+          <Route path="/newmodule" Component={NewModulePage}/>
         </Routes>
       </Router>
     </ThemeProvider>

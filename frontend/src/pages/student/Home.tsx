@@ -9,6 +9,7 @@ import MuiArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Box from '@mui/material/Box'
 import { useNavigate } from 'react-router-dom'
 
+
 const Typography = styled(MuiTypography)({
     '&.DashboardCard-heading': {
         padding: "10px",

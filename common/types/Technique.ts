@@ -9,8 +9,13 @@ export interface Technique {
     globalNotes: string;
     gi: Gi;
     hierarchy: Hierarchy;
-    type: string; // Technique Type relational database object
-    position: string; // Technqiue Position relational database object
-    openGuard: string | null; // Technique OpenGuard relational database object
+    type: DTO; // Technique Type relational database object
+    position: DTO; // Technqiue Position relational database object
+    openGuard?: DTO; // Technique OpenGuard relational database object
                               // May be null if position is not an open guard
+}
+
+interface DTO {
+    title: string;
+    description: string;
 }

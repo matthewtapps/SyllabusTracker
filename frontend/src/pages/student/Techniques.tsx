@@ -16,12 +16,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 
 
-interface FrontendTechnique extends Technique {
-    _type: { title: string; description: string; };
-    _position: { title: string; description: string; };
-    _openGuard: { title: string; description: string; } | null;
-  }
-
 const Accordion = styled((props: AccordionProps) => (
     <MuiAccordion disableGutters {...props} />
 ))(({ theme }) => ({
@@ -55,7 +49,7 @@ const Card = styled(MuiCard)({
 
 function StudentTechniques(): JSX.Element {
     const [loading, setLoading] = React.useState(true);
-    const [techniquesList, setTechniquesList] = React.useState<FrontendTechnique[]>([])
+    const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
     const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
     const [positionOptions, setPositionOptions] = React.useState<string[]>([]);
@@ -77,7 +71,7 @@ function StudentTechniques(): JSX.Element {
                     fetch('http://localhost:3000/api/technique')
                 ]);
 
-                const techniques: FrontendTechnique[] = await (techniqueResponse.json())
+                const techniques: Technique[] = await (techniqueResponse.json())
                 setTechniquesList(techniques)
 
                 const types: string[] = []
@@ -85,14 +79,14 @@ function StudentTechniques(): JSX.Element {
                 const openGuards: string[] = []
 
                 techniques.forEach(technique => {
-                    if (!types.includes(technique._type.title)) {
-                        types.push(technique._type.title);
+                    if (!types.includes(technique.type.title)) {
+                        types.push(technique.type.title);
                     }
-                    if (!positions.includes(technique._position.title)) {
-                        positions.push(technique._position.title);
+                    if (!positions.includes(technique.position.title)) {
+                        positions.push(technique.position.title);
                     }
-                    if (technique._openGuard && !openGuards.includes(technique._openGuard.title)) {
-                        openGuards.push(technique._openGuard.title);
+                    if (technique.openGuard && !openGuards.includes(technique.openGuard.title)) {
+                        openGuards.push(technique.openGuard.title);
                     }
                 });
                 
@@ -115,9 +109,9 @@ function StudentTechniques(): JSX.Element {
     const filteredTechniques = techniquesList.filter(technique => {
         return (!filters.title.toLowerCase() || technique.title.includes(filters.title.toLowerCase())) &&
                (!filters.hierarchy || technique.hierarchy.includes(filters.hierarchy)) &&
-               (!filters.type || technique._type.title.includes(filters.type)) &&
-               (!filters.position || technique._position.title.includes(filters.position)) &&
-               (!filters.openGuard || (technique._openGuard && technique._openGuard.title.includes(filters.openGuard))) &&
+               (!filters.type || technique.type.title.includes(filters.type)) &&
+               (!filters.position || technique.position.title.includes(filters.position)) &&
+               (!filters.openGuard || (technique.openGuard && technique.openGuard.title.includes(filters.openGuard))) &&
                (!filters.gi || giFilterMatch(filters.gi, technique.gi));
     });
 
@@ -230,11 +224,11 @@ function StudentTechniques(): JSX.Element {
                                 </ListItem>
 
                                 <ListItem>
-                                    <ListItemText primary="Position" secondary={technique._position.title} />
+                                    <ListItemText primary="Position" secondary={technique.position.title} />
                                 </ListItem>
 
                                 <ListItem>
-                                    <ListItemText secondary={technique._position.description} />
+                                    <ListItemText secondary={technique.position.description} />
                                 </ListItem>
 
                                 <ListItem>
@@ -242,21 +236,21 @@ function StudentTechniques(): JSX.Element {
                                 </ListItem>
 
                                 <ListItem>
-                                    <ListItemText primary="Type" secondary={technique._type.title} />
+                                    <ListItemText primary="Type" secondary={technique.type.title} />
                                 </ListItem>
 
                                 <ListItem>
-                                    <ListItemText secondary={technique._type.description} />
+                                    <ListItemText secondary={technique.type.description} />
                                 </ListItem>
 
-                                {technique._openGuard && (
+                                {technique.openGuard && (
                                     <div>
                                         <ListItem>
-                                            <ListItemText primary="Open Guard" secondary={technique._openGuard.title} />
+                                            <ListItemText primary="Open Guard" secondary={technique.openGuard.title} />
                                         </ListItem>
 
                                         <ListItem>
-                                            <ListItemText secondary={technique._openGuard.description} />
+                                            <ListItemText secondary={technique.openGuard.description} />
                                         </ListItem>
                                     </div>
                                 )}

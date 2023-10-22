@@ -1,11 +1,21 @@
 import React from 'react';
-import { User, Role, fetchUser } from 'common'
+import { User, Role } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../theme/Theme';
 import StudentDashboard from './student/Home';
 
+
 const HomePage: React.FC = () => {
-    const user: User = fetchUser() // Could be moved to login page logic
+    const user: User = {
+        userId: 'test',
+        role: Role.Student,
+        username: 'Liam',
+        firstName: 'Liam',
+        lastName: 'Heaver',
+        dateOfBirth: new Date(1995, 0, 24),
+        email: 'test@example.com',
+        mobile: '+61400000000'
+    }           // Could be moved to login page logic
                                    // once auth is implemented and hoisted to 
                                    // higher app state for easy referring
     

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import { validateTechniques } from '../../shared/validators/validateGlobalTechniques';
-import { Technique } from '../../shared/types/Technique';
+import { validateTechniques } from 'common';
+import { Technique } from 'common';
 
 let techniquesPath = "./dummy_data/techniques.json";
 

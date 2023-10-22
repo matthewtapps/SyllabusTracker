@@ -24,11 +24,11 @@ const NewTechnique: React.FC = () => {
         gi: '',
         hierarchy: '',
         type: '',
+        typeDescription: '',
         position: '',
+        positionDescription: '',
         openGuard: '',
         openGuardDescription: '',
-        typeDescription: '',
-        positionDescription: '',
     })
     
     // Autocomplete suggestions

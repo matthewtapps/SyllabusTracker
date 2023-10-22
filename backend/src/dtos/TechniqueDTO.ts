@@ -1,6 +1,11 @@
-import { Hierarchy } from "./Types";
-import { Gi } from "./enums/Gi";
-export interface Technique {
+import { Gi, Hierarchy } from "common";
+
+class DTO{
+    title: string
+    description: string
+}
+
+export default class TechniqueDTO {
     techniqueId: string;
     title: string;
     videoSrc: string;
@@ -12,8 +17,3 @@ export interface Technique {
     position: DTO;
     openGuard?: DTO;
 }
-interface DTO {
-    title: string;
-    description: string;
-}
-export {};

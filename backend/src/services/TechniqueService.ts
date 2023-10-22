@@ -27,7 +27,7 @@ export class TechniqueService {
         if (data.openGuard) {
             openGuard = await openGuardRepo.findOne({ where: { title: data.openGuard } });
             if (!openGuard) {
-                openGuard = openGuardRepo.create({ title: data.openGuard });
+                openGuard = openGuardRepo.create({ title: data.openGuard, description: data.openGuardDescription });
                 await openGuardRepo.save(openGuard);
             }
         }
@@ -39,9 +39,11 @@ export class TechniqueService {
         technique.globalNotes = data.globalNotes;
         technique.gi = data.gi;
         technique.hierarchy = data.hierarchy;
-        technique._type = type;
-        technique._position = position;
-        technique._openGuard = openGuard;
+        technique.type = type;
+        technique.position = position;
+        if (openGuard) {
+            technique.openGuard = openGuard;
+        }
 
         return await techniqueRepo.save(technique);
     };
@@ -56,7 +58,7 @@ export class TechniqueService {
     async getAllTechniques(): Promise<Technique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const techniques = await techniqueRepo.find({
-            relations: ["_type", "_position", "_openGuard"]
+            relations: ["type", "position", "openGuard"]
         })
 
         return techniques

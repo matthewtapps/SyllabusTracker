@@ -4,7 +4,7 @@ import MuiTextField, { TextFieldProps} from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Autocomplete from '@mui/material/Autocomplete'
-import NavBar from '../NavBar'
+import NavBar from '../../components/NavBar'
 import { styled } from '@mui/material/styles'
 import { Technique, Gi, Hierarchy } from 'common'
 
@@ -14,7 +14,7 @@ const TextField = styled((props: TextFieldProps) => (
     backgroundColor: '#3c3836'
 }))
 
-const NewTechniquePage: React.FC = () => {
+const NewTechnique: React.FC = () => {
     
     const [technique, setTechnique] = React.useState({
         title: '',
@@ -366,4 +366,4 @@ const postTechnique = async (technique: Technique) => {
         }
 };
 
-export default NewTechniquePage;
+export default NewTechnique;

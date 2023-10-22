@@ -11,7 +11,9 @@ import { Card } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Technique } from 'common'
 import { styled } from '@mui/material/styles'
-import NavBar from '../NavBar'
+import NavBar from '../../components/NavBar'
+import CircularProgress from '@mui/material/CircularProgress'
+import Box from '@mui/material/Box'
 
 
 interface FrontendTechnique extends Technique {
@@ -69,8 +71,8 @@ const ListItemText = styled((props: ListItemTextProps) => (
     },
 }))
 
-
-function TechniquesList(): JSX.Element {
+function StudentTechniques(): JSX.Element {
+    const [loading, setLoading] = React.useState(true);
     const [techniquesList, setTechniquesList] = React.useState<FrontendTechnique[]>([])
     const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
@@ -95,11 +97,11 @@ function TechniquesList(): JSX.Element {
 
                 const techniques: FrontendTechnique[] = await (techniqueResponse.json())
                 setTechniquesList(techniques)
-                
+
                 const types: string[] = []
                 const positions: string[] = []
                 const openGuards: string[] = []
-                
+
                 techniques.forEach(technique => {
                     if (!types.includes(technique._type.title)) {
                         types.push(technique._type.title);
@@ -115,9 +117,11 @@ function TechniquesList(): JSX.Element {
                 setTypeOptions(types)
                 setPositionOptions(positions)
                 setOpenGuardOptions(openGuards)
+                setLoading(false)
 
             } catch (error) {
                 alert(`Error fetching data: ${error}`);
+                setLoading(false)
             }
         })();
     }, []);
@@ -243,69 +247,74 @@ function TechniquesList(): JSX.Element {
                 borderRadius: 2,
                 boxShadow: 3
             }}>
-            {filteredTechniques.map(technique => (
-                <React.Fragment key={technique.techniqueId}>
-                    <Accordion>
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon sx={{color: "#fbf1c7"}}/>}
-                            aria-controls="panel1a-content"
-                        >
-                            <Typography variant="h5">{technique.title}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <ListItem>
-                                <ListItemText primary="Description" secondary={technique.description} />
-                            </ListItem>
-
-                            <ListItem>
-                                <ListItemText primary="Position" secondary={technique._position.title} />
-                            </ListItem>
-
-                            <ListItem>
-                                <ListItemText secondary={technique._position.description} />
-                            </ListItem>
-
-                            <ListItem>
-                                <ListItemText primary="Hierarchy" secondary={technique.hierarchy} />
-                            </ListItem>
-
-                            <ListItem>
-                                <ListItemText primary="Type" secondary={technique._type.title} />
-                            </ListItem>
-
-                            <ListItem>
-                                <ListItemText secondary={technique._type.description} />
-                            </ListItem>
-                            
-                            {technique._openGuard && (
-                                <div>
-                                    <ListItem>
-                                        <ListItemText primary="Open Guard" secondary={technique._openGuard.title} />
-                                    </ListItem>
-
-                                    <ListItem>
-                                        <ListItemText secondary={technique._openGuard.description} />
-                                    </ListItem>
-                                </div>
-                            )}
-                            
-                            <ListItem>
-                                <ListItemText primary="Gi or No Gi" secondary={technique.gi} />
-                            </ListItem>
-                            
-                            {technique.globalNotes && (
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+                    <CircularProgress />
+                </Box>
+            ) : (
+                filteredTechniques.map(technique => (
+                    <React.Fragment key={technique.techniqueId}>
+                        <Accordion>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon sx={{color: "#fbf1c7"}}/>}
+                                aria-controls="panel1a-content"
+                            >
+                                <Typography variant="h5">{technique.title}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
                                 <ListItem>
-                                    <ListItemText primary="Global Notes" secondary={technique.globalNotes} />
+                                    <ListItemText primary="Description" secondary={technique.description} />
                                 </ListItem>
-                            )}
 
-                        </AccordionDetails>
-                    </Accordion>
-                </React.Fragment>
-                ))}
+                                <ListItem>
+                                    <ListItemText primary="Position" secondary={technique._position.title} />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText secondary={technique._position.description} />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="Hierarchy" secondary={technique.hierarchy} />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="Type" secondary={technique._type.title} />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText secondary={technique._type.description} />
+                                </ListItem>
+
+                                {technique._openGuard && (
+                                    <div>
+                                        <ListItem>
+                                            <ListItemText primary="Open Guard" secondary={technique._openGuard.title} />
+                                        </ListItem>
+
+                                        <ListItem>
+                                            <ListItemText secondary={technique._openGuard.description} />
+                                        </ListItem>
+                                    </div>
+                                )}
+
+                                <ListItem>
+                                    <ListItemText primary="Gi or No Gi" secondary={technique.gi} />
+                                </ListItem>
+                                
+                                {technique.globalNotes && (
+                                    <ListItem>
+                                        <ListItemText primary="Global Notes" secondary={technique.globalNotes} />
+                                    </ListItem>
+                                )}
+
+                            </AccordionDetails>
+                        </Accordion>
+                    </React.Fragment>
+                )))
+            }
             </Card>
         </div>
-    )
-}
+        );};
 
-export default TechniquesList
+export default StudentTechniques

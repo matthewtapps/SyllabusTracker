@@ -2,9 +2,9 @@ import React from 'react';
 import { User, Role, fetchUser } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../theme/Theme';
-import StudentDashboard from './student/Home';
+import NewTechnique from './coach/NewTechnique';
 
-const HomePage: React.FC = () => {
+const NewTechniquePage: React.FC = () => {
     const user: User = fetchUser() // Could be moved to login page logic
                                    // once auth is implemented and hoisted to 
                                    // higher app state for easy referring
@@ -12,16 +12,15 @@ const HomePage: React.FC = () => {
     let content: React.ReactNode
     switch(user.role) {
         case Role.Student:
-        content = StudentDashboard()
+        content = (
+            <div>
+                <p>Incorrect permissions</p>
+            </div>
+        )
         break;
 
         case Role.Coach:
-            content = (
-                <div>
-                    <p>Hello Coach!</p>
-                    <p>Dashboard goes here</p>
-                </div>
-        )
+            content = <NewTechnique/>
         break;
         
         case Role.Admin:
@@ -43,4 +42,4 @@ const HomePage: React.FC = () => {
     );
 };
 
-export default HomePage;
+export default NewTechniquePage;

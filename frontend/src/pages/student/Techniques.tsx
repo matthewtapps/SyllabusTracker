@@ -25,12 +25,7 @@ interface FrontendTechnique extends Technique {
 const Accordion = styled((props: AccordionProps) => (
     <MuiAccordion disableGutters {...props} />
 ))(({ theme }) => ({
-    borderBottom: `1px solid`,
     backgroundColor: `#3c3836`,
-    color: `#fbf1c7`,
-    '&:last-child': {
-        borderBottom: 0,
-    }
 }))
 
 const ListItem = styled((props: ListItemProps) => (
@@ -43,8 +38,6 @@ const ListItem = styled((props: ListItemProps) => (
 const ListItemText = styled((props: ListItemTextProps) => (
     <MuiListItemText primaryTypographyProps={{variant: 'h6'}} secondaryTypographyProps={{variant: 'body1'}}{...props} />
 ))(({ theme }) => ({
-    '& .MuiListItemText-primary': {        
-    },
     '& .MuiListItemText-secondary': {
         paddingLeft: "8px"
     },

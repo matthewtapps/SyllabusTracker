@@ -24,7 +24,6 @@ const Card = styled(MuiCard)({
         marginRight: "10px",
         border: "1px",
         borderRadius: "2",
-        boxShadow: "3"
     }
 });
 
@@ -32,7 +31,6 @@ const ArrowForwardIosIcon = styled(MuiArrowForwardIosIcon)({
     paddingRight: "8px",
     fontSize: "2em"
 });
-
 
 function StudentDashboard(): React.ReactNode {
     const navigate = useNavigate();

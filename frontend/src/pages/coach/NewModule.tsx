@@ -189,7 +189,7 @@ const NewModule: React.FC = () => {
                         inputValue={module.type}
                         onInputChange={(event, newValue) => {
                             setModule(prevType => ({ ...prevType, type: newValue }));
-                            const matchingSuggestions = typeSuggestions.filter(option => 
+                            typeSuggestions.filter(option => 
                                 option.toLowerCase().includes(newValue.toLowerCase())
                             );
                         }}
@@ -210,7 +210,7 @@ const NewModule: React.FC = () => {
                         inputValue={module.position}
                         onInputChange={(event, newValue) => {
                             setModule(prevPosition => ({ ...prevPosition, position: newValue }));
-                            const matchingSuggestions = positionSuggestions.filter(option => 
+                            positionSuggestions.filter(option => 
                                 option.toLowerCase().includes(newValue.toLowerCase())
                             );
                             setShowOpenGuardField(newValue.toLowerCase() === "open guard");
@@ -233,7 +233,7 @@ const NewModule: React.FC = () => {
                             inputValue={module.openGuard}
                             onInputChange={(event, newValue) => {
                                 setModule(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
-                                const matchingSuggestions = openGuardSuggestions.filter(option => 
+                                openGuardSuggestions.filter(option => 
                                     option.toLowerCase().includes(newValue.toLowerCase())
                                 );
                             }}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Role, fetchUser } from 'common'
+import { Role } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../theme/Theme';
 import NewModule from './coach/NewModule';

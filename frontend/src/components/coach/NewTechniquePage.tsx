@@ -26,6 +26,7 @@ const NewTechniquePage: React.FC = () => {
         type: '',
         position: '',
         openGuard: '',
+        openGuardDescription: '',
         typeDescription: '',
         positionDescription: '',
     })
@@ -42,6 +43,7 @@ const NewTechniquePage: React.FC = () => {
     const [showTypeDescription, setShowTypeDescription] = React.useState(false)
     const [showPositionDescription, setShowPositionDescription] = React.useState(false)
     const [showOpenGuardField, setShowOpenGuardField] = React.useState(false)
+    const [showOpenGuardDescription, setShowOpenGuardDescription] = React.useState(false)
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -176,7 +178,6 @@ const NewTechniquePage: React.FC = () => {
                                     fullWidth
                                     label="Gi or No Gi"
                                     variant="outlined"
-                                    color="primary"
                                 />
                             )}
                         />
@@ -195,7 +196,6 @@ const NewTechniquePage: React.FC = () => {
                                     fullWidth
                                     label="Hierarchy"
                                     variant="outlined"
-                                    color="primary"
                                 />
                             )}
                         />
@@ -219,7 +219,6 @@ const NewTechniquePage: React.FC = () => {
                                     fullWidth
                                     label="Type"
                                     variant="outlined"
-                                    color="primary"
                                 />
                             )}
                         />
@@ -257,7 +256,6 @@ const NewTechniquePage: React.FC = () => {
                                     fullWidth
                                     label="Position"
                                     variant="outlined"
-                                    color="primary"
                                 />
                             )}
                         />
@@ -284,6 +282,10 @@ const NewTechniquePage: React.FC = () => {
                                 inputValue={technique.openGuard}
                                 onInputChange={(event, newValue) => {
                                     setTechnique(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
+                                    const matchingSuggestions = openGuardSuggestions.filter(option => 
+                                        option.toLowerCase().includes(newValue.toLowerCase())
+                                    );
+                                    setShowOpenGuardDescription(matchingSuggestions.length === 0);
                                 }}
                                 renderInput={(params) => (
                                     <TextField
@@ -292,9 +294,21 @@ const NewTechniquePage: React.FC = () => {
                                         label="Open Guard"
                                         name="openGuard"
                                         variant="outlined"
-                                        color="primary"
                                     />
                                 )}
+                            />
+                        </Grid>
+                    )}
+
+                    {showOpenGuardDescription && showOpenGuardField && (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Open Guard Description"
+                                name="openGuardDescription"
+                                value={technique.openGuardDescription}
+                                onChange={handleInputChange}
+                                variant="outlined"
                             />
                         </Grid>
                     )}

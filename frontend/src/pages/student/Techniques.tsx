@@ -1,13 +1,13 @@
 import React from 'react'
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
-import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary'
-import MuiAccordionDetails, { AccordionDetailsProps } from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
 import MuiListItem, { ListItemProps } from '@mui/material/ListItem'
 import MuiListItemText, { ListItemTextProps} from '@mui/material/ListItemText'
 import TextField from '@mui/material/TextField'
 import Autocomplete from '@mui/material/Autocomplete'
 import Typography from '@mui/material/Typography'
-import { Card } from '@mui/material'
+import MuiCard from '@mui/material/Card'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Technique } from 'common'
 import { styled } from '@mui/material/styles'
@@ -23,33 +23,14 @@ interface FrontendTechnique extends Technique {
   }
 
 const Accordion = styled((props: AccordionProps) => (
-    <MuiAccordion disableGutters elevation={0} square {...props} />
+    <MuiAccordion disableGutters {...props} />
 ))(({ theme }) => ({
-    borderBottom: `1px solid ${theme.palette.secondary.main}`,
+    borderBottom: `1px solid`,
     backgroundColor: `#3c3836`,
     color: `#fbf1c7`,
     '&:last-child': {
         borderBottom: 0,
-    },
-    '&:before': {
-        display: 'none',
     }
-}))
-
-const AccordionSummary = styled((props: AccordionSummaryProps) => (
-    <MuiAccordionSummary {...props} />
-))(({ theme }) => ({
-    border: `1px solid ${theme.palette.secondary}`,
-    backgroundColor: `#3c3836`,
-    color: `#fbf1c7`
-}))
-
-const AccordionDetails = styled((props: AccordionDetailsProps) => (
-    <MuiAccordionDetails {...props} />
-))(({ theme }) => ({
-    border: `1px solid ${theme.palette.secondary}`,
-    backgroundColor: `#282828`,
-    color: `#fbf1c7`
 }))
 
 const ListItem = styled((props: ListItemProps) => (
@@ -62,14 +43,22 @@ const ListItem = styled((props: ListItemProps) => (
 const ListItemText = styled((props: ListItemTextProps) => (
     <MuiListItemText primaryTypographyProps={{variant: 'h6'}} secondaryTypographyProps={{variant: 'body1'}}{...props} />
 ))(({ theme }) => ({
-    '& .MuiListItemText-primary': {
-        color: `#fbf1c7`,
-        
+    '& .MuiListItemText-primary': {        
     },
     '& .MuiListItemText-secondary': {
-        color: `#fbf1c7`,
+        paddingLeft: "8px"
     },
 }))
+
+const Card = styled(MuiCard)({
+    '&.MuiCard-root': {
+        marginLeft: "10px",
+        marginTop: "10px",
+        marginRight: "10px",
+        borderRadius: "2",
+        boxShadow: "3"
+    }
+});
 
 function StudentTechniques(): JSX.Element {
     const [loading, setLoading] = React.useState(true);
@@ -141,27 +130,20 @@ function StudentTechniques(): JSX.Element {
 
     return (
         <div>
-            <NavBar text="All Techniques"/>
-            <Card sx={{
-                backgroundColor: "#3c3836",
-                color: "#fbf1c7",
-                margin: 2,
-                border: 1,
-                borderRadius: 2,
-                boxShadow: 3
-            }}>
+            <NavBar text="Techniques"/>
+            <Card>
                 <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color: "#fbf1c7"}}/>}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                         <TextField
-                            fullWidth
-                            label="Title"
+                            label="Filter"
                             value={filters.title}
                             onChange={e => setFilters(prev => ({ ...prev, title: e.target.value }))}
+                            onClick={e => e.stopPropagation()}
+                            variant="outlined"
                         />
                     </AccordionSummary>
                     <AccordionDetails>
                         <Autocomplete
-                            freeSolo={false}
                             options={giOptions}
                             value={filters.gi}
                             onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue }))}
@@ -170,12 +152,11 @@ function StudentTechniques(): JSX.Element {
                                     {...params}
                                     fullWidth
                                     label="Yes Gi or No Gi"
-                                    variant="outlined"
+                                    sx={{marginRight: "10px"}}
                                 />
                             )}
                         />
                         <Autocomplete
-                            freeSolo={false}
                             options={hierarchyOptions}
                             value={filters.hierarchy}
                             onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, hierarchy: newValue }))}
@@ -184,13 +165,11 @@ function StudentTechniques(): JSX.Element {
                                     {...params}
                                     fullWidth
                                     label="Hierarchy"
-                                    variant="outlined"
                                     sx={{marginTop: "10px"}}
                                 />
                             )}
                         />
                         <Autocomplete
-                            freeSolo={false}
                             options={typeOptions}
                             value={filters.type}
                             onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, type: newValue }))}
@@ -205,7 +184,6 @@ function StudentTechniques(): JSX.Element {
                             )}
                         />
                         <Autocomplete
-                            freeSolo={false}
                             options={positionOptions}
                             value={filters.position}
                             onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, position: newValue }))}
@@ -221,7 +199,6 @@ function StudentTechniques(): JSX.Element {
                         />
                         { openGuardOptions && (
                         <Autocomplete
-                            freeSolo={false}
                             options={openGuardOptions}
                             value={filters.openGuard}
                             onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, openGuard: newValue }))}
@@ -239,14 +216,7 @@ function StudentTechniques(): JSX.Element {
                     </AccordionDetails>
                 </Accordion>
             </Card>
-            <Card sx={{
-                backgroundColor: "#3c3836",
-                color: "#fbf1c7",
-                margin: 2,
-                border: 1,
-                borderRadius: 2,
-                boxShadow: 3
-            }}>
+            <Card>
             {loading ? (
                 <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
                     <CircularProgress />
@@ -256,10 +226,10 @@ function StudentTechniques(): JSX.Element {
                     <React.Fragment key={technique.techniqueId}>
                         <Accordion>
                             <AccordionSummary
-                                expandIcon={<ExpandMoreIcon sx={{color: "#fbf1c7"}}/>}
+                                expandIcon={<ExpandMoreIcon/>}
                                 aria-controls="panel1a-content"
                             >
-                                <Typography variant="h5">{technique.title}</Typography>
+                                <Typography variant="h6">{technique.title}</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <ListItem>

@@ -11,10 +11,6 @@ import MuiTypography from '@mui/material/Typography'
 import NavBar from '../../components/NavBar'
 import { styled } from '@mui/material/styles'
 import { Technique, Module, Gi, Hierarchy } from 'common'
-import ListItem from '@mui/material/ListItem'
-import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText'
-import Box from '@mui/material/Box'
-import Checkbox from '@mui/material/Checkbox'
 import TechniquesList from '../../components/TechniqueList'
 
 const Accordion = styled(MuiAccordion)({
@@ -52,10 +48,6 @@ const Typography = styled(MuiTypography)({
     },
 })
 
-const ListItemText = styled((props: ListItemTextProps) => (
-    <MuiListItemText primaryTypographyProps={{variant: 'body1'}} secondaryTypographyProps={{variant: 'body2'}}{...props} />
-))(({ theme }) => ({}))
-
 const NewModule: React.FC = () => {
     
     const [module, setModule] = React.useState({
@@ -72,7 +64,6 @@ const NewModule: React.FC = () => {
     // Autocomplete suggestions
     const [techniques, setTechniques] = React.useState<Technique[]>([]);
     const [moduleTitleSuggestions, setModuleTitleSuggestions] = React.useState<string[]>([]);
-    const [techniqueTitleSuggestions, setTechniqueTitleSuggestions] = React.useState<string[]>([]);
     const [giSuggestions, setGiSuggestions] = React.useState<string[]>([]);
     const [typeSuggestions, setTypeSuggestions] = React.useState<string[]>([]);
     const [positionSuggestions, setPositionSuggestions] = React.useState<string[]>([]);
@@ -89,6 +80,9 @@ const NewModule: React.FC = () => {
 
     // Module field displays
     const [showOpenGuardField, setShowOpenGuardField] = React.useState(false)
+
+    // Selected techniques
+    const [selectedTechniques, setSelectedTechniques] = React.useState<string[]>([])
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -107,16 +101,25 @@ const NewModule: React.FC = () => {
         await postModule(validModule);
         }
 
+    const handleTechniqueCheck = (techniqueId: string) => {
+        setSelectedTechniques(prevChecked => {
+            if (prevChecked.includes(techniqueId)) {
+                return prevChecked.filter(id => id !== techniqueId);
+            } else {
+                return [...prevChecked, techniqueId];
+            }
+        });
+    };
+    
     React.useEffect(() => {
         (async () => {
             try {
-                const [moduleTitleResponse, techniqueResponse, typeResponse, positionResponse, openGuardResponse, techniqueTitleResponse] = await Promise.all([
+                const [moduleTitleResponse, techniqueResponse, typeResponse, positionResponse, openGuardResponse] = await Promise.all([
                     fetch('http://192.168.0.156:3000/api/module/titles'),
                     fetch('http://192.168.0.156:3000/api/technique'),
                     fetch('http://192.168.0.156:3000/api/technique/types'),
                     fetch('http://192.168.0.156:3000/api/technique/positions'),
                     fetch('http://192.168.0.156:3000/api/technique/openGuards'),
-                    fetch('http://192.168.0.156:3000/api/technique/titles')
                 ]);
 
                 interface TitleObject {
@@ -128,12 +131,10 @@ const NewModule: React.FC = () => {
                 const moduleTitles = (await moduleTitleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
                 const positions = (await positionResponse.json()).map((positionObj: TitleObject) => positionObj.title);
                 const openGuards = (await openGuardResponse.json()).map((openGuardObj: TitleObject) => openGuardObj.title);
-                const techniqueTitles = (await techniqueTitleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
     
                 setTechniques(techniques)
                 setTypeSuggestions(types);
                 setModuleTitleSuggestions(moduleTitles);
-                setTechniqueTitleSuggestions(techniqueTitles);
                 setPositionSuggestions(positions);
                 setOpenGuardSuggestions(openGuards);
                 setGiSuggestions(['Yes Gi', 'No Gi', 'Both']);
@@ -164,7 +165,7 @@ const NewModule: React.FC = () => {
         <Card>
             <Accordion disableGutters>
                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                    <Typography variant="h6">Details</Typography>
+                    <Typography variant="h6">Module Details</Typography>
                 </AccordionSummary>
                 <AccordionDetails>            
                     <form onSubmit={handleSubmit}>
@@ -397,7 +398,12 @@ const NewModule: React.FC = () => {
                     <Typography variant="h6">Select Techniques</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <TechniquesList filteredTechniques={filteredTechniques} checkbox/>
+                    <TechniquesList 
+                    filteredTechniques={filteredTechniques} 
+                    checkbox elevation={0} 
+                    checkedTechniques={selectedTechniques}
+                    onTechniqueCheck={handleTechniqueCheck}
+                    />
                 </AccordionDetails>
             </Accordion>
         </Card>

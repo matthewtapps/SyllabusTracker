@@ -1,5 +1,5 @@
 import React from 'react'
-import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
+import MuiAccordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import MuiListItem, { ListItemProps } from '@mui/material/ListItem'
@@ -18,11 +18,11 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 
 
-const Accordion = styled((props: AccordionProps) => (
-    <MuiAccordion disableGutters {...props} />
-))(({ theme }) => ({
+const Accordion = styled(MuiAccordion)({
+    '&.MuiAccordion-root' : {
     backgroundColor: `#3c3836`,
-}))
+    }
+});
 
 const ListItem = styled((props: ListItemProps) => (
     <MuiListItem {...props} />
@@ -121,7 +121,7 @@ function CoachTechniques(): JSX.Element {
         <div>
             <NavBar text="Techniques"/>
             <Card>
-                <Accordion>
+                <Accordion disableGutters={true}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                         <TextField
                             label="Filter"

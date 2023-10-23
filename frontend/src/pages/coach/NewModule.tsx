@@ -4,6 +4,7 @@ import CardContent from '@mui/material/CardContent'
 import MuiTextField, { TextFieldProps} from '@mui/material/TextField'
 import MuiButton from '@mui/material/Button'
 import Autocomplete from '@mui/material/Autocomplete'
+import MuiTypography from '@mui/material/Typography'
 import NavBar from '../../components/NavBar'
 import { styled } from '@mui/material/styles'
 import { Technique, Module, Gi, Hierarchy } from 'common'
@@ -30,6 +31,13 @@ const Button = styled(MuiButton)({
         marginTop: "10px"
     }
 })
+
+const Typography = styled(MuiTypography)({
+    '&.DashboardCard-heading': {
+        padding: "10px",
+    },
+})
+
 const NewModule: React.FC = () => {
     
     const [module, setModule] = React.useState({
@@ -76,11 +84,11 @@ const NewModule: React.FC = () => {
         (async () => {
             try {
                 const [titleResponse, techniqueResponse, typeResponse, positionResponse, openGuardResponse] = await Promise.all([
-                    fetch('http://localhost:3000/api/module/titles'),
-                    fetch('http://localhost:3000/api/technique'),
-                    fetch('http://localhost:3000/api/technique/types'),
-                    fetch('http://localhost:3000/api/technique/positions'),
-                    fetch('http://localhost:3000/api/technique/openGuards'),
+                    fetch('http://192.168.0.156:3000/api/module/titles'),
+                    fetch('http://192.168.0.156:3000/api/technique'),
+                    fetch('http://192.168.0.156:3000/api/technique/types'),
+                    fetch('http://192.168.0.156:3000/api/technique/positions'),
+                    fetch('http://192.168.0.156:3000/api/technique/openGuards'),
                 ]);
 
                 interface TitleObject {
@@ -111,6 +119,7 @@ const NewModule: React.FC = () => {
         <NavBar text="New Module"/>
         <Card>
             <CardContent>
+                <Typography variant='h6' className='DashboardCard-title'>Module Details</Typography>
                 <form onSubmit={handleSubmit}>
                     <Autocomplete
                         options={titleSuggestions}
@@ -184,7 +193,6 @@ const NewModule: React.FC = () => {
                         )}
                     />
                     <Autocomplete
-                        freeSolo
                         options={typeSuggestions}
                         inputValue={module.type}
                         onInputChange={(event, newValue) => {
@@ -205,7 +213,6 @@ const NewModule: React.FC = () => {
                     />
 
                     <Autocomplete
-                        freeSolo
                         options={positionSuggestions}
                         inputValue={module.position}
                         onInputChange={(event, newValue) => {
@@ -252,6 +259,11 @@ const NewModule: React.FC = () => {
                         Submit
                     </Button>
                 </form>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardContent>
+                <Typography variant='h6' className='DashboardCard-title'>Filter Techniques</Typography>
             </CardContent>
         </Card>
     </div>

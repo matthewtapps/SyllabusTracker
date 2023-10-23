@@ -86,10 +86,10 @@ const NewTechnique: React.FC = () => {
         (async () => {
             try {
                 const [typeResponse, titleResponse, positionResponse, openGuardResponse] = await Promise.all([
-                    fetch('http://localhost:3000/api/technique/types'),
-                    fetch('http://localhost:3000/api/technique/titles'),
-                    fetch('http://localhost:3000/api/technique/positions'),
-                    fetch('http://localhost:3000/api/technique/openGuards')
+                    fetch('http://192.168.0.156:3000/api/technique/types'),
+                    fetch('http://192.168.0.156:3000/api/technique/titles'),
+                    fetch('http://192.168.0.156:3000/api/technique/positions'),
+                    fetch('http://192.168.0.156:3000/api/technique/openGuards')
                 ]);
 
                 interface TitleObject {

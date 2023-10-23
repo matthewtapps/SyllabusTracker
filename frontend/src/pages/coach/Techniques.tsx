@@ -9,6 +9,8 @@ import Autocomplete from '@mui/material/Autocomplete'
 import Typography from '@mui/material/Typography'
 import MuiCard from '@mui/material/Card'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Fab from '@mui/material/Fab'
+import AddIcon from '@mui/icons-material/Add'
 import { Technique } from 'common'
 import { styled } from '@mui/material/styles'
 import NavBar from '../../components/NavBar'
@@ -68,7 +70,7 @@ function CoachTechniques(): JSX.Element {
         (async () => {
             try {
                 const [techniqueResponse] = await Promise.all([
-                    fetch('http://localhost:3000/api/technique')
+                    fetch('http://192.168.0.156:3000/api/technique')
                 ]);
 
                 const techniques: Technique[] = await (techniqueResponse.json())
@@ -271,6 +273,9 @@ function CoachTechniques(): JSX.Element {
                 )))
             }
             </Card>
+            <Fab color="primary" aria-label="add" style={{ position: 'fixed', bottom: '16px', right: '16px'}}>
+                <AddIcon/>
+            </Fab>
         </div>
         );};
 

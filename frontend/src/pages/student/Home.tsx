@@ -19,10 +19,6 @@ const Typography = styled(MuiTypography)({
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
         backgroundColor: "#3c3836",
-        color: "#fbf1c7",
-        marginLeft: "10px",
-        marginTop: "10px",
-        marginRight: "10px",
         border: "1px",
         borderRadius: "2",
     }
@@ -41,13 +37,13 @@ function StudentDashboard(): React.ReactNode {
     return (
     <div>
         <NavBar text="Dashboard"/>
-        <Grid container>
-            <Grid xs={12}>
+        <Grid container spacing={1} padding={1}>
+            <Grid item xs={12}>
                 <Card>
                     <Typography variant='h6' className="DashboardCard-heading">Progress</Typography>
                 </Card>
             </Grid>
-            <Grid xs={6}>
+            <Grid item xs={6}>
                 <Card onClick={navigateToTechniques}>
                     <CardActionArea>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -57,7 +53,7 @@ function StudentDashboard(): React.ReactNode {
                     </CardActionArea>
                 </Card>
             </Grid>
-            <Grid xs={6}>
+            <Grid item xs={6}>
                 <Card onClick={navigateToModules}>
                     <CardActionArea>
                         <Box display="flex" justifyContent="space-between" alignItems="center">

@@ -8,7 +8,11 @@ import TextField from '@mui/material/TextField'
 import Autocomplete from '@mui/material/Autocomplete'
 import Typography from '@mui/material/Typography'
 import MuiCard from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Fab from '@mui/material/Fab'
+import AddIcon from '@mui/icons-material/Add'
+import { useNavigate } from 'react-router-dom'
 import { Technique } from 'common'
 import { styled } from '@mui/material/styles'
 import NavBar from '../../components/NavBar'
@@ -48,7 +52,11 @@ const Card = styled(MuiCard)({
 });
 
 function StudentTechniques(): JSX.Element {
+    const navigate = useNavigate();
+    const navigateToNewTechnique = () => { navigate('/newtechnique') }
+
     const [loading, setLoading] = React.useState(true);
+    const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
     const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
     const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
@@ -68,7 +76,7 @@ function StudentTechniques(): JSX.Element {
         (async () => {
             try {
                 const [techniqueResponse] = await Promise.all([
-                    fetch('http://localhost:3000/api/technique')
+                    fetch('http://192.168.0.156:3000/api/technique')
                 ]);
 
                 const techniques: Technique[] = await (techniqueResponse.json())
@@ -96,7 +104,7 @@ function StudentTechniques(): JSX.Element {
                 setLoading(false)
 
             } catch (error) {
-                alert(`Error fetching data: ${error}`);
+                setPlaceholderContent(`Error fetching data: ${error}`)
                 setLoading(false)
             }
         })();
@@ -208,6 +216,10 @@ function StudentTechniques(): JSX.Element {
                 <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
                     <CircularProgress />
                 </Box>
+            ) : filteredTechniques.length === 0 ? (
+                <CardContent>
+                    <Typography>{placeholderContent}</Typography>
+                </CardContent>
             ) : (
                 filteredTechniques.map(technique => (
                     <React.Fragment key={technique.techniqueId}>
@@ -271,6 +283,14 @@ function StudentTechniques(): JSX.Element {
                 )))
             }
             </Card>
+            <Fab 
+            color="primary" 
+            aria-label="add" 
+            style={{position: 'fixed', bottom: '16px', right: '16px'}}
+            onClick={navigateToNewTechnique}
+            >
+                <AddIcon/>
+            </Fab>
         </div>
         );};
 

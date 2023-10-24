@@ -17,23 +17,32 @@ const Accordion = styled(MuiAccordion)({
     }
 });
 
-const ListItemText = styled((props: ListItemTextProps) => (
-    <MuiListItemText primaryTypographyProps={{variant: 'body1'}} secondaryTypographyProps={{variant: 'body2'}}{...props} />
-))(({ theme }) => ({}))
-
 interface TechniquesListProps {
     filteredTechniques: Technique[];
-    checkbox: boolean;
+    checkbox?: boolean;
     elevation: number;
-    checkedTechniques: string[];
-    onTechniqueCheck: (techniqueId: string) => void;
+    checkedTechniques?: string[];
+    onTechniqueCheck?: (techniqueId: string) => void;
+}
+
+TechniquesList.defaultProps = {
+    checkbox: false,
+    elevation: 3
 }
 
 function TechniquesList(props: TechniquesListProps): JSX.Element {
+   
     return (
         <React.Fragment>
-            {props.filteredTechniques.map(technique => (
-                <Accordion disableGutters elevation={props.elevation}>
+            {props.filteredTechniques.map(technique => {
+                const ListItemText = styled((propss: ListItemTextProps) => (
+                    (props.checkbox) 
+                        ? (<MuiListItemText primaryTypographyProps={{variant: 'body1'}} secondaryTypographyProps={{variant: 'body2'}}{...propss} />)
+                        : (<MuiListItemText primaryTypographyProps={{variant: 'h6'}} secondaryTypographyProps={{variant: 'body1'}}{...propss} />)
+                ))(({ theme }) => ({}));
+            
+            return (
+                <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
                     <AccordionSummary
                         expandIcon={<ExpandMore/>}
                         aria-controls="panel1a-content"
@@ -42,12 +51,16 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
                             <Box display="flex" alignItems="center" marginLeft="0px">
                                 <Checkbox
                                     size='small'
-                                    checked={props.checkedTechniques.includes(technique.techniqueId)}
-                                    onChange={() => props.onTechniqueCheck(technique.techniqueId)}
+                                    checked={props.checkedTechniques?.includes(technique.techniqueId)}
+                                    onChange={() => props.onTechniqueCheck?.(technique.techniqueId)}
                                     onClick={e => e.stopPropagation()}
                                 />
                                 <Typography variant="body1">{technique.title}</Typography>
                             </Box>
+                        )}
+
+                        {!props.checkbox && (
+                            <Typography variant="h6">{technique.title}</Typography>
                         )}
                     </AccordionSummary>
                     <AccordionDetails>
@@ -98,9 +111,9 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
                         )}
                     </AccordionDetails>
                 </Accordion>
-            ))}
+            )})}
         </React.Fragment>
     )
 }
-
-export default TechniquesList;
+    
+export default TechniquesList

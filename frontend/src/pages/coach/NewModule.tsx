@@ -71,11 +71,11 @@ const NewModule: React.FC = () => {
     const [hierarchySuggestions, setHierarchySuggestions] = React.useState<string[]>([]);
     const [filters, setFilters] = React.useState({
         title: '',
-        hierarchy: '',
-        type: '',
-        position: '',
-        openGuard: '',
-        gi: ''
+        hierarchy: null as null | string,
+        type: null as null | string,
+        position: null as null | string,
+        openGuard: null as null | string,
+        gi: null as null | string,
     });
 
     // Module field displays
@@ -324,7 +324,8 @@ const NewModule: React.FC = () => {
                     <Autocomplete
                         options={giSuggestions}
                         value={filters.gi}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue }))}
+                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
+                        isOptionEqualToValue={(option, value) => option === value}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -337,7 +338,8 @@ const NewModule: React.FC = () => {
                     <Autocomplete
                         options={hierarchySuggestions}
                         value={filters.hierarchy}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, hierarchy: newValue }))}
+                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
+                        isOptionEqualToValue={(option, value) => option === value}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -350,7 +352,8 @@ const NewModule: React.FC = () => {
                     <Autocomplete
                         options={typeSuggestions}
                         value={filters.type}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, type: newValue }))}
+                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
+                        isOptionEqualToValue={(option, value) => option === value}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -364,7 +367,8 @@ const NewModule: React.FC = () => {
                     <Autocomplete
                         options={positionSuggestions}
                         value={filters.position}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, position: newValue }))}
+                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
+                        isOptionEqualToValue={(option, value) => option === value}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -379,7 +383,8 @@ const NewModule: React.FC = () => {
                     <Autocomplete
                         options={openGuardSuggestions}
                         value={filters.openGuard}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, openGuard: newValue }))}
+                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
+                        isOptionEqualToValue={(option, value) => option === value}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -400,7 +405,8 @@ const NewModule: React.FC = () => {
                 <AccordionDetails>
                     <TechniquesList 
                     filteredTechniques={filteredTechniques} 
-                    checkbox elevation={0} 
+                    checkbox
+                    elevation={0} 
                     checkedTechniques={selectedTechniques}
                     onTechniqueCheck={handleTechniqueCheck}
                     />

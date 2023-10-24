@@ -18,27 +18,13 @@ import { styled } from '@mui/material/styles'
 import NavBar from '../../components/NavBar'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
+import TechniquesList from '../../components/TechniqueList'
 
 
 const Accordion = styled((props: AccordionProps) => (
     <MuiAccordion disableGutters {...props} />
 ))(({ theme }) => ({
     backgroundColor: `#3c3836`,
-}))
-
-const ListItem = styled((props: ListItemProps) => (
-    <MuiListItem {...props} />
-))(({ theme }) => ({
-    margin: '0px',
-    padding: '0px'
-}))
-
-const ListItemText = styled((props: ListItemTextProps) => (
-    <MuiListItemText primaryTypographyProps={{variant: 'h6'}} secondaryTypographyProps={{variant: 'body1'}}{...props} />
-))(({ theme }) => ({
-    '& .MuiListItemText-secondary': {
-        paddingLeft: "8px"
-    },
 }))
 
 const Card = styled(MuiCard)({
@@ -65,11 +51,11 @@ function StudentTechniques(): JSX.Element {
     const [giOptions] = React.useState<string[]>(['Yes Gi', 'No Gi']);
     const [filters, setFilters] = React.useState({
         title: '',
-        hierarchy: '',
-        type: '',
-        position: '',
-        openGuard: '',
-        gi: ''
+        hierarchy: null as null | string,
+        type: null as null | string,
+        position: null as null | string,
+        openGuard: null as null | string,
+        gi: null as null | string,
     });
 
     React.useEffect(() => {
@@ -141,7 +127,8 @@ function StudentTechniques(): JSX.Element {
                         <Autocomplete
                             options={giOptions}
                             value={filters.gi}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue }))}
+                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
+                            isOptionEqualToValue={(option, value) => option === value}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -154,7 +141,8 @@ function StudentTechniques(): JSX.Element {
                         <Autocomplete
                             options={hierarchyOptions}
                             value={filters.hierarchy}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, hierarchy: newValue }))}
+                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, hierarchy: newValue || null }))}
+                            isOptionEqualToValue={(option, value) => option === value}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -167,7 +155,8 @@ function StudentTechniques(): JSX.Element {
                         <Autocomplete
                             options={typeOptions}
                             value={filters.type}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, type: newValue }))}
+                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, type: newValue || null }))}
+                            isOptionEqualToValue={(option, value) => option === value}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -181,7 +170,8 @@ function StudentTechniques(): JSX.Element {
                         <Autocomplete
                             options={positionOptions}
                             value={filters.position}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, position: newValue }))}
+                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, position: newValue || null }))}
+                            isOptionEqualToValue={(option, value) => option === value}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -196,7 +186,8 @@ function StudentTechniques(): JSX.Element {
                         <Autocomplete
                             options={openGuardOptions}
                             value={filters.openGuard}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, openGuard: newValue }))}
+                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, openGuard: newValue || null }))}
+                            isOptionEqualToValue={(option, value) => option === value}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -221,67 +212,8 @@ function StudentTechniques(): JSX.Element {
                     <Typography>{placeholderContent}</Typography>
                 </CardContent>
             ) : (
-                filteredTechniques.map(technique => (
-                    <React.Fragment key={technique.techniqueId}>
-                        <Accordion>
-                            <AccordionSummary
-                                expandIcon={<ExpandMoreIcon/>}
-                                aria-controls="panel1a-content"
-                            >
-                                <Typography variant="h6">{technique.title}</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <ListItem>
-                                    <ListItemText primary="Description" secondary={technique.description} />
-                                </ListItem>
-
-                                <ListItem>
-                                    <ListItemText primary="Position" secondary={technique.position.title} />
-                                </ListItem>
-
-                                <ListItem>
-                                    <ListItemText secondary={technique.position.description} />
-                                </ListItem>
-
-                                <ListItem>
-                                    <ListItemText primary="Hierarchy" secondary={technique.hierarchy} />
-                                </ListItem>
-
-                                <ListItem>
-                                    <ListItemText primary="Type" secondary={technique.type.title} />
-                                </ListItem>
-
-                                <ListItem>
-                                    <ListItemText secondary={technique.type.description} />
-                                </ListItem>
-
-                                {technique.openGuard && (
-                                    <div>
-                                        <ListItem>
-                                            <ListItemText primary="Open Guard" secondary={technique.openGuard.title} />
-                                        </ListItem>
-
-                                        <ListItem>
-                                            <ListItemText secondary={technique.openGuard.description} />
-                                        </ListItem>
-                                    </div>
-                                )}
-
-                                <ListItem>
-                                    <ListItemText primary="Gi or No Gi" secondary={technique.gi} />
-                                </ListItem>
-                                
-                                {technique.globalNotes && (
-                                    <ListItem>
-                                        <ListItemText primary="Global Notes" secondary={technique.globalNotes} />
-                                    </ListItem>
-                                )}
-
-                            </AccordionDetails>
-                        </Accordion>
-                    </React.Fragment>
-                )))
-            }
+                <TechniquesList filteredTechniques={filteredTechniques}/>
+            )}
             </Card>
             <Fab 
             color="primary" 

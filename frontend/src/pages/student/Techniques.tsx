@@ -64,7 +64,6 @@ function StudentTechniques(): JSX.Element {
 
     return (
         <div>
-            <NavBar text="Techniques"/>
             <Card>
                 <TechniqueFilter 
                 onFiltersChange={handleFilterChange} 

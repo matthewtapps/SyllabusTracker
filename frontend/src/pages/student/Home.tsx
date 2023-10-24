@@ -29,42 +29,43 @@ const ArrowForwardIosIcon = styled(MuiArrowForwardIosIcon)({
     fontSize: "2em"
 });
 
-function StudentDashboard(): React.ReactNode {
+const StudentDashboard: React.FC = () => {
+
     const navigate = useNavigate();
     const navigateToTechniques = () => { navigate('/techniques') }
     const navigateToModules = () => { navigate('/') }
 
     return (
-    <div>
-        <NavBar text="Dashboard"/>
-        <Grid container spacing={1} padding={1}>
-            <Grid item xs={12}>
-                <Card>
-                    <Typography variant='h6' className="DashboardCard-heading">Progress</Typography>
-                </Card>
+        <div>
+            <Grid container spacing={1} padding={1}>
+                <Grid item xs={12}>
+                    <Card>
+                        <Typography variant='h6' className="DashboardCard-heading">Progress</Typography>
+                    </Card>
+                </Grid>
+                <Grid item xs={6}>
+                    <Card onClick={navigateToTechniques}>
+                        <CardActionArea>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant='h6' className="DashboardCard-heading">Techniques</Typography>
+                                <ArrowForwardIosIcon/>
+                            </Box>
+                        </CardActionArea>
+                    </Card>
+                </Grid>
+                <Grid item xs={6}>
+                    <Card onClick={navigateToModules}>
+                        <CardActionArea>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant='h6' className="DashboardCard-heading">Modules</Typography>
+                                <ArrowForwardIosIcon/>
+                            </Box>
+                        </CardActionArea>
+                    </Card>
+                </Grid>
             </Grid>
-            <Grid item xs={6}>
-                <Card onClick={navigateToTechniques}>
-                    <CardActionArea>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography variant='h6' className="DashboardCard-heading">Techniques</Typography>
-                            <ArrowForwardIosIcon/>
-                        </Box>
-                    </CardActionArea>
-                </Card>
-            </Grid>
-            <Grid item xs={6}>
-                <Card onClick={navigateToModules}>
-                    <CardActionArea>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography variant='h6' className="DashboardCard-heading">Modules</Typography>
-                            <ArrowForwardIosIcon/>
-                        </Box>
-                    </CardActionArea>
-                </Card>
-            </Grid>
-        </Grid>
-    </div>
-);};
+        </div>
+    );
+};
 
 export default StudentDashboard;

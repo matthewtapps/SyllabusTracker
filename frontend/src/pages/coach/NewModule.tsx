@@ -12,6 +12,7 @@ import NavBar from '../../components/NavBar'
 import { styled } from '@mui/material/styles'
 import { Technique, Module, Gi, Hierarchy } from 'common'
 import TechniquesList from '../../components/TechniqueList'
+import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../components/TechniqueFilter'
 
 const Accordion = styled(MuiAccordion)({
     '&.MuiAccordion-root' : {
@@ -64,42 +65,19 @@ const NewModule: React.FC = () => {
     // Autocomplete suggestions
     const [techniques, setTechniques] = React.useState<Technique[]>([]);
     const [moduleTitleSuggestions, setModuleTitleSuggestions] = React.useState<string[]>([]);
-    const [giSuggestions, setGiSuggestions] = React.useState<string[]>([]);
-    const [typeSuggestions, setTypeSuggestions] = React.useState<string[]>([]);
-    const [positionSuggestions, setPositionSuggestions] = React.useState<string[]>([]);
-    const [openGuardSuggestions, setOpenGuardSuggestions] = React.useState<string[]>([]);
-    const [hierarchySuggestions, setHierarchySuggestions] = React.useState<string[]>([]);
-    const [filters, setFilters] = React.useState({
-        title: '',
-        hierarchy: null as null | string,
-        type: null as null | string,
-        position: null as null | string,
-        openGuard: null as null | string,
-        gi: null as null | string,
-    });
+    
+    // Generate options for the filters based on the full techniques list
+    const options = useDetermineFilterOptions(techniques)
 
+    // Generated list of filtered techniques which is held at this level, and function for handling filter
+    // changes which is passed to the onFiltersChange prop on TechniqueFilter
+    const { filteredTechniques, handleFilterChange } = useHandleFilterChange(techniques)
+    
     // Module field displays
     const [showOpenGuardField, setShowOpenGuardField] = React.useState(false)
 
     // Selected techniques
     const [selectedTechniques, setSelectedTechniques] = React.useState<string[]>([])
-
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setModule(prevTechnique => ({ ...prevTechnique, [name]: value }));
-    };
-
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-
-        const validModule = transformModuleForBackend(module);
-        if (!validModule) {
-            alert('Not a valid technique posted')
-            return
-        };
-        
-        await postModule(validModule);
-        }
 
     const handleTechniqueCheck = (techniqueId: string) => {
         setSelectedTechniques(prevChecked => {
@@ -110,16 +88,19 @@ const NewModule: React.FC = () => {
             }
         });
     };
-    
+
+    // New module input change
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        setModule(prevTechnique => ({ ...prevTechnique, [name]: value }));
+    };
+
     React.useEffect(() => {
         (async () => {
             try {
-                const [moduleTitleResponse, techniqueResponse, typeResponse, positionResponse, openGuardResponse] = await Promise.all([
+                const [moduleTitleResponse, techniqueResponse] = await Promise.all([
                     fetch('http://192.168.0.156:3000/api/module/titles'),
                     fetch('http://192.168.0.156:3000/api/technique'),
-                    fetch('http://192.168.0.156:3000/api/technique/types'),
-                    fetch('http://192.168.0.156:3000/api/technique/positions'),
-                    fetch('http://192.168.0.156:3000/api/technique/openGuards'),
                 ]);
 
                 interface TitleObject {
@@ -127,18 +108,10 @@ const NewModule: React.FC = () => {
                 }
                 
                 const techniques = (await techniqueResponse.json())
-                const types = (await typeResponse.json()).map((typeObj: TitleObject) => typeObj.title);
                 const moduleTitles = (await moduleTitleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
-                const positions = (await positionResponse.json()).map((positionObj: TitleObject) => positionObj.title);
-                const openGuards = (await openGuardResponse.json()).map((openGuardObj: TitleObject) => openGuardObj.title);
     
                 setTechniques(techniques)
-                setTypeSuggestions(types);
                 setModuleTitleSuggestions(moduleTitles);
-                setPositionSuggestions(positions);
-                setOpenGuardSuggestions(openGuards);
-                setGiSuggestions(['Yes Gi', 'No Gi', 'Both']);
-                setHierarchySuggestions(['Top', 'Bottom']);
 
             } catch (error) {
                 alert(`Error fetching data: ${error}`);
@@ -146,149 +119,92 @@ const NewModule: React.FC = () => {
         })();
     }, []);
 
-    const giFilterMatch = (filterValue: string, techniqueValue: string) => {
-        return techniqueValue === 'Both' || techniqueValue.includes(filterValue);
-    };
-
-    const filteredTechniques = techniques.filter(technique => {
-        return (!filters.title || technique.title.toLowerCase().includes(filters.title.toLowerCase())) &&
-               (!filters.hierarchy || technique.hierarchy.includes(filters.hierarchy)) &&
-               (!filters.type || technique.type.title.includes(filters.type)) &&
-               (!filters.position || technique.position.title.includes(filters.position)) &&
-               (!filters.openGuard || (technique.openGuard && technique.openGuard.title.includes(filters.openGuard))) &&
-               (!filters.gi || giFilterMatch(filters.gi, technique.gi));
-    });
-
     return (
         <div>
-        <NavBar text="New Module"/>
-        <Card>
-            <Accordion disableGutters>
-                <AccordionSummary expandIcon={<ExpandMore/>}>
-                    <Typography variant="h6">Module Details</Typography>
-                </AccordionSummary>
-                <AccordionDetails>            
-                    <form onSubmit={handleSubmit}>
-                        <Autocomplete
-                            options={moduleTitleSuggestions}
-                            freeSolo
-                            inputValue={module.title}
-                            onInputChange={(event, newValue) => {
-                                setModule(prevTechnique => ({ ...prevTechnique, title: newValue }));
-                            }}
-                            openOnFocus={false}
-                            filterOptions={(options, { inputValue }) => {
-                                return inputValue ? options.filter(option => 
-                                    option.toLowerCase().includes(inputValue.toLowerCase())
-                                ) : [];
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Module Title"
-                                    variant="outlined"
-                                />
-                            )}
-                        />
-
-                        <TextField
-                            fullWidth
-                            label="Module Description"
-                            name="description"
-                            value={module.description}
-                            onChange={handleInputChange}
-                            variant="outlined"
-                        />
-                        <TextField
-                            fullWidth
-                            label="Optional: Global Notes"
-                            name="globalNotes"
-                            value={module.globalNotes}
-                            onChange={handleInputChange}
-                            variant="outlined"
-                        />
-                        <Autocomplete
-                            options={giSuggestions}
-                            inputValue={module.gi}
-                            onInputChange={(event, newValue) => {
-                                setModule(prevGi => ({ ...prevGi, gi: newValue }));
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Optional: Gi or No Gi"
-                                    variant="outlined"
-                                    name="gi"
-                                />
-                            )}
-                        />
-                        <Autocomplete
-                            options={hierarchySuggestions}
-                            inputValue={module.hierarchy}
-                            onInputChange={(event, newValue) => {
-                                setModule(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Optional: Hierarchy"
-                                    variant="outlined"
-                                    name="hierarchy"
-                                />
-                            )}
-                        />
-                        <Autocomplete
-                            options={typeSuggestions}
-                            inputValue={module.type}
-                            onInputChange={(event, newValue) => {
-                                setModule(prevType => ({ ...prevType, type: newValue }));
-                                typeSuggestions.filter(option => 
-                                    option.toLowerCase().includes(newValue.toLowerCase())
-                                );
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Optional: Type"
-                                    variant="outlined"
-                                    name="type"
-                                />
-                            )}
-                        />
-
-                        <Autocomplete
-                            options={positionSuggestions}
-                            inputValue={module.position}
-                            onInputChange={(event, newValue) => {
-                                setModule(prevPosition => ({ ...prevPosition, position: newValue }));
-                                positionSuggestions.filter(option => 
-                                    option.toLowerCase().includes(newValue.toLowerCase())
-                                );
-                                setShowOpenGuardField(newValue.toLowerCase() === "open guard");
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Optional: Position"
-                                    variant="outlined"
-                                    name="position"
-                                />
-                            )}
-                        />
-
-                        {showOpenGuardField && (
+            <Card>
+                <Accordion disableGutters>
+                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                        <Typography variant="h6">Module Details</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>            
+                        <form onSubmit={handleSubmit}>
                             <Autocomplete
-                                options={openGuardSuggestions}
+                                options={moduleTitleSuggestions}
                                 freeSolo
-                                inputValue={module.openGuard}
+                                inputValue={module.title}
                                 onInputChange={(event, newValue) => {
-                                    setModule(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
-                                    openGuardSuggestions.filter(option => 
+                                    setModule(prevTechnique => ({ ...prevTechnique, title: newValue }));
+                                }}
+                                openOnFocus={false}
+                                filterOptions={(options, { inputValue }) => {
+                                    return inputValue ? options.filter(option => 
+                                        option.toLowerCase().includes(inputValue.toLowerCase())
+                                    ) : [];
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Module Title"
+                                        variant="outlined"
+                                    />
+                                )}
+                            />
+
+                            <TextField
+                                fullWidth
+                                label="Module Description"
+                                name="description"
+                                value={module.description}
+                                onChange={handleInputChange}
+                                variant="outlined"
+                            />
+                            <TextField
+                                fullWidth
+                                label="Optional: Global Notes"
+                                name="globalNotes"
+                                value={module.globalNotes}
+                                onChange={handleInputChange}
+                                variant="outlined"
+                            />
+                            <Autocomplete
+                                options={options.giOptions}
+                                inputValue={module.gi}
+                                onInputChange={(event, newValue) => {
+                                    setModule(prevGi => ({ ...prevGi, gi: newValue }));
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Optional: Gi or No Gi"
+                                        variant="outlined"
+                                        name="gi"
+                                    />
+                                )}
+                            />
+                            <Autocomplete
+                                options={options.hierarchyOptions}
+                                inputValue={module.hierarchy}
+                                onInputChange={(event, newValue) => {
+                                    setModule(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Optional: Hierarchy"
+                                        variant="outlined"
+                                        name="hierarchy"
+                                    />
+                                )}
+                            />
+                            <Autocomplete
+                                options={options.typeOptions}
+                                inputValue={module.type}
+                                onInputChange={(event, newValue) => {
+                                    setModule(prevType => ({ ...prevType, type: newValue }));
+                                    options.typeOptions.filter(option => 
                                         option.toLowerCase().includes(newValue.toLowerCase())
                                     );
                                 }}
@@ -296,124 +212,83 @@ const NewModule: React.FC = () => {
                                     <TextField
                                         {...params}
                                         fullWidth
-                                        label="Optional: Open Guard"
-                                        name="openGuard"
+                                        label="Optional: Type"
                                         variant="outlined"
+                                        name="type"
                                     />
                                 )}
                             />
-                        )}
-                        <Button variant="contained" color="primary" type="submit">
-                            Submit
-                        </Button>
-                    </form>
-                </AccordionDetails>
-            </Accordion>
-            <Accordion disableGutters={true}>
-                <AccordionSummary expandIcon={<ExpandMore/>}>
-                    <TextField
-                        label="Filter Techniques"
-                        value={filters.title}
-                        onChange={e => setFilters(prev => ({ ...prev, title: e.target.value }))}
-                        onClick={e => e.stopPropagation()}
-                        variant="outlined"
-                        sx={{marginTop: "0px"}}
-                    />
-                </AccordionSummary>
-                <AccordionDetails>
-                    <Autocomplete
-                        options={giSuggestions}
-                        value={filters.gi}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
-                        isOptionEqualToValue={(option, value) => option === value}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Yes Gi or No Gi"
-                                sx={{marginRight: "10px"}}
+
+                            <Autocomplete
+                                options={options.positionOptions}
+                                inputValue={module.position}
+                                onInputChange={(event, newValue) => {
+                                    setModule(prevPosition => ({ ...prevPosition, position: newValue }));
+                                    options.positionOptions.filter(option => 
+                                        option.toLowerCase().includes(newValue.toLowerCase())
+                                    );
+                                    setShowOpenGuardField(newValue.toLowerCase() === "open guard");
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Optional: Position"
+                                        variant="outlined"
+                                        name="position"
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                    <Autocomplete
-                        options={hierarchySuggestions}
-                        value={filters.hierarchy}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
-                        isOptionEqualToValue={(option, value) => option === value}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Hierarchy"
-                                sx={{marginTop: "10px"}}
-                            />
-                        )}
-                    />
-                    <Autocomplete
-                        options={typeSuggestions}
-                        value={filters.type}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
-                        isOptionEqualToValue={(option, value) => option === value}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Type"
-                                variant="outlined"
-                                sx={{marginTop: "10px"}}
-                            />
-                        )}
-                    />
-                    <Autocomplete
-                        options={positionSuggestions}
-                        value={filters.position}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
-                        isOptionEqualToValue={(option, value) => option === value}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Position"
-                                variant="outlined"
-                                sx={{marginTop: "10px"}}
-                            />
-                        )}
-                    />
-                    { openGuardSuggestions && (
-                    <Autocomplete
-                        options={openGuardSuggestions}
-                        value={filters.openGuard}
-                        onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
-                        isOptionEqualToValue={(option, value) => option === value}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Open Guard"
-                                variant="outlined"
-                                sx={{marginTop: "10px"}}
-                            />
-                        )}
-                    />
-                    )}
-                </AccordionDetails>
-            </Accordion>
-            <Accordion disableGutters defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMore/>}>
-                    <Typography variant="h6">Select Techniques</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <TechniquesList 
-                    filteredTechniques={filteredTechniques} 
-                    checkbox
-                    elevation={0} 
-                    checkedTechniques={selectedTechniques}
-                    onTechniqueCheck={handleTechniqueCheck}
-                    />
-                </AccordionDetails>
-            </Accordion>
-        </Card>
-    </div>
+
+                            {showOpenGuardField && (
+                                <Autocomplete
+                                    options={options.openGuardOptions}
+                                    freeSolo
+                                    inputValue={module.openGuard}
+                                    onInputChange={(event, newValue) => {
+                                        setModule(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
+                                        options.openGuardOptions.filter(option => 
+                                            option.toLowerCase().includes(newValue.toLowerCase())
+                                        );
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            fullWidth
+                                            label="Optional: Open Guard"
+                                            name="openGuard"
+                                            variant="outlined"
+                                        />
+                                    )}
+                                />
+                            )}
+                            <Button variant="contained" color="primary" type="submit">
+                                Submit
+                            </Button>
+                        </form>
+                    </AccordionDetails>
+                </Accordion>
+                                    
+                <TechniqueFilter 
+                    onFiltersChange={handleFilterChange} 
+                    options={options}/>
+
+                <Accordion disableGutters defaultExpanded>
+                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                        <Typography variant="h6">Select Techniques</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <TechniquesList 
+                        filteredTechniques={filteredTechniques} 
+                        checkbox
+                        elevation={0} 
+                        checkedTechniques={selectedTechniques}
+                        onTechniqueCheck={handleTechniqueCheck}
+                        />
+                    </AccordionDetails>
+                </Accordion>
+            </Card>
+        </div>
     );
 };
 
@@ -456,5 +331,17 @@ const postModule = async (module: Module) => {
             alert(`Error posting module: ${error}`);
         }
 };
+
+const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const validModule = transformModuleForBackend(module);
+    if (!validModule) {
+        alert('Not a valid technique posted')
+        return
+    };
+    
+    await postModule(validModule);
+    }
 
 export default NewModule;

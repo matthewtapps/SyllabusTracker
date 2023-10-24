@@ -116,192 +116,191 @@ const NewTechnique: React.FC = () => {
 
     return (
         <div>
-        <NavBar text="New Technique"/>
-        <Card>
-            <CardContent>
-                <form onSubmit={handleSubmit}>
-                    <Autocomplete
-                        options={titleSuggestions}
-                        freeSolo
-                        inputValue={technique.title}
-                        onInputChange={(event, newValue) => {
-                            setTechnique(prevTechnique => ({ ...prevTechnique, title: newValue }));
-                            setTitleError(titleSuggestions.includes(newValue));
-                        }}
-                        openOnFocus={false}
-                        filterOptions={(options, { inputValue }) => {
-                            return inputValue ? options.filter(option => 
-                                option.toLowerCase().includes(inputValue.toLowerCase())
-                            ) : [];
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Technique Title"
-                                variant="outlined"
-                                error={titleError}
-                                helperText={titleError ? "Technique already exists" : ''}
-                            />
-                        )}
-                    />
-
-                    <TextField
-                        fullWidth
-                        label="Video Source"
-                        name="videoSrc"
-                        value={technique.videoSrc}
-                        onChange={handleInputChange}
-                        variant="outlined"
-                    />
-                    <TextField
-                        fullWidth
-                        label="Technique Description"
-                        name="description"
-                        value={technique.description}
-                        onChange={handleInputChange}
-                        variant="outlined"
-                    />
-                    <TextField
-                        fullWidth
-                        label="Global Notes"
-                        name="globalNotes"
-                        value={technique.globalNotes}
-                        onChange={handleInputChange}
-                        variant="outlined"
-                    />
-                    <Autocomplete
-                        options={giSuggestions}
-                        inputValue={technique.gi}
-                        onInputChange={(event, newValue) => {
-                            setTechnique(prevGi => ({ ...prevGi, gi: newValue }));
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Gi or No Gi"
-                                variant="outlined"
-                            />
-                        )}
-                    />
-                    <Autocomplete
-                        options={hierarchySuggestions}
-                        inputValue={technique.hierarchy}
-                        onInputChange={(event, newValue) => {
-                            setTechnique(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Hierarchy"
-                                variant="outlined"
-                            />
-                        )}
-                    />
-                    <Autocomplete
-                        freeSolo
-                        options={typeSuggestions}
-                        inputValue={technique.type}
-                        onInputChange={(event, newValue) => {
-                            setTechnique(prevType => ({ ...prevType, type: newValue }));
-                            const matchingSuggestions = typeSuggestions.filter(option => 
-                                option.toLowerCase().includes(newValue.toLowerCase())
-                            );
-                            setShowTypeDescription(matchingSuggestions.length === 0);
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Type"
-                                variant="outlined"
-                            />
-                        )}
-                    />
-                    {showTypeDescription && (
-                        <TextField
-                            fullWidth
-                            label="Type Description"
-                            name="typeDescription"
-                            value={technique.typeDescription}
-                            onChange={handleInputChange}
-                            variant="outlined"
-                        />
-                    )}
-                    <Autocomplete
-                        freeSolo
-                        options={positionSuggestions}
-                        inputValue={technique.position}
-                        onInputChange={(event, newValue) => {
-                            setTechnique(prevPosition => ({ ...prevPosition, position: newValue }));
-                            const matchingSuggestions = positionSuggestions.filter(option => 
-                                option.toLowerCase().includes(newValue.toLowerCase())
-                            );
-                            setShowPositionDescription(matchingSuggestions.length === 0);
-                            setShowOpenGuardField(newValue.toLowerCase() === "open guard");
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                fullWidth
-                                label="Position"
-                                variant="outlined"
-                            />
-                        )}
-                    />
-                    {showPositionDescription && (
-                        <TextField
-                            fullWidth
-                            label="Position Description"
-                            name="positionDescription"
-                            value={technique.positionDescription}
-                            onChange={handleInputChange}
-                            variant="outlined"
-                        />
-                    )}
-                    {showOpenGuardField && (
+            <Card>
+                <CardContent>
+                    <form onSubmit={handleSubmit}>
                         <Autocomplete
-                            options={openGuardSuggestions}
+                            options={titleSuggestions}
                             freeSolo
-                            inputValue={technique.openGuard}
+                            inputValue={technique.title}
                             onInputChange={(event, newValue) => {
-                                setTechnique(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
-                                const matchingSuggestions = openGuardSuggestions.filter(option => 
-                                    option.toLowerCase().includes(newValue.toLowerCase())
-                                );
-                                setShowOpenGuardDescription(matchingSuggestions.length === 0);
+                                setTechnique(prevTechnique => ({ ...prevTechnique, title: newValue }));
+                                setTitleError(titleSuggestions.includes(newValue));
+                            }}
+                            openOnFocus={false}
+                            filterOptions={(options, { inputValue }) => {
+                                return inputValue ? options.filter(option => 
+                                    option.toLowerCase().includes(inputValue.toLowerCase())
+                                ) : [];
                             }}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Open Guard"
-                                    name="openGuard"
+                                    label="Technique Title"
+                                    variant="outlined"
+                                    error={titleError}
+                                    helperText={titleError ? "Technique already exists" : ''}
+                                />
+                            )}
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Video Source"
+                            name="videoSrc"
+                            value={technique.videoSrc}
+                            onChange={handleInputChange}
+                            variant="outlined"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Technique Description"
+                            name="description"
+                            value={technique.description}
+                            onChange={handleInputChange}
+                            variant="outlined"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Global Notes"
+                            name="globalNotes"
+                            value={technique.globalNotes}
+                            onChange={handleInputChange}
+                            variant="outlined"
+                        />
+                        <Autocomplete
+                            options={giSuggestions}
+                            inputValue={technique.gi}
+                            onInputChange={(event, newValue) => {
+                                setTechnique(prevGi => ({ ...prevGi, gi: newValue }));
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    fullWidth
+                                    label="Gi or No Gi"
                                     variant="outlined"
                                 />
                             )}
                         />
-                    )}
-                    {showOpenGuardDescription && showOpenGuardField && (
-                        <TextField
-                            fullWidth
-                            label="Open Guard Description"
-                            name="openGuardDescription"
-                            value={technique.openGuardDescription}
-                            onChange={handleInputChange}
-                            variant="outlined"
+                        <Autocomplete
+                            options={hierarchySuggestions}
+                            inputValue={technique.hierarchy}
+                            onInputChange={(event, newValue) => {
+                                setTechnique(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    fullWidth
+                                    label="Hierarchy"
+                                    variant="outlined"
+                                />
+                            )}
                         />
-                    )}
-                    <Button variant="contained" color="primary" type="submit">
-                        Submit
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
-    </div>
-);
+                        <Autocomplete
+                            freeSolo
+                            options={typeSuggestions}
+                            inputValue={technique.type}
+                            onInputChange={(event, newValue) => {
+                                setTechnique(prevType => ({ ...prevType, type: newValue }));
+                                const matchingSuggestions = typeSuggestions.filter(option => 
+                                    option.toLowerCase().includes(newValue.toLowerCase())
+                                );
+                                setShowTypeDescription(matchingSuggestions.length === 0);
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    fullWidth
+                                    label="Type"
+                                    variant="outlined"
+                                />
+                            )}
+                        />
+                        {showTypeDescription && (
+                            <TextField
+                                fullWidth
+                                label="Type Description"
+                                name="typeDescription"
+                                value={technique.typeDescription}
+                                onChange={handleInputChange}
+                                variant="outlined"
+                            />
+                        )}
+                        <Autocomplete
+                            freeSolo
+                            options={positionSuggestions}
+                            inputValue={technique.position}
+                            onInputChange={(event, newValue) => {
+                                setTechnique(prevPosition => ({ ...prevPosition, position: newValue }));
+                                const matchingSuggestions = positionSuggestions.filter(option => 
+                                    option.toLowerCase().includes(newValue.toLowerCase())
+                                );
+                                setShowPositionDescription(matchingSuggestions.length === 0);
+                                setShowOpenGuardField(newValue.toLowerCase() === "open guard");
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    fullWidth
+                                    label="Position"
+                                    variant="outlined"
+                                />
+                            )}
+                        />
+                        {showPositionDescription && (
+                            <TextField
+                                fullWidth
+                                label="Position Description"
+                                name="positionDescription"
+                                value={technique.positionDescription}
+                                onChange={handleInputChange}
+                                variant="outlined"
+                            />
+                        )}
+                        {showOpenGuardField && (
+                            <Autocomplete
+                                options={openGuardSuggestions}
+                                freeSolo
+                                inputValue={technique.openGuard}
+                                onInputChange={(event, newValue) => {
+                                    setTechnique(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
+                                    const matchingSuggestions = openGuardSuggestions.filter(option => 
+                                        option.toLowerCase().includes(newValue.toLowerCase())
+                                    );
+                                    setShowOpenGuardDescription(matchingSuggestions.length === 0);
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Open Guard"
+                                        name="openGuard"
+                                        variant="outlined"
+                                    />
+                                )}
+                            />
+                        )}
+                        {showOpenGuardDescription && showOpenGuardField && (
+                            <TextField
+                                fullWidth
+                                label="Open Guard Description"
+                                name="openGuardDescription"
+                                value={technique.openGuardDescription}
+                                onChange={handleInputChange}
+                                variant="outlined"
+                            />
+                        )}
+                        <Button variant="contained" color="primary" type="submit">
+                            Submit
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
+        </div>
+    );
 };
 
 const transformTechniqueForBackend = (technique: any): Technique | null => {

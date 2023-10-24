@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
     let content: React.ReactNode
     switch(user.role) {
         case Role.Student:
-        content = StudentDashboard()
+        content = <StudentDashboard/>
         break;
 
         case Role.Coach:

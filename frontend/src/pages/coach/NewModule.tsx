@@ -308,7 +308,7 @@ const NewModule: React.FC = () => {
                         </Button>
                     </form>
                 </AccordionDetails>
-            </Accordion> 
+            </Accordion>
             <Accordion disableGutters={true}>
                 <AccordionSummary expandIcon={<ExpandMore/>}>
                     <TextField

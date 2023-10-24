@@ -115,5 +115,5 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
         </React.Fragment>
     )
 }
-    
+
 export default TechniquesList

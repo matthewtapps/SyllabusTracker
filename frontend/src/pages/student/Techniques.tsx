@@ -1,15 +1,7 @@
 import React from 'react'
-import MuiAccordion, { AccordionProps } from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import MuiListItem, { ListItemProps } from '@mui/material/ListItem'
-import MuiListItemText, { ListItemTextProps} from '@mui/material/ListItemText'
-import TextField from '@mui/material/TextField'
-import Autocomplete from '@mui/material/Autocomplete'
 import Typography from '@mui/material/Typography'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import { useNavigate } from 'react-router-dom'
@@ -19,13 +11,8 @@ import NavBar from '../../components/NavBar'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import TechniquesList from '../../components/TechniqueList'
+import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../components/TechniqueFilter'
 
-
-const Accordion = styled((props: AccordionProps) => (
-    <MuiAccordion disableGutters {...props} />
-))(({ theme }) => ({
-    backgroundColor: `#3c3836`,
-}))
 
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
@@ -41,22 +28,12 @@ function StudentTechniques(): JSX.Element {
     const navigate = useNavigate();
     const navigateToNewTechnique = () => { navigate('/newtechnique') }
 
+    // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
     const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
+
+    // List of techniques state
     const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
-    const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
-    const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
-    const [positionOptions, setPositionOptions] = React.useState<string[]>([]);
-    const [openGuardOptions, setOpenGuardOptions] = React.useState<string[]>([]);
-    const [giOptions] = React.useState<string[]>(['Yes Gi', 'No Gi']);
-    const [filters, setFilters] = React.useState({
-        title: '',
-        hierarchy: null as null | string,
-        type: null as null | string,
-        position: null as null | string,
-        openGuard: null as null | string,
-        gi: null as null | string,
-    });
 
     React.useEffect(() => {
         (async () => {
@@ -67,140 +44,31 @@ function StudentTechniques(): JSX.Element {
 
                 const techniques: Technique[] = await (techniqueResponse.json())
                 setTechniquesList(techniques)
-
-                const types: string[] = []
-                const positions: string[] = []
-                const openGuards: string[] = []
-
-                techniques.forEach(technique => {
-                    if (!types.includes(technique.type.title)) {
-                        types.push(technique.type.title);
-                    }
-                    if (!positions.includes(technique.position.title)) {
-                        positions.push(technique.position.title);
-                    }
-                    if (technique.openGuard && !openGuards.includes(technique.openGuard.title)) {
-                        openGuards.push(technique.openGuard.title);
-                    }
-                });
                 
-                setTypeOptions(types)
-                setPositionOptions(positions)
-                setOpenGuardOptions(openGuards)
                 setLoading(false)
 
             } catch (error) {
-                setPlaceholderContent(`Error fetching data: ${error}`)
+                setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
+                
                 setLoading(false)
             }
         })();
     }, []);
 
-    const giFilterMatch = (filterValue: string, techniqueValue: string) => {
-        return techniqueValue === 'Both' || techniqueValue.includes(filterValue);
-    };
+    // Generate options for the filters based on the full techniques list
+    const options = useDetermineFilterOptions(techniquesList)
 
-    const filteredTechniques = techniquesList.filter(technique => {
-        return (!filters.title || technique.title.toLowerCase().includes(filters.title.toLowerCase())) &&
-               (!filters.hierarchy || technique.hierarchy.includes(filters.hierarchy)) &&
-               (!filters.type || technique.type.title.includes(filters.type)) &&
-               (!filters.position || technique.position.title.includes(filters.position)) &&
-               (!filters.openGuard || (technique.openGuard && technique.openGuard.title.includes(filters.openGuard))) &&
-               (!filters.gi || giFilterMatch(filters.gi, technique.gi));
-    });
+    // Generated list of filtered techniques which is held at this level, and function for handling filter
+    // changes which is passed to the onFiltersChange prop on TechniqueFilter
+    const { filteredTechniques, handleFilterChange } = useHandleFilterChange(techniquesList)
 
     return (
         <div>
             <NavBar text="Techniques"/>
             <Card>
-                <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                        <TextField
-                            label="Filter"
-                            value={filters.title}
-                            onChange={e => setFilters(prev => ({ ...prev, title: e.target.value }))}
-                            onClick={e => e.stopPropagation()}
-                            variant="outlined"
-                        />
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Autocomplete
-                            options={giOptions}
-                            value={filters.gi}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, gi: newValue || null }))}
-                            isOptionEqualToValue={(option, value) => option === value}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Yes Gi or No Gi"
-                                    sx={{marginRight: "10px"}}
-                                />
-                            )}
-                        />
-                        <Autocomplete
-                            options={hierarchyOptions}
-                            value={filters.hierarchy}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, hierarchy: newValue || null }))}
-                            isOptionEqualToValue={(option, value) => option === value}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Hierarchy"
-                                    sx={{marginTop: "10px"}}
-                                />
-                            )}
-                        />
-                        <Autocomplete
-                            options={typeOptions}
-                            value={filters.type}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, type: newValue || null }))}
-                            isOptionEqualToValue={(option, value) => option === value}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Type"
-                                    variant="outlined"
-                                    sx={{marginTop: "10px"}}
-                                />
-                            )}
-                        />
-                        <Autocomplete
-                            options={positionOptions}
-                            value={filters.position}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, position: newValue || null }))}
-                            isOptionEqualToValue={(option, value) => option === value}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Position"
-                                    variant="outlined"
-                                    sx={{marginTop: "10px"}}
-                                />
-                            )}
-                        />
-                        { openGuardOptions && (
-                        <Autocomplete
-                            options={openGuardOptions}
-                            value={filters.openGuard}
-                            onInputChange={(event, newValue) => setFilters(prev => ({ ...prev, openGuard: newValue || null }))}
-                            isOptionEqualToValue={(option, value) => option === value}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Open Guard"
-                                    variant="outlined"
-                                    sx={{marginTop: "10px"}}
-                                />
-                            )}
-                        />
-                        )}
-                    </AccordionDetails>
-                </Accordion>
+                <TechniqueFilter 
+                onFiltersChange={handleFilterChange} 
+                options={options}/>
             </Card>
             <Card>
             {loading ? (
@@ -215,7 +83,7 @@ function StudentTechniques(): JSX.Element {
                 <TechniquesList filteredTechniques={filteredTechniques}/>
             )}
             </Card>
-            <Fab 
+            <Fab // Should only exist on coach version of techniques
             color="primary" 
             aria-label="add" 
             style={{position: 'fixed', bottom: '16px', right: '16px'}}
@@ -224,6 +92,7 @@ function StudentTechniques(): JSX.Element {
                 <AddIcon/>
             </Fab>
         </div>
-        );};
+    );
+};
 
 export default StudentTechniques

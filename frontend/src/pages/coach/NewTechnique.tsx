@@ -33,6 +33,7 @@ const Button = styled(MuiButton)({
 
 const NewTechnique: React.FC = () => {
     
+    // Technique for submitting to server
     const [technique, setTechnique] = React.useState({
         title: '',
         videoSrc: '',

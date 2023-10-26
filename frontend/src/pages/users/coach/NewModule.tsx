@@ -14,8 +14,13 @@ import TechniquesList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
 
 const Accordion = styled(MuiAccordion)({
-    '&.MuiAccordion-root' : {
     backgroundColor: `#3c3836`,
+    boxShadow: 'none',
+    '&:before': {
+        display: 'none'
+    },
+    '&:not(:last-child)': {
+        borderBottom: '1px solid #7c6f64'
     }
 });
 
@@ -27,19 +32,15 @@ const TextField = styled((props: TextFieldProps) => (
 }))
 
 const Card = styled(MuiCard)({
-    '&.MuiCard-root': {
         backgroundColor: "#3c3836",
         marginLeft: "10px",
         marginTop: "10px",
         marginRight: "10px",
         borderRadius: "2",
-    }
 });
 
 const Button = styled(MuiButton)({
-    '&.MuiButton-root': {
         marginTop: "10px"
-    }
 })
 
 const Typography = styled(MuiTypography)({
@@ -283,7 +284,7 @@ const NewModule: React.FC = () => {
                 onFiltersChange={handleFilterChange} 
                 options={options}/>
 
-            <Accordion disableGutters defaultExpanded>
+            <Accordion disableGutters defaultExpanded sx={{borderTop: '1px solid #7c6f64'}}>
                 <AccordionSummary expandIcon={<ExpandMore/>}>
                     <Typography variant="h6">Select Techniques</Typography>
                 </AccordionSummary>

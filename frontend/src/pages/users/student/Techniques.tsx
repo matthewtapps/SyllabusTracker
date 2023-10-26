@@ -12,7 +12,6 @@ import Box from '@mui/material/Box'
 import TechniquesList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
 
-
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
         marginLeft: "10px",

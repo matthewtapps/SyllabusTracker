@@ -17,7 +17,7 @@ function App() {
           <Route path="/" element={<BaseLayout text="Home"><HomePage/></BaseLayout>} />
           <Route path="/newtechnique" element={<BaseLayout text="New Technique"><NewTechniquePage/></BaseLayout>} />
           <Route path="/techniques" element={<BaseLayout text="Techniques"><TechniquesPage/></BaseLayout>} />
-          <Route path="/newmodule" element={<BaseLayout text="NewModule"><NewModulePage/></BaseLayout>}/>
+          <Route path="/newmodule" element={<BaseLayout text="New Module"><NewModulePage/></BaseLayout>}/>
         </Routes>
       </Router>
     </ThemeProvider>

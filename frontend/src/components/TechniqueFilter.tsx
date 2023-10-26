@@ -8,9 +8,12 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Technique } from 'common';
 
+
 const Accordion = styled(MuiAccordion)({
-    '&.MuiAccordion-root' : {
     backgroundColor: `#3c3836`,
+    boxShadow: 'none',
+    '&:before': {
+        display: 'none'
     }
 });
 
@@ -117,7 +120,7 @@ function TechniqueFilter({ onFiltersChange, options }: TechniqueFilterProps): JS
         <Accordion disableGutters>
             <AccordionSummary expandIcon={<ExpandMore/>}>
                 <TextField
-                    label="Filter"
+                    label="Filter Techniques"
                     value={filters.title}
                     onChange={e => {
                         const newFilters = { ...filters, title: e.target.value };

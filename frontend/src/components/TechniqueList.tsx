@@ -40,7 +40,7 @@ interface TechniquesListProps {
     filteredTechniques: Technique[];
     checkbox?: boolean;
     elevation: number;
-    checkedTechniques?: string[];
+    checkedTechniques?: {index: number, technique: Technique}[];
     onTechniqueCheck?: (techniqueId: string) => void;
 }
 
@@ -50,7 +50,7 @@ TechniquesList.defaultProps = {
 }
 
 function TechniquesList(props: TechniquesListProps): JSX.Element {
-   
+
     return (
         <React.Fragment>
             {props.filteredTechniques.map(technique => {
@@ -74,7 +74,7 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
                             <Box display="flex" alignItems="center" marginLeft="0px">
                                 <Checkbox
                                     size='small'
-                                    checked={props.checkedTechniques?.includes(technique.techniqueId)}
+                                    checked={props.checkedTechniques?.some(item => item.technique === technique)}
                                     onChange={() => props.onTechniqueCheck?.(technique.techniqueId)}
                                     onClick={e => e.stopPropagation()}
                                 />

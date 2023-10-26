@@ -9,8 +9,8 @@ import { Technique } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
-import TechniquesList from '../../../components/TechniqueList'
-import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
+import TechniquesList from '../../components/TechniqueList'
+import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../components/TechniqueFilter'
 
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {

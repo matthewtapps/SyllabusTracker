@@ -2,7 +2,7 @@ import React from 'react';
 import { Role } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../../theme/Theme';
-import StudentTechniques from '../users/student/Techniques';
+import StudentTechniques from '../student/Techniques';
 
 const TechniquesPage: React.FC = () => {
     const user = {

@@ -1,4 +1,4 @@
-import { Gi, Hierarchy } from "./Types";
+import { Gi, Hierarchy, Technique } from "./Types";
 export interface Module {
     moduleId: string;
     title: string;
@@ -14,6 +14,7 @@ interface DTO {
     title: string;
 }
 interface ModuleTechniqueDTO {
-    techniqueId: string;
+    index: number;
+    technique: Technique;
 }
 export {};

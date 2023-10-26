@@ -2,7 +2,7 @@ import React from 'react';
 import { Role, Belt, Stripes } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../../theme/Theme';
-import StudentDashboard from '../users/student/Home';
+import StudentDashboard from '../student/Home';
 
 
 const HomePage: React.FC = () => {

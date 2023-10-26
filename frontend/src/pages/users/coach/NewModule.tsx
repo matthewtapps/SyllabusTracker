@@ -12,6 +12,7 @@ import { styled } from '@mui/material/styles'
 import { Technique, Module, Gi, Hierarchy } from 'common'
 import TechniquesList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
+import DragDropTechniquesList from '../../../components/DragDropTechniques'
 
 const Accordion = styled(MuiAccordion)({
     backgroundColor: `#3c3836`,
@@ -76,15 +77,21 @@ const NewModule: React.FC = () => {
     // Module field displays
     const [showOpenGuardField, setShowOpenGuardField] = React.useState(false)
 
-    // Selected techniques
-    const [selectedTechniques, setSelectedTechniques] = React.useState<string[]>([])
+    // Selected techniques with indexes
+    const [selectedTechniques, setSelectedTechniques] = React.useState<{ index: number, technique: Technique }[]>([]);
 
     const handleTechniqueCheck = (techniqueId: string) => {
-        setSelectedTechniques(prevChecked => {
-            if (prevChecked.includes(techniqueId)) {
-                return prevChecked.filter(id => id !== techniqueId);
+        setSelectedTechniques(prevSelectedTechniques => {
+            const foundTechnique = prevSelectedTechniques.find(item => item.technique.techniqueId === techniqueId);
+            if (foundTechnique) {
+                return prevSelectedTechniques.filter(item => item.technique.techniqueId !== techniqueId);
             } else {
-                return [...prevChecked, techniqueId];
+                const techniqueToAdd = techniques.find(technique => technique.techniqueId === techniqueId);
+                if (techniqueToAdd) {
+                    return [...prevSelectedTechniques, { index: prevSelectedTechniques.length, technique: techniqueToAdd }];
+                } else {
+                    return prevSelectedTechniques;
+                }
             }
         });
     };
@@ -284,7 +291,16 @@ const NewModule: React.FC = () => {
                 onFiltersChange={handleFilterChange} 
                 options={options}/>
 
-            <Accordion disableGutters defaultExpanded sx={{borderTop: '1px solid #7c6f64'}}>
+            <Accordion disableGutters sx={{borderTop: '1px solid #7c6f64'}}>
+                <AccordionSummary expandIcon={<ExpandMore/>}>
+                    <Typography variant="h6">Order Techniques</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <DragDropTechniquesList selectedTechniques={selectedTechniques} onReorder={(newOrder) => setSelectedTechniques(newOrder)}/>
+                </AccordionDetails>
+            </Accordion>
+
+            <Accordion disableGutters defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMore/>}>
                     <Typography variant="h6">Select Techniques</Typography>
                 </AccordionSummary>
@@ -302,7 +318,7 @@ const NewModule: React.FC = () => {
     );
 };
 
-const transformModuleForBackend = (module: any, selectedTechniques: string[]): Module | null => {
+const transformModuleForBackend = (module: any, selectedTechniques: {index: number, technique: Technique}[]): Module | null => {
     if (module.gi && !Object.values(Gi).includes(module.gi)) {
       alert('Invalid Gi value');
       return null;
@@ -312,19 +328,12 @@ const transformModuleForBackend = (module: any, selectedTechniques: string[]): M
       alert('Invalid Hierarchy value');
       return null;
     }
-    
-    const selectedModuleTechniques = []
-    for (let technique of selectedTechniques) {
-        selectedModuleTechniques.push({
-            techniqueId: technique
-        })
-    }
 
     return {
       ...module,
       gi: module.gi as Gi,
       hierarchy: module.hierarchy as Hierarchy,
-      moduleTechniques: selectedModuleTechniques,
+      moduleTechniques: selectedTechniques,
     };
   }
 

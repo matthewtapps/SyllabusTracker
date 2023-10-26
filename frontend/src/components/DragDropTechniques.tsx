@@ -42,6 +42,17 @@ const DragDropTechniquesList: React.FC<DragDropTechniquesListProps> = ({ selecte
     };
 
     return (
+        (selectedTechniques.length === 0)  ? (
+            <Card elevation={0}>
+                <Accordion elevation={0} disableGutters square>
+                    <AccordionSummary>
+                        <Typography variant="body1">
+                            No techniques selected
+                        </Typography>
+                    </AccordionSummary>
+                </Accordion>
+            </Card>
+        ) : (
         <DragDropContext onDragEnd={handleOnDragEnd}>
             <Droppable droppableId="techniques">
                 {(provided) => (
@@ -54,7 +65,7 @@ const DragDropTechniquesList: React.FC<DragDropTechniquesListProps> = ({ selecte
                                             <AccordionSummary>
                                                 <Box display="flex" alignItems="center">
                                                     <DragHandleIcon style={{ marginRight: "8px" }} />
-                                                    <Typography variant="h6">
+                                                    <Typography variant="body1">
                                                         {item.technique.title}
                                                     </Typography>
                                                 </Box>
@@ -69,6 +80,7 @@ const DragDropTechniquesList: React.FC<DragDropTechniquesListProps> = ({ selecte
                 )}
             </Droppable>
         </DragDropContext>
+        )
     );
 }
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button'
 import { useNavigate } from 'react-router-dom';
-import '../css/login.css'
 
 interface LoginData {
     username: string,

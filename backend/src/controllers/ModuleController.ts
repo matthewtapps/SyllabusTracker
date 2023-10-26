@@ -5,8 +5,8 @@ export class ModuleController {
     static async createOrUpdateModule(req: Request, res: Response) {
         const moduleService = new ModuleService();
         try {
-            const technique = await moduleService.createOrUpdateModule(req.body);
-            res.json(technique);
+            const module = await moduleService.createOrUpdateModule(req.body);
+            res.json(module);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
@@ -15,8 +15,8 @@ export class ModuleController {
     static async getAllModules(req: Request, res: Response) {
         const moduleService = new ModuleService();
         try {
-            const techniques = await moduleService.getAllModules();
-            res.json(techniques);
+            const modules = await moduleService.getAllModules();
+            res.json(modules);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
@@ -25,8 +25,8 @@ export class ModuleController {
     static async getAllModuleTitles(req: Request, res: Response) {
         const moduleService = new ModuleService();
         try {
-            const techniqueTitles = await moduleService.getAllModuleTitles();
-            res.json(techniqueTitles);
+            const moduleTitles = await moduleService.getAllModuleTitles();
+            res.json(moduleTitles);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }

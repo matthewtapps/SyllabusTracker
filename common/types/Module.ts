@@ -1,12 +1,13 @@
-import { Technique } from "./Technique";
-import { Gi } from "./Types";
+import { ModuleTechnique } from "./Types";
+import { Gi, Hierarchy } from "./Types";
 
 export interface Module {
     moduleId: string;
     title: string;
     description: string;
     gi: Gi;
-    techniques: Technique[];
+    moduleTechniques: ModuleTechniqueDTO[];
+    hierarchy: Hierarchy;
     type: DTO;
     position: DTO;
     openGuard: DTO;
@@ -14,4 +15,8 @@ export interface Module {
 
 interface DTO {
     title: string;
+}
+
+interface ModuleTechniqueDTO {
+    techniqueId: string;
 }

@@ -1,5 +1,4 @@
 import React from 'react';
-import NavBar from '../../components/NavBar';
 import MuiCard from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import { styled } from '@mui/material/styles';

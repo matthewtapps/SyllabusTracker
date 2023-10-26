@@ -1,6 +1,6 @@
-import { Gi, Module as ModuleInterface} from "common";
-import { Entity, PrimaryGeneratedColumn, Column, Generated, ManyToMany, JoinTable, ManyToOne } from "typeorm";
-import { Technique } from "./Technique";
+import { Gi, Hierarchy, Module as ModuleInterface} from "common";
+import { Entity, PrimaryGeneratedColumn, Column, Generated, OneToMany, ManyToOne, JoinTable} from "typeorm";
+import { ModuleTechnique } from "./ModuleTechnique";
 import { Position } from "./Position";
 import { TechniqueType } from "./TechniqueType";
 import { OpenGuard } from "./OpenGuard";
@@ -18,11 +18,16 @@ export class Module implements ModuleInterface {
     description: string;
 
     @Column()
+    globalNotes: string;
+
+    @Column()
     gi: Gi;
 
-    @ManyToMany(type => Technique, technique => technique.techniqueId)
-    @JoinTable()
-    techniques: Technique[];
+    @Column()
+    hierarchy: Hierarchy;
+
+    @OneToMany(() => ModuleTechnique, mt => mt.module)
+    moduleTechniques: ModuleTechnique[];
 
     @ManyToOne(type => Position, position => position.positionId)
     @JoinTable()

@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
-import NewTechniquePage from "./pages/coach/NewTechnique";
-import TechniquesPage from "./pages/TechniquesPage";
+import LoginPage from './pages/navigation/LoginPage';
+import HomePage from './pages/navigation/HomePage';
+import NewTechniquePage from "./pages/users/coach/NewTechnique";
+import TechniquesPage from "./pages/navigation/TechniquesPage";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/Theme";
-import NewModulePage from "./pages/NewModulePage";
+import NewModulePage from "./pages/navigation/NewModulePage";
 import BaseLayout from "./components/BaseLayout";
 
 function App() {

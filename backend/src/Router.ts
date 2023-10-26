@@ -10,6 +10,7 @@ router.get('/technique/types', TechniqueController.getAllTechniqueTypes);
 router.get('/technique/titles', TechniqueController.getAllTechniqueTitles)
 router.get('/technique/positions', TechniqueController.getAllTechniquePositions);
 router.get('/technique/openguards', TechniqueController.getAllTechniqueOpenGuards);
+router.post('/module', ModuleController.createOrUpdateModule)
 router.get('/module', ModuleController.getAllModules)
 router.get('/module/titles', ModuleController.getAllModuleTitles)
 

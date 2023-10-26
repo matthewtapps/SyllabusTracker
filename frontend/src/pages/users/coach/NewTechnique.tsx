@@ -4,7 +4,6 @@ import CardContent from '@mui/material/CardContent'
 import MuiTextField, { TextFieldProps} from '@mui/material/TextField'
 import MuiButton from '@mui/material/Button'
 import Autocomplete from '@mui/material/Autocomplete'
-import NavBar from '../../components/NavBar'
 import { styled } from '@mui/material/styles'
 import { Technique, Gi, Hierarchy } from 'common'
 

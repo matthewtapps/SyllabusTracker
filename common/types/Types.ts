@@ -11,6 +11,7 @@ import { StudentTechnique } from './StudentTechnique'
 import { Gi } from './enums/Gi'
 import { Hierarchy } from './enums/Hierarchies'
 import { Module } from './Module'
+import { ModuleTechnique } from './ModuleTechnique'
 
 export {
     User, 
@@ -26,5 +27,6 @@ export {
     StudentTechnique,
     Gi,
     Hierarchy,
-    Module
+    Module,
+    ModuleTechnique
 }

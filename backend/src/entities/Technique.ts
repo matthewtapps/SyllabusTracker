@@ -1,8 +1,9 @@
 import { Hierarchy, Technique as TechniqueInterface, Gi } from "common";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, OneToMany } from "typeorm";
 import { TechniqueType } from "./TechniqueType";
 import { Position } from "./Position";
 import { OpenGuard } from "./OpenGuard";
+import { ModuleTechnique } from "./ModuleTechnique";
 
 @Entity()
 export class Technique implements TechniqueInterface {
@@ -36,4 +37,7 @@ export class Technique implements TechniqueInterface {
 
     @ManyToOne(() => OpenGuard)
     openGuard: OpenGuard;
+
+    @OneToMany(() => ModuleTechnique, mt => mt.technique)
+    moduleTechniques: ModuleTechnique[]
 }

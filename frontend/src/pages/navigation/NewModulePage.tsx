@@ -1,35 +1,35 @@
 import React from 'react';
 import { Role } from 'common'
 import { ThemeProvider } from '@emotion/react';
-import theme from '../theme/Theme';
-import StudentTechniques from './student/Techniques';
+import theme from '../../theme/Theme';
+import NewModule from '../users/coach/NewModule';
 
-const TechniquesPage: React.FC = () => {
+const NewModulePage: React.FC = () => {
     const user = {
         userId: 'test',
-        role: Role.Student
-    }
+        role: Role.Coach
+    }      
     
     let content: React.ReactNode
     switch(user.role) {
         case Role.Student:
-        content = StudentTechniques()
+        content = (
+            <div>
+                <p>Incorrect permissions</p>
+                <p>New Module Placeholder</p>
+            </div>
+        )
         break;
 
         case Role.Coach:
-            content = (
-                <div>
-                    <p>Hello Coach!</p>
-                    <p>Techniques page placeholder</p>
-                </div>
-        )
+            content = <NewModule/>
         break;
         
         case Role.Admin:
             content = (
                 <div>
                     <p>Hello Admin!</p>
-                    <p>Techniques page placeholder</p>
+                    <p>New Module Placeholder</p>
                 </div>
         )
         break;
@@ -44,4 +44,4 @@ const TechniquesPage: React.FC = () => {
     );
 };
 
-export default TechniquesPage;
+export default NewModulePage;

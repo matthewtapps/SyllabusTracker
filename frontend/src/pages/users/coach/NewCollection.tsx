@@ -9,7 +9,7 @@ import MuiButton from '@mui/material/Button'
 import Autocomplete from '@mui/material/Autocomplete'
 import MuiTypography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
-import { Technique, Module, Gi, Hierarchy } from 'common'
+import { Technique, Collection, Gi, Hierarchy } from 'common'
 import TechniquesList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
 import DragDropTechniquesList from '../../../components/DragDropTechniques'
@@ -50,9 +50,9 @@ const Typography = styled(MuiTypography)({
     },
 })
 
-const NewModule: React.FC = () => {
+const NewCollection: React.FC = () => {
     
-    const [module, setModule] = React.useState({
+    const [collection, setCollection] = React.useState({
         title: '',
         description: '',
         globalNotes: '',
@@ -65,7 +65,7 @@ const NewModule: React.FC = () => {
     
     // Autocomplete suggestions
     const [techniques, setTechniques] = React.useState<Technique[]>([]);
-    const [moduleTitleSuggestions, setModuleTitleSuggestions] = React.useState<string[]>([]);
+    const [collectionTitleSuggestions, setCollectionTitleSuggestions] = React.useState<string[]>([]);
     
     // Generate options for the filters based on the full techniques list
     const options = useDetermineFilterOptions(techniques)
@@ -96,28 +96,28 @@ const NewModule: React.FC = () => {
         });
     };
 
-    // New module input change
+    // New collection input change
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setModule(prevTechnique => ({ ...prevTechnique, [name]: value }));
+        setCollection(prevTechnique => ({ ...prevTechnique, [name]: value }));
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
     
-        const validModule = transformModuleForBackend(module, selectedTechniques);
-        if (!validModule) {
+        const validCollection = transformCollectionForBackend(collection, selectedTechniques);
+        if (!validCollection) {
             alert('Not a valid technique posted')
             return
         };
         
-        await postModule(validModule);
+        await postCollection(validCollection);
         };
 
     React.useEffect(() => {
         (async () => {
             try {
-                const [moduleTitleResponse, techniqueResponse] = await Promise.all([
+                const [collectionTitleResponse, techniqueResponse] = await Promise.all([
                     fetch('http://192.168.0.156:3000/api/module/titles'),
                     fetch('http://192.168.0.156:3000/api/technique'),
                 ]);
@@ -127,10 +127,10 @@ const NewModule: React.FC = () => {
                 }
                 
                 const techniques = (await techniqueResponse.json())
-                const moduleTitles = (await moduleTitleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
+                const collectionTitles = (await collectionTitleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
     
                 setTechniques(techniques)
-                setModuleTitleSuggestions(moduleTitles);
+                setCollectionTitleSuggestions(collectionTitles);
 
             } catch (error) {
                 alert(`Error fetching data: ${error}`);
@@ -142,16 +142,16 @@ const NewModule: React.FC = () => {
         <Card>
             <Accordion disableGutters>
                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                    <Typography variant="h6">Module Details</Typography>
+                    <Typography variant="h6">Collection Details</Typography>
                 </AccordionSummary>
                 <AccordionDetails>            
                     <form onSubmit={handleSubmit}>
                         <Autocomplete
-                            options={moduleTitleSuggestions}
+                            options={collectionTitleSuggestions}
                             freeSolo
-                            inputValue={module.title}
+                            inputValue={collection.title}
                             onInputChange={(event, newValue) => {
-                                setModule(prevTechnique => ({ ...prevTechnique, title: newValue }));
+                                setCollection(prevTechnique => ({ ...prevTechnique, title: newValue }));
                             }}
                             openOnFocus={false}
                             filterOptions={(options, { inputValue }) => {
@@ -163,7 +163,7 @@ const NewModule: React.FC = () => {
                                 <TextField
                                     {...params}
                                     fullWidth
-                                    label="Module Title"
+                                    label="Collection Title"
                                     variant="outlined"
                                 />
                             )}
@@ -171,9 +171,9 @@ const NewModule: React.FC = () => {
 
                         <TextField
                             fullWidth
-                            label="Module Description"
+                            label="Collection Description"
                             name="description"
-                            value={module.description}
+                            value={collection.description}
                             onChange={handleInputChange}
                             variant="outlined"
                         />
@@ -181,15 +181,15 @@ const NewModule: React.FC = () => {
                             fullWidth
                             label="Optional: Global Notes"
                             name="globalNotes"
-                            value={module.globalNotes}
+                            value={collection.globalNotes}
                             onChange={handleInputChange}
                             variant="outlined"
                         />
                         <Autocomplete
                             options={options.giOptions}
-                            inputValue={module.gi}
+                            inputValue={collection.gi}
                             onInputChange={(event, newValue) => {
-                                setModule(prevGi => ({ ...prevGi, gi: newValue }));
+                                setCollection(prevGi => ({ ...prevGi, gi: newValue }));
                             }}
                             renderInput={(params) => (
                                 <TextField
@@ -203,9 +203,9 @@ const NewModule: React.FC = () => {
                         />
                         <Autocomplete
                             options={options.hierarchyOptions}
-                            inputValue={module.hierarchy}
+                            inputValue={collection.hierarchy}
                             onInputChange={(event, newValue) => {
-                                setModule(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
+                                setCollection(prevHierarchy => ({ ...prevHierarchy, hierarchy: newValue }));
                             }}
                             renderInput={(params) => (
                                 <TextField
@@ -219,9 +219,9 @@ const NewModule: React.FC = () => {
                         />
                         <Autocomplete
                             options={options.typeOptions}
-                            inputValue={module.type}
+                            inputValue={collection.type}
                             onInputChange={(event, newValue) => {
-                                setModule(prevType => ({ ...prevType, type: newValue }));
+                                setCollection(prevType => ({ ...prevType, type: newValue }));
                                 options.typeOptions.filter(option => 
                                     option.toLowerCase().includes(newValue.toLowerCase())
                                 );
@@ -239,9 +239,9 @@ const NewModule: React.FC = () => {
 
                         <Autocomplete
                             options={options.positionOptions}
-                            inputValue={module.position}
+                            inputValue={collection.position}
                             onInputChange={(event, newValue) => {
-                                setModule(prevPosition => ({ ...prevPosition, position: newValue }));
+                                setCollection(prevPosition => ({ ...prevPosition, position: newValue }));
                                 options.positionOptions.filter(option => 
                                     option.toLowerCase().includes(newValue.toLowerCase())
                                 );
@@ -262,9 +262,9 @@ const NewModule: React.FC = () => {
                             <Autocomplete
                                 options={options.openGuardOptions}
                                 freeSolo
-                                inputValue={module.openGuard}
+                                inputValue={collection.openGuard}
                                 onInputChange={(event, newValue) => {
-                                    setModule(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
+                                    setCollection(prevOpenGuard => ({ ...prevOpenGuard, openGuard: newValue }));
                                     options.openGuardOptions.filter(option => 
                                         option.toLowerCase().includes(newValue.toLowerCase())
                                     );
@@ -318,33 +318,33 @@ const NewModule: React.FC = () => {
     );
 };
 
-const transformModuleForBackend = (module: any, selectedTechniques: {index: number, technique: Technique}[]): Module | null => {
-    if (module.gi && !Object.values(Gi).includes(module.gi)) {
+const transformCollectionForBackend = (collection: any, selectedTechniques: {index: number, technique: Technique}[]): Collection | null => {
+    if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
       alert('Invalid Gi value');
       return null;
     }
   
-    if (module.hierarchy && !Object.values(Hierarchy).includes(module.hierarchy)) {
+    if (collection.hierarchy && !Object.values(Hierarchy).includes(collection.hierarchy)) {
       alert('Invalid Hierarchy value');
       return null;
     }
 
     return {
-      ...module,
-      gi: module.gi as Gi,
-      hierarchy: module.hierarchy as Hierarchy,
-      moduleTechniques: selectedTechniques,
+      ...collection,
+      gi: collection.gi as Gi,
+      hierarchy: collection.hierarchy as Hierarchy,
+      collectionTechniques: selectedTechniques,
     };
   }
 
-const postModule = async (module: Module) => {
+const postCollection = async (collection: Collection) => {
     try {
         const response = await fetch('http://localhost:3000/api/module', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(module),
+            body: JSON.stringify(collection),
         });
   
         if (!response.ok) {
@@ -355,8 +355,8 @@ const postModule = async (module: Module) => {
         console.log('Success:', responseData);
         } catch (error) {
             console.error('Error:', error);
-            alert(`Error posting module: ${error}`);
+            alert(`Error posting collection: ${error}`);
         }
 };
 
-export default NewModule;
+export default NewCollection;

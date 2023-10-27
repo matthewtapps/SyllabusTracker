@@ -14,8 +14,8 @@ import {
     StudentTechnique,
     Gi,
     Hierarchy,
-    Module,
-    ModuleTechnique
+    Collection,
+    CollectionTechnique
 } from './types/Types'
 
 export { 
@@ -35,6 +35,6 @@ export {
     validateTechniques,
     Gi,
     Hierarchy,
-    Module,
-    ModuleTechnique
+    Collection,
+    CollectionTechnique
 }

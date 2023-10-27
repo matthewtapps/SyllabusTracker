@@ -1,32 +1,32 @@
 import { Request, Response } from 'express';
-import { ModuleService } from '../services/ModuleService';
+import { CollectionService } from '../services/CollectionService';
 
-export class ModuleController {
-    static async createOrUpdateModule(req: Request, res: Response) {
-        const moduleService = new ModuleService();
+export class CollectionController {
+    static async createOrUpdateCollection(req: Request, res: Response) {
+        const collectionService = new CollectionService();
         try {
-            const module = await moduleService.createOrUpdateModule(req.body);
-            res.json(module);
+            const collection = await collectionService.createNewCollection(req.body);
+            res.json(collection);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     }
 
-    static async getAllModules(req: Request, res: Response) {
-        const moduleService = new ModuleService();
+    static async getAllCollections(req: Request, res: Response) {
+        const collectionService = new CollectionService();
         try {
-            const modules = await moduleService.getAllModules();
-            res.json(modules);
+            const collections = await collectionService.getAllCollections();
+            res.json(collections);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     }
 
-    static async getAllModuleTitles(req: Request, res: Response) {
-        const moduleService = new ModuleService();
+    static async getAllCollectionTitles(req: Request, res: Response) {
+        const collectionService = new CollectionService();
         try {
-            const moduleTitles = await moduleService.getAllModuleTitles();
-            res.json(moduleTitles);
+            const collectionTitles = await collectionService.getAllCollectionTitles();
+            res.json(collectionTitles);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }

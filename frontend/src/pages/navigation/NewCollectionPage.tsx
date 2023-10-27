@@ -2,7 +2,7 @@ import React from 'react';
 import { Role } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../../theme/Theme';
-import NewModule from '../users/coach/NewModule';
+import NewCollection from '../users/coach/NewCollection';
 
 const NewModulePage: React.FC = () => {
     const user = {
@@ -16,20 +16,20 @@ const NewModulePage: React.FC = () => {
         content = (
             <div>
                 <p>Incorrect permissions</p>
-                <p>New Module Placeholder</p>
+                <p>New Collection Placeholder</p>
             </div>
         )
         break;
 
         case Role.Coach:
-            content = <NewModule/>
+            content = <NewCollection/>
         break;
         
         case Role.Admin:
             content = (
                 <div>
                     <p>Hello Admin!</p>
-                    <p>New Module Placeholder</p>
+                    <p>New Collection Placeholder</p>
                 </div>
         )
         break;

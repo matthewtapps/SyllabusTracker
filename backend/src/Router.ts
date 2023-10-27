@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { TechniqueController } from './controllers/TechniqueController';
-import { ModuleController } from './controllers/ModuleController';
+import { CollectionController } from './controllers/ModuleController';
 
 const router = Router();
 
@@ -10,8 +10,8 @@ router.get('/technique/types', TechniqueController.getAllTechniqueTypes);
 router.get('/technique/titles', TechniqueController.getAllTechniqueTitles)
 router.get('/technique/positions', TechniqueController.getAllTechniquePositions);
 router.get('/technique/openguards', TechniqueController.getAllTechniqueOpenGuards);
-router.post('/module', ModuleController.createOrUpdateModule)
-router.get('/module', ModuleController.getAllModules)
-router.get('/module/titles', ModuleController.getAllModuleTitles)
+router.post('/module', CollectionController.createOrUpdateCollection)
+router.get('/module', CollectionController.getAllCollections)
+router.get('/module/titles', CollectionController.getAllCollectionTitles)
 
 export default router;

@@ -10,8 +10,8 @@ import { TechniqueStatus, stringToTechniqueStatus } from './enums/TechniqueStatu
 import { StudentTechnique } from './StudentTechnique'
 import { Gi } from './enums/Gi'
 import { Hierarchy } from './enums/Hierarchies'
-import { Module } from './Module'
-import { ModuleTechnique } from './ModuleTechnique'
+import { Collection } from './Collection'
+import { CollectionTechnique } from './CollectionTechnique'
 
 export {
     User, 
@@ -27,6 +27,6 @@ export {
     StudentTechnique,
     Gi,
     Hierarchy,
-    Module,
-    ModuleTechnique
+    Collection,
+    CollectionTechnique
 }

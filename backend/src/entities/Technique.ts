@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, OneToMany
 import { TechniqueType } from "./TechniqueType";
 import { Position } from "./Position";
 import { OpenGuard } from "./OpenGuard";
-import { ModuleTechnique } from "./ModuleTechnique";
+import { CollectionTechnique } from "./CollectionTechnique";
 
 @Entity()
 export class Technique implements TechniqueInterface {
@@ -38,6 +38,6 @@ export class Technique implements TechniqueInterface {
     @ManyToOne(() => OpenGuard)
     openGuard: OpenGuard;
 
-    @OneToMany(() => ModuleTechnique, mt => mt.technique)
-    moduleTechniques: ModuleTechnique[]
+    @OneToMany(() => CollectionTechnique, ct => ct.technique)
+    collectionTechniques: CollectionTechnique[]
 }

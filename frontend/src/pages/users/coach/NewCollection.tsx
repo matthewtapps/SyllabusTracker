@@ -52,15 +52,24 @@ const Typography = styled(MuiTypography)({
 
 const NewCollection: React.FC = () => {
     
-    const [collection, setCollection] = React.useState({
+    const [collection, setCollection] = React.useState<{
+        title: string,
+        description: string,
+        globalNotes: string,
+        gi: undefined | string,
+        type: undefined | string,
+        position: undefined | string,
+        openGuard: undefined | string,
+        hierarchy: undefined | string,
+    }>({
         title: '',
         description: '',
         globalNotes: '',
-        gi: '',
-        type: '',
-        position: '',
-        openGuard: '',
-        hierarchy: '',
+        gi: undefined,
+        type: undefined,
+        position: undefined,
+        openGuard: undefined,
+        hierarchy: undefined,
     })
     
     // Autocomplete suggestions
@@ -104,33 +113,43 @@ const NewCollection: React.FC = () => {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-    
-        const validCollection = transformCollectionForBackend(collection, selectedTechniques);
+        
+        const validCollection = transformCollectionForBackend(collection);
+            
         if (!validCollection) {
             alert('Not a valid technique posted')
             return
         };
+
+        const collectionStatus = await postCollection(validCollection);
         
-        await postCollection(validCollection);
+        let collectionTechniquesStatus
+        if (selectedTechniques) { collectionTechniquesStatus = await postCollectionTechniques(selectedTechniques) }
+
+        
+
+
+
         };
 
     React.useEffect(() => {
         (async () => {
             try {
-                const [collectionTitleResponse, techniqueResponse] = await Promise.all([
-                    fetch('http://192.168.0.156:3000/api/module/titles'),
-                    fetch('http://192.168.0.156:3000/api/technique'),
-                ]);
+                const techniqueResponse = await fetch('http://192.168.0.156:3000/api/technique')
+                const techniques = (await techniqueResponse.json())
+                setTechniques(techniques)
+
+            } catch (error) { alert(`Error fetching data: ${error}`);}
+            
+            try {
 
                 interface TitleObject {
                     title: string
                 }
-                
-                const techniques = (await techniqueResponse.json())
+
+                const collectionTitleResponse = await fetch('http://192.168.0.156:3000/api/collection/titles')                
                 const collectionTitles = (await collectionTitleResponse.json()).map((titleObj: TitleObject) => titleObj.title);
-    
-                setTechniques(techniques)
-                setCollectionTitleSuggestions(collectionTitles);
+                setCollectionTitleSuggestions(collectionTitles)
 
             } catch (error) {
                 alert(`Error fetching data: ${error}`);
@@ -318,7 +337,7 @@ const NewCollection: React.FC = () => {
     );
 };
 
-const transformCollectionForBackend = (collection: any, selectedTechniques: {index: number, technique: Technique}[]): Collection | null => {
+const transformCollectionForBackend = (collection: any): Collection | null => {
     if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
       alert('Invalid Gi value');
       return null;
@@ -333,18 +352,41 @@ const transformCollectionForBackend = (collection: any, selectedTechniques: {ind
       ...collection,
       gi: collection.gi as Gi,
       hierarchy: collection.hierarchy as Hierarchy,
-      collectionTechniques: selectedTechniques,
     };
   }
 
 const postCollection = async (collection: Collection) => {
     try {
-        const response = await fetch('http://localhost:3000/api/module', {
+        const response = await fetch('http://localhost:3000/api/newCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(collection),
+        });
+  
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
+        }
+  
+        const responseData = await response.json();
+        return response.status
+        console.log('Success:', responseData);
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Error posting collection: ${error}`);
+            return error
+        }
+};
+
+const postCollectionTechniques = async (collectionTechniques: { index: number, technique: Technique }[]) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/addToCollection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(collectionTechniques),
         });
   
         if (!response.ok) {

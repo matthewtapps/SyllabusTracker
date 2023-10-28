@@ -5,33 +5,33 @@ import { AppDataSource } from '../data-source';
 import { Collection } from '../entities/Collection';
 import { Technique } from '../entities/Technique';
 import { CollectionTechnique } from '../entities/CollectionTechnique';
+import CollectionDTO from '../dtos/CollectionDTO';
+import CollectionTechniqueDTO from '../dtos/CollectionTechniqueDTO';
 
 export class CollectionService {
-    async addTechniquesToCollection(data: any): Promise<CollectionTechnique[]> {
+    async addTechniquesToCollection(data: CollectionTechniqueDTO[]): Promise<CollectionTechnique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const collectionTechniqueRepo = AppDataSource.getRepository(CollectionTechnique)
 
         const collectionTechniques: CollectionTechnique[] = [];
         
-        for (const technique of data.collectionTechniques) {
-            const techniqueId = technique.techniqueId
-            const techniqueToAdd = await techniqueRepo.findOne(techniqueId)
+        for (const collectionTechnique of data) {
+            const techniqueToAdd = await techniqueRepo.findOne({ where: { techniqueId: collectionTechnique.technique.techniqueId }})
             if (!techniqueToAdd) {
-                throw new Error(`Technique with id ${techniqueId} not found.`);
+                throw new Error(`Technique with id ${collectionTechnique.technique.techniqueId} not found in technique repo.`);
             }
 
-            const collectionTechnique = new CollectionTechnique();
-            data.module = module;
-            collectionTechnique.technique = techniqueToAdd;
-            collectionTechnique.order = technique.order + 1;
+            const newCollectionTechnique = new CollectionTechnique();
+            newCollectionTechnique.technique = techniqueToAdd;
+            newCollectionTechnique.order = collectionTechnique.index + 1;
             
-            collectionTechniques.push(collectionTechnique)
+            collectionTechniques.push(newCollectionTechnique)
         };
 
         return await collectionTechniqueRepo.save(collectionTechniques);
     }
 
-    async createNewCollection(data: any): Promise<Collection> {
+    async createNewCollection(data: CollectionDTO): Promise<Collection> {
         const collectionRepo = AppDataSource.getRepository(Collection);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);
@@ -40,24 +40,24 @@ export class CollectionService {
         let collection = new Collection();
         collection.title = data.title;
         collection.description = data.description;
-        collection.globalNotes = data.globalNotes;
-        collection.gi = data.gi;
-        collection.hierarchy = data.hierarchy;
+        collection.globalNotes = data.globalNotes ?? null;
+        collection.gi = data.gi ?? null;
+        collection.hierarchy = data.hierarchy ?? null;
 
         if (data.type) {
             let type = await typeRepo.findOne({ where: { title: data.type }});
             collection.type = type;
-        }
+        } else collection.type = null;
 
         if (data.position) {
             let position = await positionRepo.findOne({ where: { title: data.position }});
             collection.position = position;
-        }
+        } else collection.position = null;
 
         if (data.openGuard) {
             let openGuard = await openGuardRepo.findOne({ where: { title: data.openGuard } });
             collection.openGuard = openGuard
-        }
+        } else collection.openGuard = null;
 
         return await collectionRepo.save(collection)        
     };
@@ -72,7 +72,7 @@ export class CollectionService {
     async getAllCollections(): Promise<Collection[]> {
         const collectionRepo = AppDataSource.getRepository(Collection);
         const collections = await collectionRepo.find({
-            relations: ["type", "position", "openGuard", "techniques"]
+            relations: ["type", "position", "openGuard", "collectionTechniques"]
         })
 
         return collections

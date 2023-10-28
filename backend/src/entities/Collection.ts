@@ -9,7 +9,7 @@ import { OpenGuard } from "./OpenGuard";
 export class Collection implements CollectionInterface {
     @PrimaryGeneratedColumn('uuid')
     @Generated('uuid')
-    moduleId: string;
+    collectionId: string;
 
     @Column()
     title: string;
@@ -29,15 +29,15 @@ export class Collection implements CollectionInterface {
     @OneToMany(() => CollectionTechnique, ct => ct.collection)
     collectionTechniques: CollectionTechnique[];
 
-    @ManyToOne(type => Position, position => position.positionId, {nullable: true})
+    @ManyToOne(type => Position, position => position.title, {nullable: true})
     @JoinTable()
     position?: Position;
 
-    @ManyToOne(type => TechniqueType, type => type.typeId, {nullable: true})
+    @ManyToOne(type => TechniqueType, type => type.title, {nullable: true})
     @JoinTable()
     type?: TechniqueType;
     
-    @ManyToOne(type => OpenGuard, openGuard => openGuard.openGuardId, {nullable: true})
+    @ManyToOne(type => OpenGuard, openGuard => openGuard.title, {nullable: true})
     @JoinTable()
     openGuard?: OpenGuard;
 }

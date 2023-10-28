@@ -14,13 +14,13 @@ export class Technique implements TechniqueInterface {
     @Column()
     title: string;
 
-    @Column()
+    @Column({nullable: true})
     videoSrc: string;
 
     @Column()
     description: string;
 
-    @Column()
+    @Column({nullable: true})
     globalNotes: string;
 
     @Column()
@@ -35,9 +35,9 @@ export class Technique implements TechniqueInterface {
     @ManyToOne(() => Position)
     position: Position;
 
-    @ManyToOne(() => OpenGuard)
+    @ManyToOne(() => OpenGuard, {nullable: true})
     openGuard: OpenGuard;
 
-    @OneToMany(() => CollectionTechnique, ct => ct.technique)
+    @OneToMany(() => CollectionTechnique, ct => ct.technique, {nullable: true})
     collectionTechniques: CollectionTechnique[]
 }

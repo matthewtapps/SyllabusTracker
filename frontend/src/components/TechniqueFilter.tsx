@@ -43,7 +43,7 @@ export const useDetermineFilterOptions = (techniques: Technique[]) => {
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
     const [positionOptions, setPositionOptions] = React.useState<string[]>([]);
     const [openGuardOptions, setOpenGuardOptions] = React.useState<string[]>([]);
-    const [giOptions] = React.useState<string[]>(['Yes Gi', 'No Gi']);
+    const [giOptions] = React.useState<string[]>(['Yes Gi', 'No Gi', 'Both']);
 
     // Object of the above to pass to filter component
     const options = {

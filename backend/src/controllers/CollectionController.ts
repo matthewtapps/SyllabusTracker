@@ -2,13 +2,23 @@ import { Request, Response } from 'express';
 import { CollectionService } from '../services/CollectionService';
 
 export class CollectionController {
-    static async createOrUpdateCollection(req: Request, res: Response) {
+    static async createNewCollection(req: Request, res: Response) {
         const collectionService = new CollectionService();
         try {
             const collection = await collectionService.createNewCollection(req.body);
             res.json(collection);
         } catch (error) {
             res.status(400).json({ error: error.message });
+        }
+    }
+
+    static async addTechniquesToCollection(req: Request, res: Response) {
+        const collectionService = new CollectionService()
+        try {
+            const collectionTechniques = await collectionService.addTechniquesToCollection(req.body);
+            res.json(collectionTechniques);
+        } catch (error) {
+            res.status(400).json({ error: error.message })
         }
     }
 

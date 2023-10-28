@@ -2,7 +2,7 @@ import { Technique } from "./Technique";
 import { Collection } from "./Collection";
 
 export interface CollectionTechnique {
-    id: string;
+    collectionTechniqueId: string;
 
     order: number;
 

@@ -1,7 +1,7 @@
 import { CollectionTechnique } from "./Types";
 import { Gi, Hierarchy } from "./Types";
 export interface Collection {
-    moduleId: string;
+    collectionId: string;
     title: string;
     description: string;
     gi?: Gi;

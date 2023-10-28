@@ -7,7 +7,7 @@ import { Collection } from "./Collection";
 export class CollectionTechnique implements CollectionTechnique{
     @PrimaryGeneratedColumn('uuid')
     @Generated('uuid')
-    id: string;
+    collectionTechniqueId: string;
 
     @Column()
     order: number;

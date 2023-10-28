@@ -6,6 +6,7 @@ import MuiButton from '@mui/material/Button'
 import Autocomplete from '@mui/material/Autocomplete'
 import { styled } from '@mui/material/styles'
 import { Technique, Gi, Hierarchy } from 'common'
+import theme from '../../../theme/Theme'
 
 const TextField = styled((props: TextFieldProps) => (
     <MuiTextField {...props} />
@@ -33,19 +34,32 @@ const Button = styled(MuiButton)({
 const NewTechnique: React.FC = () => {
     
     // Technique for submitting to server
-    const [technique, setTechnique] = React.useState({
+    const [technique, setTechnique] = React.useState<{
+        title: string,
+        videoSrc: string | undefined,
+        description: string,
+        globalNotes: string | undefined,
+        gi: string,
+        hierarchy: string,
+        type: string,
+        typeDescription: string | undefined,
+        position: string,
+        positionDescription: string | undefined,
+        openGuard: string | undefined,
+        openGuardDescription: string | undefined,
+    }>({
         title: '',
-        videoSrc: '',
+        videoSrc: undefined,
         description: '',
-        globalNotes: '',
+        globalNotes: undefined,
         gi: '',
         hierarchy: '',
         type: '',
-        typeDescription: '',
+        typeDescription: undefined,
         position: '',
-        positionDescription: '',
-        openGuard: '',
-        openGuardDescription: '',
+        positionDescription: undefined,
+        openGuard: undefined,
+        openGuardDescription: undefined,
     })
     
     // Autocomplete suggestions
@@ -65,6 +79,9 @@ const NewTechnique: React.FC = () => {
     // Errors
     const [titleError, setTitleError] = React.useState(false);
 
+    // Card border for success status
+    const [borderStatus, setBorderStatus] = React.useState('none')
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         setTechnique(prevTechnique => ({ ...prevTechnique, [name]: value }));
@@ -79,8 +96,30 @@ const NewTechnique: React.FC = () => {
             return
         };
         
-        await postTechnique(validTechnique);
+        const status = await postTechnique(validTechnique);
+
+        if (status === 200) {
+            setTechnique({
+                title: '',
+                videoSrc: undefined,
+                description: '',
+                globalNotes: undefined,
+                gi: '',
+                hierarchy: '',
+                type: '',
+                typeDescription: undefined,
+                position: '',
+                positionDescription: undefined,
+                openGuard: undefined,
+                openGuardDescription: undefined,
+            })
+            setBorderStatus(`1px solid ${theme.palette.success.main}`)
+            setTimeout(() => {
+                setBorderStatus('none')
+            }, 3000)
+            
         }
+    }
 
     React.useEffect(() => {
         (async () => {
@@ -115,7 +154,7 @@ const NewTechnique: React.FC = () => {
 
     return (
         <div>
-            <Card>
+            <Card sx={{border: borderStatus}}>
                 <CardContent>
                     <form onSubmit={handleSubmit}>
                         <Autocomplete
@@ -321,9 +360,8 @@ const transformTechniqueForBackend = (technique: any): Technique | null => {
   }
 
 const postTechnique = async (technique: Technique) => {
-    console.log(technique)
     try {
-        const response = await fetch('http://localhost:3000/api/technique', {
+        const response = await fetch('http://192.168.0.156:3000/api/technique', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -337,9 +375,12 @@ const postTechnique = async (technique: Technique) => {
   
         const responseData = await response.json();
         console.log('Success:', responseData);
+        
+        return response.status
         } catch (error) {
             console.error('Error:', error);
             alert(`Error posting technique: ${error}`);
+            return error
         }
 };
 

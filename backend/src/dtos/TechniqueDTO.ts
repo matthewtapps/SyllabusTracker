@@ -1,19 +1,16 @@
 import { Gi, Hierarchy } from "common";
 
-class DTO{
-    title: string
-    description: string
-}
-
 export default class TechniqueDTO {
-    techniqueId: string;
     title: string;
-    videoSrc: string;
+    videoSrc: string | undefined;
     description: string;
-    globalNotes: string;
+    globalNotes: string | undefined;
     gi: Gi;
     hierarchy: Hierarchy;
-    type: DTO;
-    position: DTO;
-    openGuard?: DTO;
+    type: string;
+    typeDescription: string | undefined;
+    position: string;
+    positionDescription: string | undefined;
+    openGuard: string | undefined;
+    openGuardDescription: string | undefined;
 }

@@ -3,9 +3,10 @@ import { TechniqueType } from '../entities/TechniqueType';
 import { Position } from '../entities/Position';
 import { OpenGuard } from '../entities/OpenGuard';
 import { AppDataSource } from '../data-source';
+import TechniqueDTO from '../dtos/TechniqueDTO';
 
 export class TechniqueService {
-    async createOrUpdateTechnique(data: any): Promise<Technique> {
+    async createOrUpdateTechnique(data: TechniqueDTO): Promise<Technique> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);
@@ -34,16 +35,16 @@ export class TechniqueService {
 
         let technique = new Technique();
         technique.title = data.title;
-        technique.videoSrc = data.videoSrc;
+        technique.videoSrc = data.videoSrc ?? null;
         technique.description = data.description;
-        technique.globalNotes = data.globalNotes;
+        technique.globalNotes = data.globalNotes ?? null;
         technique.gi = data.gi;
         technique.hierarchy = data.hierarchy;
         technique.type = type;
         technique.position = position;
         if (openGuard) {
             technique.openGuard = openGuard;
-        }
+        } else technique.openGuard = null;
 
         return await techniqueRepo.save(technique);
     };

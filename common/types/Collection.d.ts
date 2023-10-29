@@ -4,6 +4,7 @@ export interface Collection {
     collectionId: string;
     title: string;
     description: string;
+    globalNotes?: string;
     gi?: Gi;
     collectionTechniques: CollectionTechnique[];
     hierarchy?: Hierarchy;
@@ -13,5 +14,6 @@ export interface Collection {
 }
 interface DTO {
     title: string;
+    description: string;
 }
 export {};

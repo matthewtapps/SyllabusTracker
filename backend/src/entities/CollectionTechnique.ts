@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Generated, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Generated, Column, ManyToOne, JoinTable } from "typeorm";
 import { Technique } from "./Technique";
 import { Collection } from "./Collection";
 

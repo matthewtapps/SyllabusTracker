@@ -32,7 +32,7 @@ const StudentDashboard: React.FC = () => {
 
     const navigate = useNavigate();
     const navigateToTechniques = () => { navigate('/techniques') }
-    const navigateToModules = () => { navigate('/') }
+    const navigateToCollections = () => { navigate('/collections') }
 
     return (
         <div>
@@ -53,10 +53,10 @@ const StudentDashboard: React.FC = () => {
                     </Card>
                 </Grid>
                 <Grid item xs={6}>
-                    <Card onClick={navigateToModules}>
+                    <Card onClick={navigateToCollections}>
                         <CardActionArea>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Typography variant='h6' className="DashboardCard-heading">Modules</Typography>
+                                <Typography variant='h6' className="DashboardCard-heading">Collections</Typography>
                                 <ArrowForwardIosIcon/>
                             </Box>
                         </CardActionArea>

@@ -30,14 +30,11 @@ export class Collection implements CollectionInterface {
     collectionTechniques: CollectionTechnique[];
 
     @ManyToOne(type => Position, position => position.title, {nullable: true})
-    @JoinTable()
     position?: Position;
 
     @ManyToOne(type => TechniqueType, type => type.title, {nullable: true})
-    @JoinTable()
     type?: TechniqueType;
     
     @ManyToOne(type => OpenGuard, openGuard => openGuard.title, {nullable: true})
-    @JoinTable()
     openGuard?: OpenGuard;
 }

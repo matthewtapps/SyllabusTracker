@@ -39,23 +39,25 @@ const ListItem = styled(MuiListItem)({
 interface TechniquesListProps {
     filteredTechniques: Technique[];
     checkbox?: boolean;
+    ordered?: boolean;
     elevation: number;
     checkedTechniques?: {index: number, technique: Technique}[];
     onTechniqueCheck?: (techniqueId: string) => void;
 }
 
-TechniquesList.defaultProps = {
+TechniqueList.defaultProps = {
     checkbox: false,
-    elevation: 3
+    elevation: 3,
+    ordered: false
 }
 
-function TechniquesList(props: TechniquesListProps): JSX.Element {
+function TechniqueList(props: TechniquesListProps): JSX.Element {
 
     return (
         <React.Fragment>
-            {props.filteredTechniques.map(technique => {
+            {props.filteredTechniques.map((technique, index) => {
                 const ListItemText = styled((propss: ListItemTextProps) => (
-                    (props.checkbox) 
+                    (props.ordered || props.checkbox) 
                         ? (<MuiListItemText primaryTypographyProps={{variant: 'body1'}} secondaryTypographyProps={{variant: 'body2'}}{...propss} />)
                         : (<MuiListItemText primaryTypographyProps={{variant: 'h6'}} secondaryTypographyProps={{variant: 'body1'}}{...propss} />)
                 ))(({ theme }) => ({}));
@@ -63,7 +65,8 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
                 const SubCard = styled(MuiCard)({
                     backgroundColor: 'inherit'
                 })
-            
+
+                let currentOrder = props.ordered ? index + 1 : null;            
             return (
                 <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
                     <AccordionSummary
@@ -82,44 +85,51 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
                             </Box>
                         )}
 
-                        {!props.checkbox && (
-                            <Typography variant="h6">{technique.title}</Typography>
+                        {props.ordered && (
+                            <Box display="flex" alignItems="center" marginLeft="0px">
+                                <Typography variant="body1">{currentOrder + ". "}</Typography>
+                                <Typography variant="body1" style={{marginLeft: "8px"}}>{technique.title}</Typography>
+                            </Box>
+                        )}
+
+                        {!props.checkbox && ! props.ordered &&(
+                            <Typography variant="h6">{technique?.title}</Typography>
                         )}
                     </AccordionSummary>
                     <AccordionDetails>
                         <SubCard elevation={0}>
                             <ListItem>
-                                <ListItemText primary="Description" secondary={technique.description} />
+                                <ListItemText primary="Description" secondary={technique?.description} />
                             </ListItem>
     
                             <SubAccordion elevation={0} disableGutters square>
                                 <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
                                     <ListItem>
-                                        <ListItemText primary="Position" secondary={technique.position.title} />
+                                        <ListItemText primary="Position" secondary={technique?.position.title} />
                                     </ListItem>
                                 </AccordionSummary>
 
                                 <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
                                     <ListItem >
-                                        <ListItemText secondary={technique.position.description} />
+                                        <ListItemText secondary={technique?.position.description} />
                                     </ListItem>
                                 </AccordionDetails>
                             </SubAccordion>
 
                             <ListItem>
-                                <ListItemText primary="Hierarchy" secondary={technique.hierarchy} />
+                                <ListItemText primary="Hierarchy" secondary={technique?.hierarchy} />
                             </ListItem>
 
                             <SubAccordion elevation={0} disableGutters square>
                                 <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
                                     <ListItem>
-                                        <ListItemText primary="Type" secondary={technique.type.title} />
+                                        <ListItemText primary="Type" secondary={technique?.type.title} />
                                     </ListItem>
                                 </AccordionSummary>
 
                                 <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
                                     <ListItem>
-                                        <ListItemText secondary={technique.type.description} />
+                                        <ListItemText secondary={technique?.type.description} />
                                     </ListItem>
                                 </AccordionDetails>
                             </SubAccordion>
@@ -127,22 +137,22 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
                             {technique.openGuard && (
                                 <SubAccordion elevation={0} disableGutters square>
                                     <ListItem>
-                                        <ListItemText primary="Open Guard" secondary={technique.openGuard.title} />
+                                        <ListItemText primary="Open Guard" secondary={technique?.openGuard.title} />
                                     </ListItem>
 
                                     <ListItem>
-                                        <ListItemText secondary={technique.openGuard.description} />
+                                        <ListItemText secondary={technique?.openGuard.description} />
                                     </ListItem>
                                 </SubAccordion>
                             )}
 
                             <ListItem>
-                                <ListItemText primary="Gi or No Gi" secondary={technique.gi} />
+                                <ListItemText primary="Gi or No Gi" secondary={technique?.gi} />
                             </ListItem>
                             
                             {technique.globalNotes && (
                                 <ListItem>
-                                    <ListItemText primary="Global Notes" secondary={technique.globalNotes} />
+                                    <ListItemText primary="Global Notes" secondary={technique?.globalNotes} />
                                 </ListItem>
                             )}
                         </SubCard>
@@ -153,4 +163,4 @@ function TechniquesList(props: TechniquesListProps): JSX.Element {
     )
 }
 
-export default TechniquesList
+export default TechniqueList

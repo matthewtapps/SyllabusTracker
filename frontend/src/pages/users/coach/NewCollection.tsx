@@ -10,7 +10,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 import MuiTypography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 import { Technique, Collection, Gi, Hierarchy } from 'common'
-import TechniquesList from '../../../components/TechniqueList'
+import TechniqueList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
 import DragDropTechniquesList from '../../../components/DragDropTechniques'
 
@@ -121,14 +121,9 @@ const NewCollection: React.FC = () => {
             return
         };
 
-        const collectionStatus = await postCollection(validCollection);
+        await postCollection(validCollection);
         
-        let collectionTechniquesStatus
-        if (selectedTechniques) { collectionTechniquesStatus = await postCollectionTechniques(selectedTechniques) }
-
-        
-
-
+        if (selectedTechniques) { await postCollectionTechniques(validCollection, selectedTechniques) }
 
         };
 
@@ -324,9 +319,10 @@ const NewCollection: React.FC = () => {
                     <Typography variant="h6">Select Techniques</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <TechniquesList 
+                    <TechniqueList 
                     filteredTechniques={filteredTechniques} 
                     checkbox
+                    ordered
                     elevation={0} 
                     checkedTechniques={selectedTechniques}
                     onTechniqueCheck={handleTechniqueCheck}
@@ -370,8 +366,8 @@ const postCollection = async (collection: Collection) => {
         }
   
         const responseData = await response.json();
-        return response.status
         console.log('Success:', responseData);
+        return response.status
         } catch (error) {
             console.error('Error:', error);
             alert(`Error posting collection: ${error}`);
@@ -379,14 +375,14 @@ const postCollection = async (collection: Collection) => {
         }
 };
 
-const postCollectionTechniques = async (collectionTechniques: { index: number, technique: Technique }[]) => {
+const postCollectionTechniques = async (collection: Collection, collectionTechniques: { index: number, technique: Technique }[]) => {
     try {
-        const response = await fetch('http://localhost:3000/api/addToCollection', {
+        const response = await fetch('http://192.168.0.156:3000/api/addToCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(collectionTechniques),
+            body: JSON.stringify({collection: collection, techniques: collectionTechniques}),
         });
   
         if (!response.ok) {

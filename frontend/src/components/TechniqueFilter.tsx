@@ -120,6 +120,8 @@ function TechniqueFilter({ onFiltersChange, options }: TechniqueFilterProps): JS
         <Accordion disableGutters>
             <AccordionSummary expandIcon={<ExpandMore/>}>
                 <TextField
+                    fullWidth
+                    sx={{maxWidth: "95%"}}
                     label="Filter Techniques"
                     value={filters.title}
                     onChange={e => {

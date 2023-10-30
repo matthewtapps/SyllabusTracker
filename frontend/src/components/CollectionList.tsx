@@ -32,7 +32,8 @@ const SubAccordion = styled(MuiAccordion)({
 
 const ListItem = styled(MuiListItem)({
     paddingTop: "0px",
-    paddingBottom: "0px"
+    paddingBottom: "0px",
+    paddingLeft: "0px"
 })
 
 const ListItemText = styled(({ ...props }: ListItemTextProps) => (
@@ -44,11 +45,11 @@ interface CollectionsListProps {
     elevation: number;
 }
 
-CollectionsList.defaultProps = {
+CollectionList.defaultProps = {
     elevation: 3
 }
 
-function CollectionsList(props: CollectionsListProps): JSX.Element {
+function CollectionList(props: CollectionsListProps): JSX.Element {
     return (
         <React.Fragment>
             {props.filteredCollections.map(collection => {
@@ -80,7 +81,7 @@ function CollectionsList(props: CollectionsListProps): JSX.Element {
                                         <ListItemText primary="Collection Techniques"/>
                                     </ListItem>
                                 </AccordionSummary>
-                                <AccordionDetails>
+                                <AccordionDetails sx={{padding: "0px"}}>
                                     <TechniqueList 
                                     filteredTechniques={collectionTechniques}
                                     elevation={0}
@@ -162,4 +163,4 @@ function CollectionsList(props: CollectionsListProps): JSX.Element {
     )
 }
 
-export default CollectionsList
+export default CollectionList

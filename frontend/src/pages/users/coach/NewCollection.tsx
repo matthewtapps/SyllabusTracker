@@ -322,7 +322,6 @@ const NewCollection: React.FC = () => {
                     <TechniqueList 
                     filteredTechniques={filteredTechniques} 
                     checkbox
-                    ordered
                     elevation={0} 
                     checkedTechniques={selectedTechniques}
                     onTechniqueCheck={handleTechniqueCheck}

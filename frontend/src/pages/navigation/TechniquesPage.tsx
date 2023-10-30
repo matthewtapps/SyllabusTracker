@@ -3,11 +3,12 @@ import { Role } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../../theme/Theme';
 import StudentTechniques from '../users/student/Techniques';
+import CoachTechniques from '../users/coach/Techniques';
 
 const TechniquesPage: React.FC = () => {
     const user = {
         userId: 'test',
-        role: Role.Student
+        role: Role.Coach
     }
     
     let content: React.ReactNode
@@ -17,12 +18,7 @@ const TechniquesPage: React.FC = () => {
         break;
 
         case Role.Coach:
-            content = (
-                <div>
-                    <p>Hello Coach!</p>
-                    <p>Techniques page placeholder</p>
-                </div>
-        )
+            content = CoachTechniques()
         break;
         
         case Role.Admin:

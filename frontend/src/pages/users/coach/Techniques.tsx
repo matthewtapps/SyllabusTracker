@@ -5,12 +5,12 @@ import CardContent from '@mui/material/CardContent'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import { useNavigate } from 'react-router-dom'
-import { Collection } from 'common'
+import { Technique } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
-import CollectionList from '../../../components/CollectionList'
-import CollectionFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/CollectionFilter'
+import TechniqueList from '../../../components/TechniqueList'
+import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
 
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
@@ -22,26 +22,26 @@ const Card = styled(MuiCard)({
     }
 });
 
-function StudentCollections(): JSX.Element {
+function CoachTechniques(): JSX.Element {
     const navigate = useNavigate();
-    const navigateToNewCollection = () => { navigate('/newCollection') }
+    const navigateToNewTechnique = () => { navigate('/newtechnique') }
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
-    const [placeholderContent, setPlaceholderContent] = React.useState('No collection data available')
+    const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
 
     // List of techniques state
-    const [collectionsList, setCollectionsList] = React.useState<Collection[]>([])
+    const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
 
     React.useEffect(() => {
         (async () => {
             try {
-                const [collectionResponse] = await Promise.all([
-                    fetch('http://192.168.0.156:3000/api/collection')
+                const [techniqueResponse] = await Promise.all([
+                    fetch('http://192.168.0.156:3000/api/technique')
                 ]);
 
-                const collections: Collection[] = await (collectionResponse.json())
-                setCollectionsList(collections)
+                const techniques: Technique[] = await (techniqueResponse.json())
+                setTechniquesList(techniques)
                 
                 setLoading(false)
 
@@ -54,16 +54,16 @@ function StudentCollections(): JSX.Element {
     }, []);
 
     // Generate options for the filters based on the full techniques list
-    const options = useDetermineFilterOptions(collectionsList)
+    const options = useDetermineFilterOptions(techniquesList)
 
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
-    const { filteredCollections, handleFilterChange } = useHandleFilterChange(collectionsList)
+    const { filteredTechniques, handleFilterChange } = useHandleFilterChange(techniquesList)
 
     return (
         <div>
             <Card>
-                <CollectionFilter 
+                <TechniqueFilter 
                 onFiltersChange={handleFilterChange} 
                 options={options}/>
             </Card>
@@ -72,19 +72,19 @@ function StudentCollections(): JSX.Element {
                 <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
                     <CircularProgress />
                 </Box>
-            ) : filteredCollections.length === 0 ? (
+            ) : filteredTechniques.length === 0 ? (
                 <CardContent>
                     <Typography>{placeholderContent}</Typography>
                 </CardContent>
             ) : (
-                <CollectionList filteredCollections={filteredCollections}/>
+                <TechniqueList filteredTechniques={filteredTechniques} editable/>
             )}
             </Card>
             <Fab // Should only exist on coach version of techniques
             color="primary" 
             aria-label="add" 
             style={{position: 'fixed', bottom: '16px', right: '16px'}}
-            onClick={navigateToNewCollection}
+            onClick={navigateToNewTechnique}
             >
                 <AddIcon/>
             </Fab>
@@ -92,4 +92,4 @@ function StudentCollections(): JSX.Element {
     );
 };
 
-export default StudentCollections
+export default CoachTechniques

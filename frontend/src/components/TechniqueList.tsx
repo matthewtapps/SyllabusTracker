@@ -52,6 +52,21 @@ interface ExtendedListItemTextProps extends ListItemTextProps {
     smalltext: boolean
 }
 
+interface TechniqueDTO {
+    title: string,
+    videoSrc: string | undefined,
+    description: string,
+    globalNotes: string | undefined,
+    gi: string,
+    hierarchy: string,
+    type: string,
+    typeDescription: string | undefined,
+    position: string,
+    positionDescription: string | undefined,
+    openGuard: string | undefined,
+    openGuardDescription: string | undefined,
+}
+
 const BaseListItemText: React.FC<ExtendedListItemTextProps> = (props) => {
     const { smalltext, ...otherProps } = props;
     return (
@@ -82,17 +97,26 @@ const ListItemText = styled(BaseListItemText)<ExtendedListItemTextProps>(({ them
     };
 });
 
+const SubCard = styled(MuiCard)({
+    backgroundColor: 'inherit',
+})
+
 interface TechniquesListProps {
     filteredTechniques: Technique[];
     checkbox?: boolean;
     ordered?: boolean;
     elevation: number;
     editable?: boolean;
-    onTechniqueEdit?: (techniuqeId: string, updatedTechniuqe: Technique) => void;
-    onTechniqueDelete?: (techniqueId: string) => void;
     checkedTechniques?: {index: number, technique: Technique}[];
     onTechniqueCheck?: (techniqueId: string) => void;
-}
+    editingTechniqueId?: string | null;
+    editingTechnique?: TechniqueDTO | null;
+    onEditClick?: (technique: Technique) => void;
+    onInputChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onSaveClick?: () => void;
+    onCancelClick?: () => void;
+    onDeleteClick?: (techniqueId: string) => void;
+}  
 
 TechniqueList.defaultProps = {
     checkbox: false,
@@ -103,40 +127,9 @@ TechniqueList.defaultProps = {
 
 function TechniqueList(props: TechniquesListProps): JSX.Element {
 
-    const [editingTechniqueId, setEditingTechniqueId] = React.useState<string | null>(null);
-    const [editedTechnique, setEditedTechnique] = React.useState<Technique | null>(null);
-
-    const handleEditClick = (technique: Technique) => {
-        setEditingTechniqueId(technique.techniqueId);
-        setEditedTechnique(technique);
-    }
-
-    const handleSaveClick = () => {
-        if (editedTechnique && props.onTechniqueEdit) {
-            props.onTechniqueEdit(editingTechniqueId!, editedTechnique);
-        }
-        setEditingTechniqueId(null);
-        setEditedTechnique(null);
-    }
-
-    const handleCancelClick = () => {
-        setEditingTechniqueId(null);
-        setEditedTechnique(null);
-    }
-
-    const handleDeleteClick = (techniqueId: string) => {
-        if (props.onTechniqueDelete) {
-            props.onTechniqueDelete(techniqueId);
-        }
-    }
-
     return (
         <React.Fragment>
             {props.filteredTechniques.map((technique, index) => {
-                const SubCard = styled(MuiCard)({
-                    backgroundColor: 'inherit',
-                })
-
                 let currentOrder = props.ordered ? index + 1 : null;            
             return (
                 <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
@@ -167,22 +160,23 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                             <Box display="flex" flexDirection="column" flexGrow={1}>
                                 <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between" width="97%">
                                     {!props.checkbox && !props.ordered && (
-                                        (editingTechniqueId === technique.techniqueId) ? (
-                                            <TextField size="medium" fullWidth defaultValue={technique?.title}/>
-                                        ) : (
-                                            <Typography variant="h6">{technique?.title}</Typography>
-                                        )
+                                        (props.editingTechniqueId === technique.techniqueId) ? (
+                                            <TextField size="medium" fullWidth 
+                                            defaultValue={technique?.title}
+                                            onChange={props.onInputChange} name="title" label="Title"
+                                            onClick={e => e.stopPropagation()}/>
+                                        ) : <Typography variant="h6">{technique?.title}</Typography>
                                     )}
-                                    {props.editable && !(editingTechniqueId === technique.techniqueId) && (
-                                        <Edit onClick={(event) => { event.stopPropagation(); handleEditClick(technique); }}>Edit</Edit>
+                                    {props.editable && !(props.editingTechniqueId === technique.techniqueId) && (
+                                        <Edit onClick={(event) => { event.stopPropagation(); props.onEditClick?.(technique); }}/>
                                     )}
                                 </Box>
-                                    
-                                {editingTechniqueId === technique.techniqueId && (
+
+                                {props.editingTechniqueId === technique.techniqueId && (
                                     <Box display="flex" justifyContent="space-between" sx={{}} alignItems="center" width="97%" mt={1}>
-                                        <Button onClick={(event) => { event.stopPropagation(); handleSaveClick(); }}>Save</Button>
-                                        <Button onClick={(event) => { event.stopPropagation(); handleCancelClick(); }}>Cancel</Button>
-                                        <Button onClick={(event) => { event.stopPropagation(); handleDeleteClick(technique.techniqueId); }}
+                                        <Button onClick={(event) => { event.stopPropagation(); props.onSaveClick?.(); }}>Save</Button>
+                                        <Button onClick={(event) => { event.stopPropagation(); props.onCancelClick?.(); }}>Cancel</Button>
+                                        <Button onClick={(event) => { event.stopPropagation(); props.onDeleteClick?.(technique.techniqueId); }}
                                             style={{backgroundColor: theme.palette.error.main}}
                                         >Delete</Button>
                                     </Box>
@@ -196,20 +190,24 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 <ListItemText sx={{margin: "0px"}}
                                 smalltext={(props.checkbox || props.ordered) ? true : false}
                                 primary="Description"
-                                secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.description} multiline rows={4}/> : 
+                                secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                    defaultValue={props.editingTechnique?.description} multiline rows={4}
+                                    onChange={props.onInputChange} name="description"/> : 
                                     technique?.description
                                 }
                                 />
                             </ListItem>
 
-                            {(technique?.globalNotes || editingTechniqueId === technique.techniqueId) && (
+                            {(technique?.globalNotes || props.editingTechniqueId === technique.techniqueId) && (
                                 <ListItem>
                                     <ListItemText
                                     smalltext={(props.checkbox || props.ordered) ? true : false} 
                                     primary="Global Notes"
-                                    secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                        <TextField size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} defaultValue={technique?.globalNotes} multiline rows={4}/> : 
+                                    secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                        <TextField size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} 
+                                        value={props.editingTechnique?.globalNotes} multiline rows={4}
+                                        onChange={props.onInputChange} name="globalNotes"/> : 
                                         technique?.globalNotes
                                     }
                                     />
@@ -222,8 +220,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         <ListItemText
                                         smalltext={(props.checkbox || props.ordered) ? true : false}                                    
                                         primary="Position" 
-                                        secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.position.title}/> : 
+                                        secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                            value={props.editingTechnique?.position}
+                                            onChange={props.onInputChange} name="position"/> : 
                                             technique?.position.title
                                         } 
                                         />
@@ -234,8 +234,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                     <ListItem >
                                         <ListItemText
                                         smalltext={(props.checkbox || props.ordered) ? true : false}  
-                                        secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.position.description} multiline rows={4}/> : 
+                                        secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                            <TextField size="small" placeholder='Technique Position Description' fullWidth style={{marginRight: "20px"}} 
+                                            value={props.editingTechnique?.positionDescription} multiline rows={4}
+                                            onChange={props.onInputChange} name='positionDescription'/> : 
                                             technique?.position.description
                                         }
                                         />
@@ -247,8 +249,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 <ListItemText
                                 smalltext={(props.checkbox || props.ordered) ? true : false}
                                 primary="Hierarchy" 
-                                secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.hierarchy}/> : 
+                                secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                    value={props.editingTechnique?.hierarchy}
+                                    onChange={props.onInputChange} name='hierarchy'/> : 
                                     technique?.hierarchy
                                 }
                                 />
@@ -260,8 +264,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         <ListItemText
                                         smalltext={(props.checkbox || props.ordered) ? true : false} 
                                         primary="Type" 
-                                        secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.type.title}/> : 
+                                        secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                            value={props.editingTechnique?.type}
+                                            onChange={props.onInputChange} name='type'/> : 
                                             technique?.type.title
                                         }
                                         />
@@ -272,8 +278,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                     <ListItem>
                                         <ListItemText
                                         smalltext={(props.checkbox || props.ordered) ? true : false} 
-                                        secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.type.description} multiline rows={4}/> : 
+                                        secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                            <TextField size="small" placeholder='Technique Type Description' fullWidth style={{marginRight: "20px"}} 
+                                            value={props.editingTechnique?.typeDescription} multiline rows={4}
+                                            onChange={props.onInputChange} name='typeDescription'/> : 
                                             technique?.type.description
                                         }
                                         />
@@ -281,15 +289,17 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 </AccordionDetails>
                             </SubAccordion>
 
-                            {(technique?.openGuard || editingTechniqueId === technique.techniqueId) && (
+                            {(technique?.openGuard || props.editingTechniqueId === technique.techniqueId) && (
                                 <SubAccordion elevation={0} disableGutters square>
                                     <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
                                         <ListItem>
                                             <ListItemText
                                             smalltext={(props.checkbox || props.ordered) ? true : false} 
                                             primary="Open Guard"
-                                            secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                                <TextField size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} defaultValue={technique?.openGuard?.title}/> : 
+                                            secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                                <TextField size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} 
+                                                value={props.editingTechnique?.openGuard}
+                                                onChange={props.onInputChange} name='openGuard'/> : 
                                                 technique?.openGuard?.title
                                             }
                                             />
@@ -300,8 +310,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         <ListItem>
                                             <ListItemText
                                             smalltext={(props.checkbox || props.ordered) ? true : false}   
-                                            secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                                <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.openGuard?.description} multiline rows={4}/> : 
+                                            secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                                <TextField size="small" placeholder='Open Guard Description' fullWidth style={{marginRight: "20px"}} 
+                                                value={props.editingTechnique?.openGuardDescription} multiline rows={4}
+                                                onChange={props.onInputChange} name='openGuardDescription'/> : 
                                                 technique?.openGuard?.description
                                             }
                                             />
@@ -314,8 +326,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 <ListItemText
                                 smalltext={(props.checkbox || props.ordered) ? true : false}  
                                 primary="Gi or No Gi" 
-                                secondary={(editingTechniqueId === technique.techniqueId) ? 
-                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} defaultValue={technique?.gi}/> : 
+                                secondary={(props.editingTechniqueId === technique.techniqueId) ? 
+                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                    value={props.editingTechnique?.gi}
+                                    onChange={props.onInputChange} name='gi'/> : 
                                     technique?.gi
                                 }
                                 />

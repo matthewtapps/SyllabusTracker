@@ -120,6 +120,8 @@ function CollectionFilter({ onFiltersChange, options }: CollectionFilterProps): 
         <Accordion disableGutters>
             <AccordionSummary expandIcon={<ExpandMore/>}>
                 <TextField
+                    fullWidth
+                    sx={{maxWidth: "95%"}}
                     label="Filter Collections"
                     value={filters.title}
                     onChange={e => {

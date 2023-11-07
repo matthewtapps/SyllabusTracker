@@ -160,7 +160,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
                                     {!props.checkbox && !props.ordered && (
                                         (props.editingTechniqueId === technique.techniqueId) ? (
-                                            <TextField wasSubmitted={wasSubmitted} size="medium" fullWidth style={{marginRight: "250px"}}
+                                            <TextField wasSubmitted={wasSubmitted} size="medium" style={{width: "100%"}} fullWidth
                                             defaultValue={technique?.title}
                                             onChange={props.onInputChange} name="title" label="Title"
                                             onClick={e => e.stopPropagation()}/>

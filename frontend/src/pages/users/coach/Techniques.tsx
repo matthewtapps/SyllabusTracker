@@ -85,9 +85,14 @@ function CoachTechniques(): JSX.Element {
         });
     }
 
-    const handleSaveClick = async () => {
+    const handleSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
         // TODO: Call the backend API to update the technique
         // After successful update, clear the editing states
+        const formData = new FormData(event.currentTarget)
+        const fieldValues = Object.fromEntries(formData.entries())
+        console.log(`Fast Form Submitted`, fieldValues)
+        event.preventDefault();
+
         setEditingTechniqueId(null);
         setEditedTechnique({
             title: '',
@@ -202,7 +207,7 @@ function CoachTechniques(): JSX.Element {
                 editingTechniqueId={editingTechniqueId}
                 editingTechnique={editedTechnique}
                 onEditClick={handleEditClick}
-                onSaveClick={handleSaveClick}
+                onSubmitClick={handleSaveClick}
                 onCancelClick={handleCancelClick}
                 onDeleteClick={handleDeleteClick}
                 onInputChange={debouncedHandleInputChange}

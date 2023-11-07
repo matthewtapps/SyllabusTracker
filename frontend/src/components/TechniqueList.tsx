@@ -11,8 +11,8 @@ import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import MuiListItem from '@mui/material/ListItem';
-import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText'
-import MuiTextField from '@mui/material/TextField'
+import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
+import { FastTextField as TextField } from './FastTextField';
 import MuiCard from '@mui/material/Card';
 import theme from '../theme/Theme';
 
@@ -30,9 +30,6 @@ const Accordion = styled(MuiAccordion)({
         borderBottom: '1px solid #7c6f64'
     }
 });
-
-const TextField = styled(MuiTextField)({
-})
 
 const SubAccordion = styled(MuiAccordion)({
     backgroundColor: `inherit`,
@@ -113,7 +110,7 @@ interface TechniquesListProps {
     editingTechnique?: TechniqueDTO | null;
     onEditClick?: (technique: Technique) => void;
     onInputChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    onSaveClick?: () => void;
+    onSubmitClick?: (event: React.FormEvent<HTMLFormElement>) => void;
     onCancelClick?: () => void;
     onDeleteClick?: (techniqueId: string) => void;
 }  
@@ -127,8 +124,10 @@ TechniqueList.defaultProps = {
 
 function TechniqueList(props: TechniquesListProps): JSX.Element {
 
+    const [wasSubmitted, setWasSubmitted] = React.useState(false)
+
     return (
-        <React.Fragment>
+        <form noValidate onSubmit={props.onSubmitClick}>
             {props.filteredTechniques.map((technique, index) => {
                 let currentOrder = props.ordered ? index + 1 : null;            
             return (
@@ -158,10 +157,10 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                             )}
 
                             <Box display="flex" flexDirection="column" flexGrow={1}>
-                                <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between" width="97%">
+                                <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
                                     {!props.checkbox && !props.ordered && (
                                         (props.editingTechniqueId === technique.techniqueId) ? (
-                                            <TextField size="medium" fullWidth 
+                                            <TextField wasSubmitted={wasSubmitted} size="medium" fullWidth style={{marginRight: "250px"}}
                                             defaultValue={technique?.title}
                                             onChange={props.onInputChange} name="title" label="Title"
                                             onClick={e => e.stopPropagation()}/>
@@ -173,8 +172,8 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 </Box>
 
                                 {props.editingTechniqueId === technique.techniqueId && (
-                                    <Box display="flex" justifyContent="space-between" sx={{}} alignItems="center" width="97%" mt={1}>
-                                        <Button onClick={(event) => { event.stopPropagation(); props.onSaveClick?.(); }}>Save</Button>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" width="97%" mt={1}>
+                                        <Button type="submit" onClick={(event) => { event.stopPropagation() }}>Save</Button>
                                         <Button onClick={(event) => { event.stopPropagation(); props.onCancelClick?.(); }}>Cancel</Button>
                                         <Button onClick={(event) => { event.stopPropagation(); props.onDeleteClick?.(technique.techniqueId); }}
                                             style={{backgroundColor: theme.palette.error.main}}
@@ -191,9 +190,8 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 smalltext={(props.checkbox || props.ordered) ? true : false}
                                 primary="Description"
                                 secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} 
-                                    defaultValue={props.editingTechnique?.description} multiline rows={4}
-                                    onChange={props.onInputChange} name="description"/> : 
+                                    <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                    defaultValue={props.editingTechnique?.description} multiline rows={4} name="description"/> : 
                                     technique?.description
                                 }
                                 />
@@ -205,7 +203,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                     smalltext={(props.checkbox || props.ordered) ? true : false} 
                                     primary="Global Notes"
                                     secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                        <TextField size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} 
                                         value={props.editingTechnique?.globalNotes} multiline rows={4}
                                         onChange={props.onInputChange} name="globalNotes"/> : 
                                         technique?.globalNotes
@@ -221,7 +219,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         smalltext={(props.checkbox || props.ordered) ? true : false}                                    
                                         primary="Position" 
                                         secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                            <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
                                             value={props.editingTechnique?.position}
                                             onChange={props.onInputChange} name="position"/> : 
                                             technique?.position.title
@@ -235,7 +233,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         <ListItemText
                                         smalltext={(props.checkbox || props.ordered) ? true : false}  
                                         secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" placeholder='Technique Position Description' fullWidth style={{marginRight: "20px"}} 
+                                            <TextField wasSubmitted={wasSubmitted} size="small" placeholder='Technique Position Description' fullWidth style={{marginRight: "20px"}} 
                                             value={props.editingTechnique?.positionDescription} multiline rows={4}
                                             onChange={props.onInputChange} name='positionDescription'/> : 
                                             technique?.position.description
@@ -250,7 +248,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 smalltext={(props.checkbox || props.ordered) ? true : false}
                                 primary="Hierarchy" 
                                 secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                    <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
                                     value={props.editingTechnique?.hierarchy}
                                     onChange={props.onInputChange} name='hierarchy'/> : 
                                     technique?.hierarchy
@@ -265,7 +263,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         smalltext={(props.checkbox || props.ordered) ? true : false} 
                                         primary="Type" 
                                         secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                            <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
                                             value={props.editingTechnique?.type}
                                             onChange={props.onInputChange} name='type'/> : 
                                             technique?.type.title
@@ -279,7 +277,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         <ListItemText
                                         smalltext={(props.checkbox || props.ordered) ? true : false} 
                                         secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                            <TextField size="small" placeholder='Technique Type Description' fullWidth style={{marginRight: "20px"}} 
+                                            <TextField wasSubmitted={wasSubmitted} size="small" placeholder='Technique Type Description' fullWidth style={{marginRight: "20px"}} 
                                             value={props.editingTechnique?.typeDescription} multiline rows={4}
                                             onChange={props.onInputChange} name='typeDescription'/> : 
                                             technique?.type.description
@@ -297,7 +295,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                             smalltext={(props.checkbox || props.ordered) ? true : false} 
                                             primary="Open Guard"
                                             secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                                <TextField size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} 
+                                                <TextField wasSubmitted={wasSubmitted} size="small" placeholder='Optional' fullWidth style={{marginRight: "20px"}} 
                                                 value={props.editingTechnique?.openGuard}
                                                 onChange={props.onInputChange} name='openGuard'/> : 
                                                 technique?.openGuard?.title
@@ -311,7 +309,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                             <ListItemText
                                             smalltext={(props.checkbox || props.ordered) ? true : false}   
                                             secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                                <TextField size="small" placeholder='Open Guard Description' fullWidth style={{marginRight: "20px"}} 
+                                                <TextField wasSubmitted={wasSubmitted} size="small" placeholder='Open Guard Description' fullWidth style={{marginRight: "20px"}} 
                                                 value={props.editingTechnique?.openGuardDescription} multiline rows={4}
                                                 onChange={props.onInputChange} name='openGuardDescription'/> : 
                                                 technique?.openGuard?.description
@@ -327,7 +325,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                 smalltext={(props.checkbox || props.ordered) ? true : false}  
                                 primary="Gi or No Gi" 
                                 secondary={(props.editingTechniqueId === technique.techniqueId) ? 
-                                    <TextField size="small" fullWidth style={{marginRight: "20px"}} 
+                                    <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
                                     value={props.editingTechnique?.gi}
                                     onChange={props.onInputChange} name='gi'/> : 
                                     technique?.gi
@@ -338,7 +336,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                     </AccordionDetails>
                 </Accordion>
             )})}
-        </React.Fragment>
+        </form>
     )
 }
 

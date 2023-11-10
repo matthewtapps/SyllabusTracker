@@ -5,14 +5,14 @@ import CardContent from '@mui/material/CardContent'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import { useNavigate } from 'react-router-dom'
-import { Technique } from 'common'
+import { Collection } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
-import TechniqueList from '../../../components/TechniqueList'
-import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
+import CollectionList from '../../../components/CollectionList'
+import CollectionFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/CollectionFilter'
 import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
-
+import { Technique } from 'common'
 
 interface TechniqueDTO {
     title: string,
@@ -29,16 +29,6 @@ interface TechniqueDTO {
     openGuardDescription: string | undefined,
 }
 
-const Card = styled(MuiCard)({
-    '&.MuiCard-root': {
-        marginLeft: "10px",
-        marginTop: "10px",
-        marginRight: "10px",
-        borderRadius: "2",
-        boxShadow: "3"
-    }
-});
-
 const emptyTechniqueDTO: TechniqueDTO = {
     title: '',
     videoSrc: undefined,
@@ -54,18 +44,27 @@ const emptyTechniqueDTO: TechniqueDTO = {
     openGuardDescription: undefined,
 }
 
-function CoachTechniques(): JSX.Element {
+const Card = styled(MuiCard)({
+    '&.MuiCard-root': {
+        marginLeft: "10px",
+        marginTop: "10px",
+        marginRight: "10px",
+        borderRadius: "2",
+        boxShadow: "3"
+    }
+});
+
+function CoachCollections(): JSX.Element {
     const navigate = useNavigate();
-    const navigateToNewTechnique = () => { navigate('/newtechnique') }
+    const navigateToNewCollection = () => { navigate('/newCollection') }
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
-    const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
+    const [placeholderContent, setPlaceholderContent] = React.useState('No collection data available')
 
     // List of techniques state
-    const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
+    const [collectionsList, setCollectionsList] = React.useState<Collection[]>([])
 
-    // Technique editing states and functions
     const [editingTechniqueId, setEditingTechniqueId] = React.useState<string | null>(null);
     const [editedTechnique, setEditedTechnique] = React.useState<TechniqueDTO>(emptyTechniqueDTO);
     
@@ -97,14 +96,12 @@ function CoachTechniques(): JSX.Element {
             alert('Not a valid technique posted')
             return
         };
-        
+
         const status = await postTechnique(editingTechniqueId, validTechnique);
 
-        
-
         if (status === 200) {
-            const techniques = await fetchTechniques()
-            if (techniques) {setTechniquesList(techniques)}
+            const collections = await fetchCollections()
+            if (collections) {setCollectionsList(collections)}
             setEditingTechniqueId(null);
             setEditedTechnique(emptyTechniqueDTO);
         }
@@ -120,17 +117,17 @@ function CoachTechniques(): JSX.Element {
         // Handle the UI update after deletion (e.g., remove the technique from the list)
     }
 
-    const fetchTechniques = async () => {
+    const fetchCollections = async () => {
         setLoading(true);
         try {
-            const [techniqueResponse] = await Promise.all([
-                fetch('http://192.168.0.156:3000/api/technique')
+            const [collectionResponse] = await Promise.all([
+                fetch('http://192.168.0.156:3000/api/collection')
             ]);
 
-            const techniques: Technique[] = await (techniqueResponse.json())
-            techniques.sort((a, b) => a.title.localeCompare(b.title));
+            const collections: Collection[] = await (collectionResponse.json())
+            collections.sort((a, b) => a.title.localeCompare(b.title));
 
-            return techniques
+            return collections
         } catch (error) {
             setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
             return null
@@ -140,22 +137,22 @@ function CoachTechniques(): JSX.Element {
     }
 
     React.useEffect(() => {
-        fetchTechniques().then(techniques => {
-            if (techniques) setTechniquesList(techniques); // Only update state if fetchTechniques returns a value
+        fetchCollections().then(collections => {
+            if (collections) setCollectionsList(collections); // Only update state if fetchTechniques returns a value
         });
     }, []);
 
     // Generate options for the filters based on the full techniques list
-    const options = useDetermineFilterOptions(techniquesList)
+    const options = useDetermineFilterOptions(collectionsList)
 
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
-    const { filteredTechniques, handleFilterChange } = useHandleFilterChange(techniquesList)
+    const { filteredCollections, handleFilterChange } = useHandleFilterChange(collectionsList)
 
     return (
         <div>
             <Card>
-                <TechniqueFilter 
+                <CollectionFilter 
                 onFiltersChange={handleFilterChange} 
                 options={options}/>
             </Card>
@@ -164,28 +161,27 @@ function CoachTechniques(): JSX.Element {
                 <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
                     <CircularProgress />
                 </Box>
-            ) : filteredTechniques.length === 0 ? (
+            ) : filteredCollections.length === 0 ? (
                 <CardContent>
                     <Typography>{placeholderContent}</Typography>
                 </CardContent>
             ) : (
-                <TechniqueList 
-                filteredTechniques={filteredTechniques} 
+                <CollectionList 
+                filteredCollections={filteredCollections} 
                 editable
                 editingTechniqueId={editingTechniqueId}
                 editingTechnique={editedTechnique}
                 onEditClick={handleEditClick}
                 onSubmitClick={handleSaveClick}
                 onCancelClick={handleCancelClick}
-                onDeleteClick={handleDeleteClick}
-                />
+                onDeleteClick={handleDeleteClick}/>
             )}
             </Card>
             <Fab // Should only exist on coach version of techniques
             color="primary" 
             aria-label="add" 
             style={{position: 'fixed', bottom: '16px', right: '16px'}}
-            onClick={navigateToNewTechnique}
+            onClick={navigateToNewCollection}
             >
                 <AddIcon/>
             </Fab>
@@ -193,4 +189,4 @@ function CoachTechniques(): JSX.Element {
     );
 };
 
-export default CoachTechniques
+export default CoachCollections

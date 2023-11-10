@@ -23,9 +23,6 @@ const Card = styled(MuiCard)({
 });
 
 function StudentTechniques(): JSX.Element {
-    const navigate = useNavigate();
-    const navigateToNewTechnique = () => { navigate('/newtechnique') }
-
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
     const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
@@ -41,6 +38,8 @@ function StudentTechniques(): JSX.Element {
                 ]);
 
                 const techniques: Technique[] = await (techniqueResponse.json())
+                techniques.sort((a, b) => a.title.localeCompare(b.title));
+
                 setTechniquesList(techniques)
                 
                 setLoading(false)
@@ -80,14 +79,6 @@ function StudentTechniques(): JSX.Element {
                 <TechniqueList filteredTechniques={filteredTechniques}/>
             )}
             </Card>
-            <Fab // Should only exist on coach version of techniques
-            color="primary" 
-            aria-label="add" 
-            style={{position: 'fixed', bottom: '16px', right: '16px'}}
-            onClick={navigateToNewTechnique}
-            >
-                <AddIcon/>
-            </Fab>
         </div>
     );
 };

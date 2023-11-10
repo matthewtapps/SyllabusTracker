@@ -5,7 +5,7 @@ import MuiTextField, { TextFieldProps} from '@mui/material/TextField'
 import MuiButton from '@mui/material/Button'
 import Autocomplete from '@mui/material/Autocomplete'
 import { styled } from '@mui/material/styles'
-import { Technique, Gi, Hierarchy } from 'common'
+import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
 import theme from '../../../theme/Theme'
 
 const TextField = styled((props: TextFieldProps) => (
@@ -88,7 +88,6 @@ const NewTechnique: React.FC = () => {
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
 
         const validTechnique = transformTechniqueForBackend(technique);
         if (!validTechnique) {
@@ -96,7 +95,7 @@ const NewTechnique: React.FC = () => {
             return
         };
         
-        const status = await postTechnique(validTechnique);
+        const status = await postTechnique(null, validTechnique);
 
         if (status === 200) {
             setTechnique({
@@ -117,8 +116,11 @@ const NewTechnique: React.FC = () => {
             setTimeout(() => {
                 setBorderStatus('none')
             }, 3000)
+
+            
             
         }
+        event.preventDefault();
     }
 
     React.useEffect(() => {
@@ -339,49 +341,6 @@ const NewTechnique: React.FC = () => {
             </Card>
         </div>
     );
-};
-
-const transformTechniqueForBackend = (technique: any): Technique | null => {
-    if (!Object.values(Gi).includes(technique.gi)) {
-      alert('Invalid Gi value');
-      return null;
-    }
-  
-    if (!Object.values(Hierarchy).includes(technique.hierarchy)) {
-      alert('Invalid Hierarchy value');
-      return null;
-    }
-
-    return {
-      ...technique,
-      gi: technique.gi as Gi,
-      hierarchy: technique.hierarchy as Hierarchy,
-    };
-  }
-
-const postTechnique = async (technique: Technique) => {
-    try {
-        const response = await fetch('http://192.168.0.156:3000/api/technique', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(technique),
-        });
-  
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-  
-        const responseData = await response.json();
-        console.log('Success:', responseData);
-        
-        return response.status
-        } catch (error) {
-            console.error('Error:', error);
-            alert(`Error posting technique: ${error}`);
-            return error
-        }
 };
 
 export default NewTechnique;

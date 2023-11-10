@@ -7,7 +7,6 @@ type FastTextFieldProps = {
 } & TextFieldProps;
 
 export function FastTextField({ name, wasSubmitted, ...otherProps }: FastTextFieldProps) {
-    const [value, setValue] = React.useState('')
     const [touched, setTouched] = React.useState(false)
     const displayErrorMessage = (wasSubmitted || touched)
     return (
@@ -16,7 +15,6 @@ export function FastTextField({ name, wasSubmitted, ...otherProps }: FastTextFie
             id={`${name}-input`}
             name={name}
             type="text"
-            onChange={(event) => setValue(event.currentTarget.value)}
             onBlur={() => setTouched(true)}
             aria-describedby={displayErrorMessage ? `${name}-error` : undefined}
         />

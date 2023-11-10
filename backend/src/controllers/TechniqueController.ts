@@ -5,7 +5,7 @@ export class TechniqueController {
     static async createOrUpdateTechnique(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const technique = await techniqueService.createOrUpdateTechnique(req.body);
+            const technique = await techniqueService.createTechnique(req.body);
             res.json(technique);
         } catch (error) {
             res.status(400).json({ error: error.message });

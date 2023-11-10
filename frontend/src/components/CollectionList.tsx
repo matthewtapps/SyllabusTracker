@@ -11,6 +11,22 @@ import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText'
 import MuiCard from '@mui/material/Card';
 import TechniqueList from './TechniqueList';
 
+
+interface TechniqueDTO {
+    title: string,
+    videoSrc: string | undefined,
+    description: string,
+    globalNotes: string | undefined,
+    gi: string,
+    hierarchy: string,
+    type: string,
+    typeDescription: string | undefined,
+    position: string,
+    positionDescription: string | undefined,
+    openGuard: string | undefined,
+    openGuardDescription: string | undefined,
+}
+
 const Accordion = styled(MuiAccordion)({
     backgroundColor: `#3c3836`,
     boxShadow: 'none',
@@ -40,23 +56,32 @@ const ListItemText = styled(({ ...props }: ListItemTextProps) => (
     <MuiListItemText primaryTypographyProps={{variant: 'body1'}} secondaryTypographyProps={{variant: 'body2'}}{...props} />
 ))(({ theme }) => ({}))
 
+const SubCard = styled(MuiCard)({
+    backgroundColor: 'inherit'
+})
+
 interface CollectionsListProps {
     filteredCollections: Collection[];
     elevation: number;
+    editable: boolean;
+    editingTechniqueId?: string | null;
+    editingTechnique?: TechniqueDTO | null;
+    onEditClick?: (technique: Technique) => void;
+    onSubmitClick?: (event: React.FormEvent<HTMLFormElement>) => void;
+    onCancelClick?: () => void;
+    onDeleteClick?: (techniqueId: string) => void;
 }
 
 CollectionList.defaultProps = {
-    elevation: 3
+    elevation: 3,
+    editable: false
 }
 
 function CollectionList(props: CollectionsListProps): JSX.Element {
+
     return (
         <React.Fragment>
-            {props.filteredCollections.map(collection => {
-                const SubCard = styled(MuiCard)({
-                    backgroundColor: 'inherit'
-                })
-            
+            {props.filteredCollections.map(collection => {            
                 let collectionTechniques: Technique[] = []
 
                 collection.collectionTechniques.sort((a, b) => a.order - b.order)
@@ -86,6 +111,13 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                     filteredTechniques={collectionTechniques}
                                     elevation={0}
                                     ordered
+                                    editable={props.editable}
+                                    editingTechniqueId={props.editingTechniqueId}
+                                    editingTechnique={props.editingTechnique}
+                                    onEditClick={props.onEditClick}
+                                    onSubmitClick={props.onSubmitClick}
+                                    onCancelClick={props.onCancelClick}
+                                    onDeleteClick={props.onDeleteClick}
                                     />
                                 </AccordionDetails>
                             </SubAccordion>

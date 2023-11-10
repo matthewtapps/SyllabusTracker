@@ -158,7 +158,7 @@ const NewCollection: React.FC = () => {
                 <AccordionSummary expandIcon={<ExpandMore/>}>
                     <Typography variant="h6">Collection Details</Typography>
                 </AccordionSummary>
-                <AccordionDetails>            
+                <AccordionDetails>
                     <form onSubmit={handleSubmit}>
                         <Autocomplete
                             options={collectionTitleSuggestions}

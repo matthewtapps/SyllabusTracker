@@ -13,6 +13,8 @@ import CollectionList from '../../../components/CollectionList'
 import CollectionFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/CollectionFilter'
 import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
 import { Technique } from 'common'
+import { postCollectionTechniques } from '../../../util/Utilities'
+
 
 interface TechniqueDTO {
     title: string,
@@ -62,13 +64,22 @@ function CoachCollections(): JSX.Element {
     const [loading, setLoading] = React.useState(true);
     const [placeholderContent, setPlaceholderContent] = React.useState('No collection data available')
 
-    // List of techniques state
+    // List of collections state
     const [collectionsList, setCollectionsList] = React.useState<Collection[]>([])
 
+    // Technique editing states for in-place technique editing
     const [editingTechniqueId, setEditingTechniqueId] = React.useState<string | null>(null);
     const [editedTechnique, setEditedTechnique] = React.useState<TechniqueDTO>(emptyTechniqueDTO);
-    
-    const handleEditClick = (technique: Technique) => {
+
+    // State containing index, technique pairs for drag and drop
+    const [dragDropTechniques, setDragDropTechniques] = React.useState<{ index: number, technique: Technique }[]>([]);
+
+    // Collection editing states
+    const [editingCollectionId, setEditingCollectionId] = React.useState<string | null>(null);
+    const [editingCollection, setEditingCollection] = React.useState<Collection | null>(null);
+    const [editingTechniquesCollection, setEditingTechniquesCollection] = React.useState<Collection | null>(null);
+
+    const handleTechniqueEditClick = (technique: Technique) => {
         setEditingTechniqueId(technique.techniqueId);
         setEditedTechnique({
             title: technique.title,
@@ -86,7 +97,7 @@ function CoachCollections(): JSX.Element {
         });
     }
 
-    const handleSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleTechniqueSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
         const formData = new FormData(event.currentTarget)
@@ -107,12 +118,12 @@ function CoachCollections(): JSX.Element {
         }
     }
     
-    const handleCancelClick = () => {
+    const handleTechniqueCancelClick = () => {
         setEditingTechniqueId(null);
         setEditedTechnique(emptyTechniqueDTO);
     }
 
-    const handleDeleteClick = (techniqueId: string) => {
+    const handleTechniqueDeleteClick = (techniqueId: string) => {
         // TODO: Call the backend API to delete the technique
         // Handle the UI update after deletion (e.g., remove the technique from the list)
     }
@@ -132,8 +143,46 @@ function CoachCollections(): JSX.Element {
             setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
             return null
         } finally {
-            setLoading(false); // Set loading to false in both cases
+            setLoading(false);
         }
+    }
+
+    const handleCollectionTechniqueEditClick = (collection: Collection) => {
+        let orderedTechniques: {index: number, technique: Technique}[] = [];
+        collection.collectionTechniques.sort((a, b) => a.order - b.order);
+        collection.collectionTechniques.forEach(orderedTechnique => {
+            orderedTechniques.push({index: orderedTechnique.order, technique: orderedTechnique.technique})
+        });
+        setEditingTechniquesCollection(collection)
+        setDragDropTechniques(orderedTechniques)
+    }
+
+    const handleOnReorderDragDropTechniques = (newDragDropOrder: {index: number, technique: Technique}[]) => {
+        let newIndex = 1
+        let newOrder: {index: number, technique: Technique}[] = []
+        newDragDropOrder.forEach(item => {
+            newOrder.push({index: newIndex, technique: item.technique})
+            newIndex++
+        })
+        setDragDropTechniques(newOrder)
+    }
+
+    const handleDragDropSaveClick = () => {
+        setTimeout(async () => {
+            editingTechniquesCollection && await postCollectionTechniques(editingTechniquesCollection, dragDropTechniques);
+            setEditingTechniquesCollection(null);
+            setDragDropTechniques([]);
+    
+            const collections = await fetchCollections();
+            if (collections) {
+                setCollectionsList(collections);
+            }
+        }, 2000);
+    };
+
+    const handleDragDropCancelClick = () => {
+        setEditingTechniquesCollection(null)
+        setDragDropTechniques([])
     }
 
     React.useEffect(() => {
@@ -166,15 +215,27 @@ function CoachCollections(): JSX.Element {
                     <Typography>{placeholderContent}</Typography>
                 </CardContent>
             ) : (
-                <CollectionList 
-                filteredCollections={filteredCollections} 
-                editable
-                editingTechniqueId={editingTechniqueId}
-                editingTechnique={editedTechnique}
-                onEditClick={handleEditClick}
-                onSubmitClick={handleSaveClick}
-                onCancelClick={handleCancelClick}
-                onDeleteClick={handleDeleteClick}/>
+                <Box>
+                    <CollectionList 
+                    editableCollection
+                    filteredCollections={filteredCollections}
+                    editableTechniques
+                    editingTechniqueId={editingTechniqueId}
+                    editingTechnique={editedTechnique}
+                    onTechniqueEditClick={handleTechniqueEditClick}
+                    onTechniqueSubmitClick={handleTechniqueSaveClick}
+                    onTechniqueCancelClick={handleTechniqueCancelClick}
+                    onTechniqueDeleteClick={handleTechniqueDeleteClick}
+
+                    editingTechniquesCollection={editingTechniquesCollection}
+                    editingCollectionId={editingCollectionId}
+                    editingCollection={editingCollection}
+                    onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
+                    onReorderDragDropTechniques={handleOnReorderDragDropTechniques}
+                    dragDropTechniques={dragDropTechniques}
+                    onDragDropSaveClick={handleDragDropSaveClick}
+                    onDragDropCancelClick={handleDragDropCancelClick}/>
+                </Box>
             )}
             </Card>
             <Fab // Should only exist on coach version of techniques

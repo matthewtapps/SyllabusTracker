@@ -10,6 +10,10 @@ import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText'
 import MuiCard from '@mui/material/Card';
 import TechniqueList from './TechniqueList';
+import Box from '@mui/material/Box';
+import Edit from '@mui/icons-material/Edit';
+import DragDropTechniquesList from './DragDropTechniques';
+import MuiButton, { ButtonProps } from '@mui/material/Button'
 
 
 interface TechniqueDTO {
@@ -60,21 +64,44 @@ const SubCard = styled(MuiCard)({
     backgroundColor: 'inherit'
 })
 
+const Button = styled((props: ButtonProps) => (
+    <MuiButton sx={{width: "80px", marginBottom: "10px"}} variant='contained' {...props} />
+))(({ theme }) => ({}));
+
 interface CollectionsListProps {
     filteredCollections: Collection[];
     elevation: number;
-    editable: boolean;
+    editableTechniques: boolean;
+    orderedTechniques: boolean;
+    checkboxTechniques: boolean;
     editingTechniqueId?: string | null;
     editingTechnique?: TechniqueDTO | null;
-    onEditClick?: (technique: Technique) => void;
-    onSubmitClick?: (event: React.FormEvent<HTMLFormElement>) => void;
-    onCancelClick?: () => void;
-    onDeleteClick?: (techniqueId: string) => void;
+    onTechniqueEditClick?: (technique: Technique) => void;
+    onTechniqueSubmitClick?: (event: React.FormEvent<HTMLFormElement>) => void;
+    onTechniqueCancelClick?: () => void;
+    onTechniqueDeleteClick?: (techniqueId: string) => void;
+
+    editableCollection: boolean;
+    editingTechniquesCollection: Collection | null;
+    editingCollectionId: string | null;
+    editingCollection: Collection | null;
+    onCollectionTechniqueEditClick?: (collection: Collection) => void;
+    dragDropTechniques: {index: number, technique: Technique}[] | null;
+    onReorderDragDropTechniques?: (newOrder: {index: number, technique: Technique}[]) => void;
+    onDragDropSaveClick?: () => void;
+    onDragDropCancelClick?: () => void;
 }
 
 CollectionList.defaultProps = {
     elevation: 3,
-    editable: false
+    editableCollection: false,
+    editableTechniques: false,
+    orderedTechniques: true,
+    checkboxTechniques: false,
+    editingTechniquesCollection: null,
+    editingCollectionId: null,
+    editingCollection: null,
+    dragDropTechniques: null,
 }
 
 function CollectionList(props: CollectionsListProps): JSX.Element {
@@ -103,22 +130,36 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                             <SubAccordion elevation={0} disableGutters square defaultExpanded>
                                 <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
                                     <ListItem>
-                                        <ListItemText primary="Collection Techniques"/>
+                                        <Box display="flex" alignItems="center" justifyContent="flex-start" width="97%">
+                                            <ListItemText primary="Collection Techniques"/>
+                                            {props.editableCollection && !props.editingTechniquesCollection && (
+                                                <Edit onClick={(event) => { event.stopPropagation(); props.onCollectionTechniqueEditClick?.(collection); }}/>
+                                            )}
+                                        </Box>
                                     </ListItem>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{padding: "0px"}}>
-                                    <TechniqueList 
-                                    filteredTechniques={collectionTechniques}
-                                    elevation={0}
-                                    ordered
-                                    editable={props.editable}
-                                    editingTechniqueId={props.editingTechniqueId}
-                                    editingTechnique={props.editingTechnique}
-                                    onEditClick={props.onEditClick}
-                                    onSubmitClick={props.onSubmitClick}
-                                    onCancelClick={props.onCancelClick}
-                                    onDeleteClick={props.onDeleteClick}
-                                    />
+                                    {(props.editingTechniquesCollection?.collectionId === collection.collectionId) && props.dragDropTechniques && props.onReorderDragDropTechniques ? 
+                                        <Box>
+                                            <DragDropTechniquesList selectedTechniques={props.dragDropTechniques} onReorder={props.onReorderDragDropTechniques}/>
+                                            <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                                                <Button type="submit" onClick={(event) => { event.stopPropagation(); props.onDragDropSaveClick?.() }}>Save</Button>
+                                                <Button onClick={(event) => { event.stopPropagation(); props.onDragDropCancelClick?.(); }}>Cancel</Button>
+                                            </Box>
+                                        </Box>
+                                    :   (<TechniqueList
+                                        filteredTechniques={collectionTechniques}
+                                        elevation={0}
+                                        ordered={props.orderedTechniques}
+                                        editable={props.editableTechniques}
+                                        editingTechniqueId={props.editingTechniqueId}
+                                        editingTechnique={props.editingTechnique}
+                                        onEditClick={props.onTechniqueEditClick}
+                                        onSubmitClick={props.onTechniqueSubmitClick}
+                                        onCancelClick={props.onTechniqueCancelClick}
+                                        onDeleteClick={props.onTechniqueDeleteClick}
+                                        />)
+                                    }
                                 </AccordionDetails>
                             </SubAccordion>
 

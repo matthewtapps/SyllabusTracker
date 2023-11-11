@@ -38,6 +38,7 @@ const DragDropTechniquesList: React.FC<DragDropTechniquesListProps> = ({ selecte
         const reorderedTechniques = Array.from(selectedTechniques);
         const [reorderedItem] = reorderedTechniques.splice(result.source.index, 1);
         reorderedTechniques.splice(result.destination.index, 0, reorderedItem);
+        console.log(reorderedTechniques)
         onReorder(reorderedTechniques);
     };
 

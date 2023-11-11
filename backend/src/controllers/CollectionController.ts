@@ -12,10 +12,10 @@ export class CollectionController {
         }
     }
 
-    static async addTechniquesToCollection(req: Request, res: Response) {
+    static async setCollectionTechniques(req: Request, res: Response) {
         const collectionService = new CollectionService()
         try {
-            const collectionTechniques = await collectionService.addTechniquesToCollection(req.body);
+            const collectionTechniques = await collectionService.setCollectionTechniques(req.body);
             res.json(collectionTechniques);
         } catch (error) {
             res.status(400).json({ error: error.message })

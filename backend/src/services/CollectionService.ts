@@ -9,26 +9,30 @@ import CollectionDTO from '../dtos/CollectionDTO';
 import CollectionTechniqueDTO from '../dtos/CollectionTechniqueDTO';
 
 export class CollectionService {
-    async addTechniquesToCollection(data: CollectionTechniqueDTO): Promise<CollectionTechnique[]> {
+    async setCollectionTechniques(data: CollectionTechniqueDTO): Promise<CollectionTechnique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const collectionTechniqueRepo = AppDataSource.getRepository(CollectionTechnique)
         const collectionRepo = AppDataSource.getRepository(Collection)
 
+        const collection = await collectionRepo.findOne({ where: { collectionId: data.collection.collectionId} })
+
+        if (collection) {await collectionTechniqueRepo.createQueryBuilder()
+        .delete()
+        .from(CollectionTechnique)
+        .where("collection = :collection", { collection: collection.collectionId })
+        .execute();}
+        
         const collectionTechniques: CollectionTechnique[] = [];
 
-        const collection = await collectionRepo.findOne({ where: { collectionId: data.collection.collectionId} })
-        
-        for (const collectionTechnique of data.techniques) {
+        for (let collectionTechnique of data.techniques) {
             const techniqueToAdd = await techniqueRepo.findOne({ where: { techniqueId: collectionTechnique.technique.techniqueId }})
             if (!techniqueToAdd) {
                 throw new Error(`Technique with id ${collectionTechnique.technique.techniqueId} not found in technique repo.`);
             }
 
-            
-
             const newCollectionTechnique = new CollectionTechnique();
             newCollectionTechnique.technique = techniqueToAdd;
-            newCollectionTechnique.order = collectionTechnique.index + 1;
+            newCollectionTechnique.order = collectionTechnique.index;
             newCollectionTechnique.collection = collection
             
             collectionTechniques.push(newCollectionTechnique)

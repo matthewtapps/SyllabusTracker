@@ -13,6 +13,7 @@ import { Technique, Collection, Gi, Hierarchy } from 'common'
 import TechniqueList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
 import DragDropTechniquesList from '../../../components/DragDropTechniques'
+import { postCollectionTechniques, transformCollectionForBackend, postCollection } from '../../../util/Utilities'
 
 const Accordion = styled(MuiAccordion)({
     backgroundColor: `#3c3836`,
@@ -126,6 +127,15 @@ const NewCollection: React.FC = () => {
         if (selectedTechniques) { await postCollectionTechniques(validCollection, selectedTechniques) }
 
         };
+
+    const handleOnReorder = (newOrderedTechniques: {index: number, technique: Technique}[]) => {
+        let newIndex = 1
+        let newOrder: {index: number, technique: Technique}[] = []
+        newOrderedTechniques.forEach(item => {
+            newOrder.push({index: newIndex, technique: item.technique})
+        })
+        setSelectedTechniques(newOrder)
+    }
 
     React.useEffect(() => {
         (async () => {
@@ -310,7 +320,7 @@ const NewCollection: React.FC = () => {
                     <Typography variant="h6">Order Techniques</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <DragDropTechniquesList selectedTechniques={selectedTechniques} onReorder={(newOrder) => setSelectedTechniques(newOrder)}/>
+                    <DragDropTechniquesList selectedTechniques={selectedTechniques} onReorder={handleOnReorder}/>
                 </AccordionDetails>
             </Accordion>
 
@@ -330,70 +340,6 @@ const NewCollection: React.FC = () => {
             </Accordion>
         </Card>
     );
-};
-
-const transformCollectionForBackend = (collection: any): Collection | null => {
-    if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
-      alert('Invalid Gi value');
-      return null;
-    }
-  
-    if (collection.hierarchy && !Object.values(Hierarchy).includes(collection.hierarchy)) {
-      alert('Invalid Hierarchy value');
-      return null;
-    }
-
-    return {
-      ...collection,
-      gi: collection.gi as Gi,
-      hierarchy: collection.hierarchy as Hierarchy,
-    };
-  }
-
-const postCollection = async (collection: Collection) => {
-    try {
-        const response = await fetch('http://localhost:3000/api/newCollection', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(collection),
-        });
-  
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-  
-        const responseData = await response.json();
-        console.log('Success:', responseData);
-        return response.status
-        } catch (error) {
-            console.error('Error:', error);
-            alert(`Error posting collection: ${error}`);
-            return error
-        }
-};
-
-const postCollectionTechniques = async (collection: Collection, collectionTechniques: { index: number, technique: Technique }[]) => {
-    try {
-        const response = await fetch('http://192.168.0.156:3000/api/addToCollection', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({collection: collection, techniques: collectionTechniques}),
-        });
-  
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-  
-        const responseData = await response.json();
-        console.log('Success:', responseData);
-        } catch (error) {
-            console.error('Error:', error);
-            alert(`Error posting collection: ${error}`);
-        }
 };
 
 export default NewCollection;

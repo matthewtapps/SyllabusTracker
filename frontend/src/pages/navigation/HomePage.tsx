@@ -5,23 +5,15 @@ import theme from '../../theme/Theme';
 import StudentDashboard from '../users/student/Home';
 
 
-const HomePage: React.FC = () => {
-    const user = {
-        userId: '1',
-        role: Role.Student,
-        username: 'Liam',
-        firstName: 'Liam',
-        lastName: 'Heaver',
-        dateOfBirth: new Date(1963, 1, 24),
-        email: 'example@example.com',
-        mobile: '0400000000',
-        rank: {belt: Belt.White, stripes: Stripes.Four}
-    }           // Could be moved to login page logic
-                                   // once auth is implemented and hoisted to 
-                                   // higher app state for easy referring
-    
+interface HomePageProps {
+    user: {userId: string, role: Role}
+}
+
+const HomePage: React.FC<HomePageProps> = (props) => {
+
     let content: React.ReactNode
-    switch(user.role) {
+    
+    switch(props.user.role) {
         case Role.Student:
         content = <StudentDashboard/>
         break;

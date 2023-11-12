@@ -41,4 +41,14 @@ export class CollectionController {
             res.status(400).json({ error: error.message })
         }
     }
+
+    static async getCollectionTechniques(req: Request, res: Response) {
+        const collectionService = new CollectionService();
+        try {
+            const collectionTechniques = await collectionService.getCollectionTechniques();
+            res.json(collectionTechniques);
+        } catch (error) {
+            res.status(400).json({error: error.message})
+        }
+    }
 }

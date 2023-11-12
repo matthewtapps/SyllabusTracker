@@ -5,20 +5,20 @@ import theme from '../../theme/Theme';
 import StudentCollections from '../users/student/Collections';
 import CoachCollections from '../users/coach/Collections';
 
-const TechniquesPage: React.FC = () => {
-    const user = {
-        userId: 'test',
-        role: Role.Coach
-    }
-    
+interface CollectionsPageProps {
+    user: {userId: string, role: Role}
+}
+
+const CollectionsPage: React.FC<CollectionsPageProps> = (props: CollectionsPageProps) => {
+   
     let content: React.ReactNode
-    switch(user.role) {
+    switch(props.user.role) {
         case Role.Student:
-        content = StudentCollections()
+            content = <StudentCollections/>
         break;
 
         case Role.Coach:
-            content = CoachCollections()
+            content = <CoachCollections/>
         break;
         
         case Role.Admin:
@@ -40,4 +40,4 @@ const TechniquesPage: React.FC = () => {
     );
 };
 
-export default TechniquesPage;
+export default CollectionsPage;

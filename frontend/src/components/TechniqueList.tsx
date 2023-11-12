@@ -162,7 +162,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                             <Typography variant="body1">{technique?.title}</Typography>
                                         </Box>
                                     )}
-                                    {props.editable && !(props.editingTechniqueId === technique.techniqueId) && (
+                                    {props.editable && !(props.editingTechniqueId === technique.techniqueId) && !(props.editingTechniqueId) && (
                                         <Edit onClick={(event) => { event.stopPropagation(); props.onEditClick?.(technique); }}/>
                                     )}
                                 </Box>

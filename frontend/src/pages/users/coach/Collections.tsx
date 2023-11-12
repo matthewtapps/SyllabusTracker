@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import { useNavigate } from 'react-router-dom'
-import { Collection } from 'common'
+import { Collection, CollectionTechnique } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
@@ -79,6 +79,11 @@ function CoachCollections(): JSX.Element {
     const [editingCollection, setEditingCollection] = React.useState<Collection | null>(null);
     const [editingTechniquesCollection, setEditingTechniquesCollection] = React.useState<Collection | null>(null);
 
+    // Collection technique states
+    const [collectionTechniques, setCollectionTechniques] = React.useState<CollectionTechnique[] | null>(null);
+    const [collectionTechniquesLoading, setCollectionTechniquesLoading] = React.useState<boolean>(false);
+    const [collectionTechniquesPlaceholderContent, setCollectionTechniquesPlaceholderContent] = React.useState<string>("");
+
     const handleTechniqueEditClick = (technique: Technique) => {
         setEditingTechniqueId(technique.techniqueId);
         setEditedTechnique({
@@ -147,10 +152,36 @@ function CoachCollections(): JSX.Element {
         }
     }
 
+    const fetchCollectionTechniques = async () => {
+        setCollectionTechniquesLoading(true);
+        try {
+            const [collectionTechniqueResponse] = await Promise.all([
+                fetch('http://192.168.0.156:3000/api/collectiontechnique')
+            ]);
+
+            const collectionTechniques: CollectionTechnique[] = await (collectionTechniqueResponse.json())
+
+            return collectionTechniques
+        } catch (error) {
+            setCollectionTechniquesPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
+            return null
+        } finally {
+            setCollectionTechniquesLoading(false);
+        }
+    }
+
     const handleCollectionTechniqueEditClick = (collection: Collection) => {
+        
+        let filteredAndSortedTechniques: CollectionTechnique[] = []
+
+        if (collectionTechniques) {filteredAndSortedTechniques = collectionTechniques
+                        .filter(ct => ct.collection.collectionId === collection.collectionId)
+                        .sort((a, b) => a.order - b.order)
+                    }
+
         let orderedTechniques: {index: number, technique: Technique}[] = [];
-        collection.collectionTechniques.sort((a, b) => a.order - b.order);
-        collection.collectionTechniques.forEach(orderedTechnique => {
+
+        filteredAndSortedTechniques.forEach(orderedTechnique => {
             orderedTechniques.push({index: orderedTechnique.order, technique: orderedTechnique.technique})
         });
         setEditingTechniquesCollection(collection)
@@ -173,11 +204,11 @@ function CoachCollections(): JSX.Element {
             setEditingTechniquesCollection(null);
             setDragDropTechniques([]);
     
-            const collections = await fetchCollections();
+            const collections = await fetchCollectionTechniques();
             if (collections) {
-                setCollectionsList(collections);
+                setCollectionTechniques(collections);
             }
-        }, 2000);
+        }, 500);
     };
 
     const handleDragDropCancelClick = () => {
@@ -187,7 +218,11 @@ function CoachCollections(): JSX.Element {
 
     React.useEffect(() => {
         fetchCollections().then(collections => {
-            if (collections) setCollectionsList(collections); // Only update state if fetchTechniques returns a value
+            if (collections) setCollectionsList(collections);
+        });
+        
+        fetchCollectionTechniques().then(collectionTechniques => {
+            if (collectionTechniques) setCollectionTechniques(collectionTechniques);
         });
     }, []);
 
@@ -230,6 +265,7 @@ function CoachCollections(): JSX.Element {
                     editingTechniquesCollection={editingTechniquesCollection}
                     editingCollectionId={editingCollectionId}
                     editingCollection={editingCollection}
+                    collectionTechniques={collectionTechniques}
                     onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
                     onReorderDragDropTechniques={handleOnReorderDragDropTechniques}
                     dragDropTechniques={dragDropTechniques}

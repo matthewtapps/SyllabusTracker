@@ -4,13 +4,15 @@ import { ThemeProvider } from '@emotion/react';
 import theme from '../../theme/Theme';
 import NewTechnique from '../users/coach/NewTechnique';
 
-const NewTechniquePage: React.FC = () => {
-    const user = {
-        userId: 'test',
-        role: Role.Coach
-    }      
+
+interface NewTechniquePageProps {
+    user: {userId: string, role: Role}
+}
+
+const NewTechniquePage: React.FC<NewTechniquePageProps> = (props) => {
+
     let content: React.ReactNode
-    switch(user.role) {
+    switch(props.user.role) {
         case Role.Student:
         content = (
             <div>

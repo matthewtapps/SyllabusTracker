@@ -95,4 +95,18 @@ export class CollectionService {
         })
         return collections
     };
+
+    async getCollectionTechniques(): Promise<CollectionTechnique[]> {
+        const collectionTechniqueRepo = AppDataSource.getRepository(CollectionTechnique)
+        const collectionTechniques = await collectionTechniqueRepo.find({
+            relations: [
+                "technique",
+                "technique.type",
+                "technique.position",
+                "technique.openGuard",
+                "collection"
+            ]
+        });
+        return collectionTechniques
+    };
 };

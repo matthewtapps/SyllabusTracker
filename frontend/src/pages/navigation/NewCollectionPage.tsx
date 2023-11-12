@@ -4,14 +4,16 @@ import { ThemeProvider } from '@emotion/react';
 import theme from '../../theme/Theme';
 import NewCollection from '../users/coach/NewCollection';
 
-const NewModulePage: React.FC = () => {
-    const user = {
-        userId: 'test',
-        role: Role.Coach
-    }      
+
+interface NewCollectionPageProps {
+    user: {userId: string, role: Role}
+}
+
+const NewModulePage: React.FC<NewCollectionPageProps> = (props) => {
     
     let content: React.ReactNode
-    switch(user.role) {
+    
+    switch(props.user.role) {
         case Role.Student:
         content = (
             <div>

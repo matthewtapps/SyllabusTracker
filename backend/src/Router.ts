@@ -14,5 +14,6 @@ router.post('/newCollection', CollectionController.createNewCollection)
 router.post('/addToCollection', CollectionController.setCollectionTechniques)
 router.get('/collection', CollectionController.getAllCollections)
 router.get('/collection/titles', CollectionController.getAllCollectionTitles)
+router.get('/collectiontechnique', CollectionController.getCollectionTechniques)
 
 export default router;

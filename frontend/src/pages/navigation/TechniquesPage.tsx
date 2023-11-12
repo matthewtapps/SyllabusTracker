@@ -5,20 +5,22 @@ import theme from '../../theme/Theme';
 import StudentTechniques from '../users/student/Techniques';
 import CoachTechniques from '../users/coach/Techniques';
 
-const TechniquesPage: React.FC = () => {
-    const user = {
-        userId: 'test',
-        role: Role.Coach
-    }
-    
+
+interface TechniquesPageProps {
+    user: {userId: string, role: Role}
+}
+
+const TechniquesPage: React.FC<TechniquesPageProps> = (props) => {
+
     let content: React.ReactNode
-    switch(user.role) {
+
+    switch(props.user.role) {
         case Role.Student:
-        content = StudentTechniques()
+        content = <StudentTechniques/>
         break;
 
         case Role.Coach:
-            content = CoachTechniques()
+            content = <CoachTechniques/>
         break;
         
         case Role.Admin:

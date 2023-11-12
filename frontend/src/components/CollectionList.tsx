@@ -4,7 +4,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles'
-import { Collection, Technique } from 'common';
+import { Collection, Technique, CollectionTechnique } from 'common';
 import Typography from '@mui/material/Typography';
 import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText'
@@ -13,7 +13,7 @@ import TechniqueList from './TechniqueList';
 import Box from '@mui/material/Box';
 import Edit from '@mui/icons-material/Edit';
 import DragDropTechniquesList from './DragDropTechniques';
-import MuiButton, { ButtonProps } from '@mui/material/Button'
+import MuiButton, { ButtonProps } from '@mui/material/Button';
 
 
 interface TechniqueDTO {
@@ -70,6 +70,7 @@ const Button = styled((props: ButtonProps) => (
 
 interface CollectionsListProps {
     filteredCollections: Collection[];
+    collectionTechniques: CollectionTechnique[] | null;
     elevation: number;
     editableTechniques: boolean;
     orderedTechniques: boolean;
@@ -94,6 +95,7 @@ interface CollectionsListProps {
 
 CollectionList.defaultProps = {
     elevation: 3,
+    collectionTechniques: null,
     editableCollection: false,
     editableTechniques: false,
     orderedTechniques: true,
@@ -105,18 +107,25 @@ CollectionList.defaultProps = {
 }
 
 function CollectionList(props: CollectionsListProps): JSX.Element {
-
     return (
         <React.Fragment>
-            {props.filteredCollections.map(collection => {            
+            {props.filteredCollections.map(collection => {         
+
                 let collectionTechniques: Technique[] = []
 
-                collection.collectionTechniques.sort((a, b) => a.order - b.order)
-
-                collection.collectionTechniques.forEach(collectionTechnique => {
-                    collectionTechniques.push(collectionTechnique.technique)
-                });
-
+                if (props.collectionTechniques) {
+                    const filteredAndSortedTechniques = props.collectionTechniques
+                        .filter(ct => ct.collection.collectionId === collection.collectionId)
+                        .sort((a, b) => a.order - b.order)
+                        .map(ct => ct.technique);
+                    
+                    collectionTechniques = filteredAndSortedTechniques;
+                } else {
+                    collection.collectionTechniques.sort((a, b) => a.order - b.order)
+                    collection.collectionTechniques.forEach(collectionTechnique => {
+                        collectionTechniques.push(collectionTechnique.technique)
+                    });
+                }
             return (
                 <Accordion disableGutters elevation={props.elevation} key={collection.collectionId}>
                     <AccordionSummary
@@ -185,7 +194,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
 
                             {collection.hierarchy && (
                                 <ListItem>
-                                    <ListItemText primary="Hierarchy" secondary={collection.hierarchy} />
+                                    <ListItemText primary=" Hierarchy" secondary={collection.hierarchy} />
                                 </ListItem>
                             )}
 

@@ -18,7 +18,7 @@ const Accordion = styled(MuiAccordion)({
 });
 
 interface TechniqueFilterProps {
-    onFiltersChange: (filters: TechniqueFilters) => void;
+    onTechniqueFiltersChange: (filters: TechniqueFilters) => void;
     options: {
         giOptions: string[],
         hierarchyOptions: string[],
@@ -37,7 +37,7 @@ export interface TechniqueFilters {
     gi: string | null;
 }
 
-export const useDetermineFilterOptions = (techniques: Technique[]) => {
+export const useDetermineTechniqueFilterOptions = (techniques: Technique[]) => {
     // Autocomplete options for filters
     const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
@@ -79,10 +79,10 @@ export const useDetermineFilterOptions = (techniques: Technique[]) => {
     return options
 }
 
-export const useHandleFilterChange = (techniquesList: Technique[]) => {
+export const useHandleTechniqueFilterChange = (techniquesList: Technique[]) => {
     const [filteredTechniques, setFilteredTechniques] = React.useState<Technique[]>([]);
 
-    const handleFilterChange = React.useCallback((newFilters: TechniqueFilters) => {
+    const handleTechniqueFilterChange = React.useCallback((newFilters: TechniqueFilters) => {
         const giFilterMatch = (filterValue: string, techniqueValue: string) => {
             return techniqueValue === 'Both' || techniqueValue.includes(filterValue);
         };
@@ -99,10 +99,10 @@ export const useHandleFilterChange = (techniquesList: Technique[]) => {
 
     },[techniquesList]);
 
-    return { filteredTechniques, handleFilterChange };
+    return { filteredTechniques, handleTechniqueFilterChange };
 }
 
-function TechniqueFilter({ onFiltersChange, options }: TechniqueFilterProps): JSX.Element {
+function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }: TechniqueFilterProps): JSX.Element {
     const [filters, setFilters] = React.useState<TechniqueFilters>({
         title: '',
         hierarchy: null as null | string,

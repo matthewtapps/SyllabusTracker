@@ -91,6 +91,7 @@ interface CollectionsListProps {
     onReorderDragDropTechniques?: (newOrder: {index: number, technique: Technique}[]) => void;
     onDragDropSaveClick?: () => void;
     onDragDropCancelClick?: () => void;
+    onAddNewTechniqueClick?: () => void;
 }
 
 CollectionList.defaultProps = {
@@ -150,7 +151,11 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                 <AccordionDetails sx={{padding: "0px"}}>
                                     {(props.editingTechniquesCollection?.collectionId === collection.collectionId) && props.dragDropTechniques && props.onReorderDragDropTechniques ? 
                                         <Box>
-                                            <DragDropTechniquesList selectedTechniques={props.dragDropTechniques} onReorder={props.onReorderDragDropTechniques}/>
+                                            <DragDropTechniquesList 
+                                            selectedTechniques={props.dragDropTechniques} 
+                                            onReorder={props.onReorderDragDropTechniques}
+                                            onAddTechniqueClick={props.onAddNewTechniqueClick}
+                                            editable/>
                                             <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
                                                 <Button type="submit" onClick={(event) => { event.stopPropagation(); props.onDragDropSaveClick?.() }}>Save</Button>
                                                 <Button onClick={(event) => { event.stopPropagation(); props.onDragDropCancelClick?.(); }}>Cancel</Button>

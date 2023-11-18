@@ -41,8 +41,7 @@ const SubAccordion = styled(MuiAccordion)({
 
 const ListItem = styled(MuiListItem)({
     paddingTop: "0px",
-    paddingBottom: "0px",
-    paddingLeft: "0px"
+    paddingLeft: "0px",
 })
 
 interface ExtendedListItemTextProps extends ListItemTextProps {

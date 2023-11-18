@@ -1,4 +1,5 @@
 import { Technique, Hierarchy, Gi, Collection } from "common";
+import { SetStateAction, useEffect, useState } from 'react';
 
 export const transformTechniqueForBackend = (technique: any): Technique | null => {
     if (!Object.values(Gi).includes(technique.gi)) {

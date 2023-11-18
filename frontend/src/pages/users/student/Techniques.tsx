@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import TechniqueList from '../../../components/TechniqueList'
-import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
+import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/TechniqueFilter'
 
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
@@ -50,17 +50,17 @@ function StudentTechniques(): JSX.Element {
     }, []);
 
     // Generate options for the filters based on the full techniques list
-    const options = useDetermineFilterOptions(techniquesList)
+    const options = useDetermineTechniqueFilterOptions(techniquesList)
 
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
-    const { filteredTechniques, handleFilterChange } = useHandleFilterChange(techniquesList)
+    const { filteredTechniques, handleTechniqueFilterChange: handleFilterChange } = useHandleTechniqueFilterChange(techniquesList)
 
     return (
         <div>
             <Card>
                 <TechniqueFilter 
-                onFiltersChange={handleFilterChange} 
+                onTechniqueFiltersChange={handleFilterChange} 
                 options={options}/>
             </Card>
             <Card>

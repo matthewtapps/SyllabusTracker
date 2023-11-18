@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import TechniqueList from '../../../components/TechniqueList'
-import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
+import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/TechniqueFilter'
 import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
 
 
@@ -29,16 +29,6 @@ interface TechniqueDTO {
     openGuardDescription: string | undefined,
 }
 
-const Card = styled(MuiCard)({
-    '&.MuiCard-root': {
-        marginLeft: "10px",
-        marginTop: "10px",
-        marginRight: "10px",
-        borderRadius: "2",
-        boxShadow: "3"
-    }
-});
-
 const emptyTechniqueDTO: TechniqueDTO = {
     title: '',
     videoSrc: undefined,
@@ -53,6 +43,18 @@ const emptyTechniqueDTO: TechniqueDTO = {
     openGuard: undefined,
     openGuardDescription: undefined,
 }
+
+const Card = styled(MuiCard)({
+    '&.MuiCard-root': {
+        marginLeft: "10px",
+        marginTop: "10px",
+        marginRight: "10px",
+        borderRadius: "2",
+        boxShadow: "3"
+    }
+});
+
+
 
 function CoachTechniques(): JSX.Element {
     const navigate = useNavigate();
@@ -146,17 +148,17 @@ function CoachTechniques(): JSX.Element {
     }, []);
 
     // Generate options for the filters based on the full techniques list
-    const options = useDetermineFilterOptions(techniquesList)
+    const options = useDetermineTechniqueFilterOptions(techniquesList)
 
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
-    const { filteredTechniques, handleFilterChange } = useHandleFilterChange(techniquesList)
+    const { filteredTechniques, handleTechniqueFilterChange: handleFilterChange } = useHandleTechniqueFilterChange(techniquesList)
 
     return (
         <div>
             <Card>
                 <TechniqueFilter 
-                onFiltersChange={handleFilterChange} 
+                onTechniqueFiltersChange={handleFilterChange} 
                 options={options}/>
             </Card>
             <Card>

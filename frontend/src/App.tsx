@@ -27,7 +27,7 @@ function App() {
 
   const [user, setUser] = React.useState<User>({
     userId: '1',
-    role: Role.Student,
+    role: Role.Coach,
     username: 'Liam',
     firstName: 'Liam',
     lastName: 'Heaver',

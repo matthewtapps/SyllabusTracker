@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppBar, Toolbar, IconButton, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material"
+import { AppBar, Toolbar, IconButton, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Drawer } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import { Role } from 'common'
 
@@ -43,7 +43,7 @@ const NavBar = (props: NavBarProps) => {
                     </Typography>
                 </Toolbar>
             </AppBar>
-            <Dialog open={open} onClose={handleClose} aria-describedby="alert-dialog-slide-description">
+            <Drawer open={open} onClose={handleClose} aria-describedby="alert-dialog-slide-description">
                 <DialogTitle>User Role Settings</DialogTitle>
                 <DialogContent>
                     <DialogContentText>Set current user role</DialogContentText>
@@ -53,7 +53,7 @@ const NavBar = (props: NavBarProps) => {
                     <Button onClick={handleSetRole(Role.Coach)}>Coach</Button>
                     <Button onClick={handleSetRole(Role.Admin)}>Admin</Button>
                 </DialogActions>
-            </Dialog>
+            </Drawer>
         </React.Fragment>
     );
 };

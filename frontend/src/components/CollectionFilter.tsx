@@ -18,7 +18,7 @@ const Accordion = styled(MuiAccordion)({
 });
 
 interface CollectionFilterProps {
-    onFiltersChange: (filters: CollectionFilters) => void;
+    onCollectionFiltersChange: (filters: CollectionFilters) => void;
     options: {
         giOptions: string[],
         hierarchyOptions: string[],
@@ -37,7 +37,7 @@ export interface CollectionFilters {
     gi: string | null;
 }
 
-export const useDetermineFilterOptions = (collections: Collection[]) => {
+export const useDetermineCollectionFilterOptions = (collections: Collection[]) => {
     // Autocomplete options for filters
     const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
     const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
@@ -79,10 +79,10 @@ export const useDetermineFilterOptions = (collections: Collection[]) => {
     return options
 }
 
-export const useHandleFilterChange = (collectionsList: Collection[]) => {
+export const useHandleCollectionFilterChange = (collectionsList: Collection[]) => {
     const [filteredCollections, setFilteredCollections] = React.useState<Collection[]>([]);
 
-    const handleFilterChange = React.useCallback((newFilters: CollectionFilters) => {
+    const handleCollectionFilterChange = React.useCallback((newFilters: CollectionFilters) => {
         const giFilterMatch = (filterValue: string, collectionValue: string) => {
             return collectionValue === 'Both' || collectionValue.includes(filterValue);
         };
@@ -99,10 +99,10 @@ export const useHandleFilterChange = (collectionsList: Collection[]) => {
 
     },[collectionsList]);
 
-    return { filteredCollections: filteredCollections, handleFilterChange };
+    return { filteredCollections: filteredCollections, handleCollectionFilterChange };
 }
 
-function CollectionFilter({ onFiltersChange, options }: CollectionFilterProps): JSX.Element {
+function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options }: CollectionFilterProps): JSX.Element {
     const [filters, setFilters] = React.useState<CollectionFilters>({
         title: '',
         hierarchy: null as null | string,

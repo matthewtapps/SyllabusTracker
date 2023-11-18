@@ -9,9 +9,9 @@ import MuiButton from '@mui/material/Button'
 import Autocomplete from '@mui/material/Autocomplete'
 import MuiTypography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
-import { Technique, Collection, Gi, Hierarchy } from 'common'
+import { Technique } from 'common'
 import TechniqueList from '../../../components/TechniqueList'
-import TechniqueFilter, { useDetermineFilterOptions, useHandleFilterChange } from '../../../components/TechniqueFilter'
+import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/TechniqueFilter'
 import DragDropTechniquesList from '../../../components/DragDropTechniques'
 import { postCollectionTechniques, transformCollectionForBackend, postCollection } from '../../../util/Utilities'
 
@@ -78,11 +78,11 @@ const NewCollection: React.FC = () => {
     const [collectionTitleSuggestions, setCollectionTitleSuggestions] = React.useState<string[]>([]);
     
     // Generate options for the filters based on the full techniques list
-    const options = useDetermineFilterOptions(techniques)
+    const options = useDetermineTechniqueFilterOptions(techniques)
 
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
-    const { filteredTechniques, handleFilterChange } = useHandleFilterChange(techniques)
+    const { filteredTechniques, handleTechniqueFilterChange: handleFilterChange } = useHandleTechniqueFilterChange(techniques)
     
     // Module field displays
     const [showOpenGuardField, setShowOpenGuardField] = React.useState(false)
@@ -312,7 +312,7 @@ const NewCollection: React.FC = () => {
             </Accordion>
                                 
             <TechniqueFilter 
-                onFiltersChange={handleFilterChange} 
+                onTechniqueFiltersChange={handleFilterChange} 
                 options={options}/>
 
             <Accordion disableGutters sx={{borderTop: '1px solid #7c6f64'}}>

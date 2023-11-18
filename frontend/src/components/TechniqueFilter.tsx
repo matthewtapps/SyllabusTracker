@@ -7,6 +7,8 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Technique } from 'common';
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+
 
 
 const Accordion = styled(MuiAccordion)({
@@ -135,42 +137,44 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                 />
             </AccordionSummary>
             <AccordionDetails>
-                <Autocomplete
-                    options={options.giOptions}
-                    value={filters.gi}
-                    onInputChange={(event, newValue) => {
-                        const newFilters = { ...filters, gi: newValue || null };
-                        setFilters(newFilters);
-                        onFiltersChange(newFilters);
-                    }}                    isOptionEqualToValue={(option, value) => option === value}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            fullWidth
-                            label="Yes Gi or No Gi"
-                            sx={{marginRight: "10px"}}
-                            size="small"
-                        />
-                    )}
-                />
-                <Autocomplete
-                    options={options.hierarchyOptions}
-                    value={filters.hierarchy}
-                    onInputChange={(event, newValue) => {
-                        const newFilters = { ...filters, hierarchy: newValue || null };
-                        setFilters(newFilters);
-                        onFiltersChange(newFilters);
-                    }}                          isOptionEqualToValue={(option, value) => option === value}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            fullWidth
-                            label="Hierarchy"
-                            sx={{marginTop: "10px"}}
-                            size="small"
-                        />
-                    )}
-                />
+                <FormControl fullWidth size="small" sx={{ marginTop: "10px" }}>
+                    <InputLabel id="gi-select-label">Yes Gi or No Gi</InputLabel>
+                    <Select
+                        labelId="gi-select-label"
+                        id="gi-select"
+                        value={filters.gi || ''}
+                        label="Yes Gi or No Gi"
+                        onChange={(e) => {
+                            const newFilters = { ...filters, gi: e.target.value || null };
+                            setFilters(newFilters);
+                            onFiltersChange(newFilters);
+                        }}
+                    >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                        {options.giOptions.map(option => (
+                            <MenuItem key={option} value={option}>{option}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <FormControl fullWidth size="small" sx={{ marginTop: "10px" }}>
+                    <InputLabel id="hierarchy-select-label">Hierarchy</InputLabel>
+                    <Select
+                        labelId="hierarchy-select-label"
+                        id="hierarchy-select"
+                        value={filters.hierarchy || ''}
+                        label="Hierarchy"
+                        onChange={(e) => {
+                            const newFilters = { ...filters, hierarchy: e.target.value || null };
+                            setFilters(newFilters);
+                            onFiltersChange(newFilters);
+                        }}
+                    >
+                    <MenuItem value=""><em>None</em></MenuItem>
+                        {options.hierarchyOptions.map(option => (
+                            <MenuItem key={option} value={option}>{option}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
                 <Autocomplete
                     options={options.typeOptions}
                     value={filters.type}

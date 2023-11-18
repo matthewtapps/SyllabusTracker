@@ -131,6 +131,7 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                     }}
                     onClick={e => e.stopPropagation()}
                     variant="outlined"
+                    size="small"
                 />
             </AccordionSummary>
             <AccordionDetails>
@@ -148,6 +149,7 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                             fullWidth
                             label="Yes Gi or No Gi"
                             sx={{marginRight: "10px"}}
+                            size="small"
                         />
                     )}
                 />
@@ -165,6 +167,7 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                             fullWidth
                             label="Hierarchy"
                             sx={{marginTop: "10px"}}
+                            size="small"
                         />
                     )}
                 />
@@ -183,6 +186,7 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                             label="Type"
                             variant="outlined"
                             sx={{marginTop: "10px"}}
+                            size="small"
                         />
                     )}
                 />
@@ -201,6 +205,7 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                             label="Position"
                             variant="outlined"
                             sx={{marginTop: "10px"}}
+                            size="small"
                         />
                     )}
                 />
@@ -220,6 +225,7 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                             label="Open Guard"
                             variant="outlined"
                             sx={{marginTop: "10px"}}
+                            size="small"
                         />
                     )}
                 />

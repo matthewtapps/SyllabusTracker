@@ -92,6 +92,7 @@ interface CollectionsListProps {
     onDragDropSaveClick?: () => void;
     onDragDropCancelClick?: () => void;
     onAddNewTechniqueClick?: () => void;
+    onDragDropDeleteClick?: (deletedTechnique: {index: number, technique: Technique}) => void;
 }
 
 CollectionList.defaultProps = {
@@ -155,6 +156,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                             selectedTechniques={props.dragDropTechniques} 
                                             onReorder={props.onReorderDragDropTechniques}
                                             onAddTechniqueClick={props.onAddNewTechniqueClick}
+                                            onDragDropDeleteClick={props.onDragDropDeleteClick}
                                             editable/>
                                             <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
                                                 <Button type="submit" onClick={(event) => { event.stopPropagation(); props.onDragDropSaveClick?.() }}>Save</Button>

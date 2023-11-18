@@ -10,7 +10,9 @@ import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles'
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button';
+import theme from '../theme/Theme';
 
 
 const Card = styled(MuiCard)({
@@ -33,6 +35,7 @@ interface DragDropTechniquesListProps {
     selectedTechniques: { index: number, technique: Technique }[];
     onReorder: (newOrder: { index: number, technique: Technique }[]) => void;
     onAddTechniqueClick?: () => void;
+    onDragDropDeleteClick?: (deletedTechnique: {index: number, technique: Technique}) => void;
     editable: boolean;
 }
 
@@ -80,7 +83,11 @@ function DragDropTechniquesList(props: DragDropTechniquesListProps): JSX.Element
                                                                 {item.technique.title}
                                                             </Typography>
                                                         </Box>
-                                                        <DeleteIcon></DeleteIcon>                                                        
+                                                        <IconButton 
+                                                        onClick={e => {props.onDragDropDeleteClick?.({index: item.index, technique: item.technique})}}
+                                                        sx={{padding: "0px"}}>
+                                                            <DeleteIcon/>                                             
+                                                        </IconButton>
                                                     </Box>
                                                 </AccordionSummary>
                                             </Accordion>

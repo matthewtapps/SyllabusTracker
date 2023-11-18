@@ -18,6 +18,8 @@ import Dialog from '@mui/material/Dialog'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange} from '../../../components/TechniqueFilter'
 import TechniqueList from '../../../components/TechniqueList'
 import MuiButton, { ButtonProps } from '@mui/material/Button'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 
 
 interface TechniqueDTO {
@@ -61,7 +63,7 @@ const Card = styled(MuiCard)({
 });
 
 const Button = styled((props: ButtonProps) => (
-    <MuiButton sx={{width: "80px", marginX: "10px"}} variant='contained' {...props} />
+    <MuiButton sx={{width: "100%", marginX: "10px"}} variant='contained' {...props} />
 ))(({ theme }) => ({}));
 
 function CoachCollections(): JSX.Element {
@@ -109,6 +111,18 @@ function CoachCollections(): JSX.Element {
 
     const handleCloseTechniqueDialogue = () => {
         setAddTechniqueToCollectionDialogueOpen(false)
+    }
+
+    const handleSaveTechniqueDialogue = () => {
+        let updatedCollectionTechniques = dragDropTechniques
+        let length = updatedCollectionTechniques?.length
+        
+        selectedTechniques.forEach(indexTechniquePair => {
+            updatedCollectionTechniques?.push({index: length + 1, technique: indexTechniquePair.technique})
+            length++
+        })
+
+        setDragDropTechniques(updatedCollectionTechniques)
     }
 
     // State of list of techniques to show in add technique list/extra list with already-existing techniques removed to avoid double-adding
@@ -281,12 +295,19 @@ function CoachCollections(): JSX.Element {
             }
         }, 500);
         setShowFab(true)
+        setSelectedTechniques([])
     };
 
     const handleDragDropCancelClick = () => {
         setEditingTechniquesCollection(null)
         setDragDropTechniques([])
         setShowFab(true)
+    }
+
+    const handleDragDropDeleteClick = (deletedTechnique: {index: number, technique: Technique}) => {
+        let newDragDropTechniques = dragDropTechniques.filter(item => item.technique !== deletedTechnique.technique)
+
+        setDragDropTechniques(newDragDropTechniques)
     }
 
     React.useEffect(() => {
@@ -349,7 +370,8 @@ function CoachCollections(): JSX.Element {
                     dragDropTechniques={dragDropTechniques}
                     onDragDropSaveClick={handleDragDropSaveClick}
                     onDragDropCancelClick={handleDragDropCancelClick}
-                    onAddNewTechniqueClick={handleOpenTechniqueDialogue}/>
+                    onAddNewTechniqueClick={handleOpenTechniqueDialogue}
+                    onDragDropDeleteClick={handleDragDropDeleteClick}/>
                 </Box>
             )}
             </Card>
@@ -363,26 +385,31 @@ function CoachCollections(): JSX.Element {
                     <AddIcon/>
                 </Fab>
             )}
-            <Dialog open={addTechniqueToCollectionDialogueOpen} onClose={handleCloseTechniqueDialogue} scroll='body'>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                    <Button type="submit" onClick={(event) => { event.stopPropagation();  }}>Save</Button>
-                    <Button onClick={(event) => { event.stopPropagation();  }}>Cancel</Button>
-                </Box>
-                <Card>
-                    <TechniqueFilter 
-                        onTechniqueFiltersChange={handleTechniqueFilterChange} 
-                        options={techniqueOptions}/>
-                </Card>
-                <Card>
-                    <TechniqueList 
-                        filteredTechniques={filteredTechniques} 
-                        checkbox
-                        elevation={1} 
-                        checkedTechniques={selectedTechniques}
-                        onTechniqueCheck={handleTechniqueCheck}
-                        />
-                </Card>
-                <div style={{paddingTop: "10px"}}/>
+            <Dialog open={addTechniqueToCollectionDialogueOpen} onClose={handleCloseTechniqueDialogue} scroll="paper">
+                <DialogTitle sx={{padding: "0px", marginBottom: "10px"}}>
+                    <Card>
+                        <TechniqueFilter 
+                            onTechniqueFiltersChange={handleTechniqueFilterChange} 
+                            options={techniqueOptions}/>
+                    </Card> 
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                        <Button onClick={(event) => { event.stopPropagation(); handleSaveTechniqueDialogue(); handleCloseTechniqueDialogue(); }}>Save</Button>
+                        <Button onClick={(event) => { event.stopPropagation(); handleCloseTechniqueDialogue(); }}>Cancel</Button>
+                    </Box>  
+                </DialogTitle>
+
+                <DialogContent dividers={true} sx={{padding: "0px"}}> 
+                    <Card>
+                        <TechniqueList 
+                            filteredTechniques={filteredTechniques} 
+                            checkbox
+                            elevation={1} 
+                            checkedTechniques={selectedTechniques}
+                            onTechniqueCheck={handleTechniqueCheck}
+                            />
+                    </Card>
+                    <div style={{paddingTop: "10px"}}/>
+                </DialogContent>
             </Dialog>
         </div>
     );

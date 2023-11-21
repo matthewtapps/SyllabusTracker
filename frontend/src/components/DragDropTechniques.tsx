@@ -56,14 +56,30 @@ function DragDropTechniquesList(props: DragDropTechniquesListProps): JSX.Element
     return (
         (props.selectedTechniques.length === 0)  ? (
             <Card elevation={0}>
-                <Accordion elevation={0} disableGutters square>
+                <Accordion elevation={0} disableGutters square sx={{borderBottom: '1px solid #7c6f64'}}>
                     <AccordionSummary>
                         <Typography variant="body1">
                             No techniques in collection
                         </Typography>
                     </AccordionSummary>
                 </Accordion>
+                {props.editable && (
+            <Accordion disableGutters square elevation={0}>
+                <AccordionSummary >
+                    <Box display="flex" width="100%" alignItems="center" justifyContent='center'>
+                        <Button 
+                        onClick={props.onAddTechniqueClick}
+                        size="large" 
+                        style={{position: "absolute", top: "0", left: "0", right: "0", bottom: "0"}}
+                        fullWidth>
+                            <AddIcon style={{ marginRight: "8px" }}/>
+                        </Button>                        
+                    </Box>
+                </AccordionSummary>
+            </Accordion>
+            )}
             </Card>
+            
         ) : (
         <Card elevation={0} >
             <DragDropContext onDragEnd={handleOnDragEnd}>

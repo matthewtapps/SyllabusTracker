@@ -143,7 +143,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                     <ListItem>
                                         <Box display="flex" alignItems="center" justifyContent="flex-start" width="97%">
                                             <ListItemText primary="Collection Techniques"/>
-                                            {props.editableCollection && !props.editingTechniquesCollection && (
+                                            {props.editableCollection && !props.editingTechniquesCollection && !props.editingTechniqueId && (
                                                 <Edit onClick={(event) => { event.stopPropagation(); props.onCollectionTechniqueEditClick?.(collection); }}/>
                                             )}
                                         </Box>

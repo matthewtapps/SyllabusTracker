@@ -111,6 +111,7 @@ function CoachCollections(): JSX.Element {
 
     const handleCloseTechniqueDialogue = () => {
         setAddTechniqueToCollectionDialogueOpen(false)
+        setSelectedTechniques([])
     }
 
     const handleSaveTechniqueDialogue = () => {
@@ -310,6 +311,42 @@ function CoachCollections(): JSX.Element {
         setDragDropTechniques(newDragDropTechniques)
     }
 
+    interface filtersObject {
+        title: string,
+        hierarchy: string | null,
+        type: string | null,
+        position: string | null,
+        openGuard: string | null,
+        gi: string | null;
+    }
+
+    const handleTechniqueFilterMatchClick = (collection: Collection): {
+        title: string,
+        hierarchy: string | null,
+        type: string | null,
+        position: string | null,
+        openGuard: string | null,
+        gi: string | null;
+    } => {
+
+        let collectionObject: filtersObject = {
+            title: "",
+            hierarchy: null,
+            type: null,
+            position: null,
+            openGuard: null,
+            gi: null
+        }
+
+        if (collection.hierarchy) {collectionObject.hierarchy = collection.hierarchy}
+        if (collection.type) {collectionObject.type = collection.type.title}
+        if (collection.position) {collectionObject.position = collection.position.title}
+        if (collection.openGuard) {collectionObject.position = collection.openGuard.title}
+        if (collection.gi) {collectionObject.gi = collection.gi}
+        
+        return collectionObject
+    }
+
     React.useEffect(() => {
         fetchCollections().then(collections => {
             if (collections) setCollectionsList(collections);
@@ -325,7 +362,7 @@ function CoachCollections(): JSX.Element {
         
     }, []);
 
-    // Options for the filters based on the full techniques list
+    // Options for the filters based on the full collections list
     const collectionOptions = useDetermineCollectionFilterOptions(collectionsList)
 
     // Generated list of filtered techniques which is held at this level, and function for handling filter
@@ -390,10 +427,11 @@ function CoachCollections(): JSX.Element {
                     <Card>
                         <TechniqueFilter 
                             onTechniqueFiltersChange={handleTechniqueFilterChange} 
-                            options={techniqueOptions}/>
+                            options={techniqueOptions}
+                            matchTechniqueFilters={editingTechniquesCollection && (handleTechniqueFilterMatchClick(editingTechniquesCollection))}/>
                     </Card> 
                     <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                        <Button onClick={(event) => { event.stopPropagation(); handleSaveTechniqueDialogue(); handleCloseTechniqueDialogue(); }}>Save</Button>
+                        <Button disabled={(selectedTechniques.length === 0)} onClick={(event) => { event.stopPropagation(); handleSaveTechniqueDialogue(); handleCloseTechniqueDialogue(); }}>Add</Button>
                         <Button onClick={(event) => { event.stopPropagation(); handleCloseTechniqueDialogue(); }}>Cancel</Button>
                     </Box>  
                 </DialogTitle>

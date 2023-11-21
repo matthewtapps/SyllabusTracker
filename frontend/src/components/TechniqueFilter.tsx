@@ -7,7 +7,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Technique } from 'common';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 
 
 
@@ -28,6 +28,14 @@ interface TechniqueFilterProps {
         positionOptions: string[],
         openGuardOptions: string[]
     };
+    matchTechniqueFilters?: {
+        title: string,
+        hierarchy: string | null,
+        type: string | null,
+        position: string | null,
+        openGuard: string | null,
+        gi: string | null;
+    } | null
 }
 
 export interface TechniqueFilters {
@@ -104,7 +112,7 @@ export const useHandleTechniqueFilterChange = (techniquesList: Technique[]) => {
     return { filteredTechniques, handleTechniqueFilterChange };
 }
 
-function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }: TechniqueFilterProps): JSX.Element {
+function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
     const [filters, setFilters] = React.useState<TechniqueFilters>({
         title: '',
         hierarchy: null as null | string,
@@ -114,9 +122,13 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
         gi: null as null | string,
     });
 
+    const handleMatchFiltersClick = () => {
+        props.matchTechniqueFilters && setFilters(props.matchTechniqueFilters)
+    }
+
     React.useEffect(() => {
-        onFiltersChange(filters);
-    }, [onFiltersChange, filters]);
+        props.onTechniqueFiltersChange(filters);
+    }, [props.onTechniqueFiltersChange, filters]);
 
     return (
         <Accordion disableGutters>
@@ -129,7 +141,7 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                     onChange={e => {
                         const newFilters = { ...filters, title: e.target.value };
                         setFilters(newFilters);
-                        onFiltersChange(newFilters);
+                        props.onTechniqueFiltersChange(newFilters);
                     }}
                     onClick={e => e.stopPropagation()}
                     variant="outlined"
@@ -137,6 +149,9 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                 />
             </AccordionSummary>
             <AccordionDetails>
+                {props.matchTechniqueFilters && (
+                    <Button variant="contained" fullWidth size="small" onClick={handleMatchFiltersClick}>Match to Collection Filters</Button>
+                )}
                 <FormControl fullWidth size="small" sx={{ marginTop: "10px" }}>
                     <InputLabel id="gi-select-label">Yes Gi or No Gi</InputLabel>
                     <Select
@@ -147,11 +162,11 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                         onChange={(e) => {
                             const newFilters = { ...filters, gi: e.target.value || null };
                             setFilters(newFilters);
-                            onFiltersChange(newFilters);
+                            props.onTechniqueFiltersChange(newFilters);
                         }}
                     >
                     <MenuItem value=""><em>None</em></MenuItem>
-                        {options.giOptions.map(option => (
+                        {props.options.giOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
@@ -166,22 +181,22 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                         onChange={(e) => {
                             const newFilters = { ...filters, hierarchy: e.target.value || null };
                             setFilters(newFilters);
-                            onFiltersChange(newFilters);
+                            props.onTechniqueFiltersChange(newFilters);
                         }}
                     >
                     <MenuItem value=""><em>None</em></MenuItem>
-                        {options.hierarchyOptions.map(option => (
+                        {props.options.hierarchyOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
                 <Autocomplete
-                    options={options.typeOptions}
+                    options={props.options.typeOptions}
                     value={filters.type}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, type: newValue || null };
                         setFilters(newFilters);
-                        onFiltersChange(newFilters);
+                        props.onTechniqueFiltersChange(newFilters);
                     }}                          isOptionEqualToValue={(option, value) => option === value}
                     renderInput={(params) => (
                         <TextField
@@ -195,12 +210,12 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                     )}
                 />
                 <Autocomplete
-                    options={options.positionOptions}
+                    options={props.options.positionOptions}
                     value={filters.position}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, position: newValue || null };
                         setFilters(newFilters);
-                        onFiltersChange(newFilters);
+                        props.onTechniqueFiltersChange(newFilters);
                     }}                          isOptionEqualToValue={(option, value) => option === value}
                     renderInput={(params) => (
                         <TextField
@@ -213,14 +228,14 @@ function TechniqueFilter({ onTechniqueFiltersChange: onFiltersChange, options }:
                         />
                     )}
                 />
-                { options.openGuardOptions && (
+                { props.options.openGuardOptions && (
                 <Autocomplete
-                    options={options.openGuardOptions}
+                    options={props.options.openGuardOptions}
                     value={filters.openGuard}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, openGuard: newValue || null };
                         setFilters(newFilters);
-                        onFiltersChange(newFilters);
+                        props.onTechniqueFiltersChange(newFilters);
                     }}                          isOptionEqualToValue={(option, value) => option === value}
                     renderInput={(params) => (
                         <TextField

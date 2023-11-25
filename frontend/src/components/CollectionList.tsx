@@ -14,6 +14,8 @@ import Box from '@mui/material/Box';
 import Edit from '@mui/icons-material/Edit';
 import DragDropTechniquesList from './DragDropTechniques';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
+import { FastTextField as TextField } from './FastTextField';
+import theme from '../theme/Theme';
 
 
 interface TechniqueDTO {
@@ -87,6 +89,10 @@ interface CollectionsListProps {
     editingCollectionId: string | null;
     editingCollection: Collection | null;
     onCollectionTechniqueEditClick?: (collection: Collection) => void;
+    onCollectionEditClick?: (collection: Collection) => void;
+    onCollectionSaveClick?: (event: React.FormEvent<HTMLFormElement>) => void;
+    onCollectionCancelClick?: () => void;
+    onCollectionDeleteClick?: () => void;
     dragDropTechniques: {index: number, technique: Technique}[] | null;
     onReorderDragDropTechniques?: (newOrder: {index: number, technique: Technique}[]) => void;
     onDragDropSaveClick?: () => void;
@@ -109,8 +115,10 @@ CollectionList.defaultProps = {
 }
 
 function CollectionList(props: CollectionsListProps): JSX.Element {
+    const [wasSubmitted, setWasSubmitted] = React.useState(false)
+
     return (
-        <React.Fragment>
+        <form noValidate onSubmit={props.onCollectionSaveClick}>
             {props.filteredCollections.map(collection => {         
 
                 let collectionTechniques: Technique[] = []
@@ -130,11 +138,28 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                 }
             return (
                 <Accordion disableGutters elevation={props.elevation} key={collection.collectionId}>
-                    <AccordionSummary
-                        expandIcon={<ExpandMore/>}
-                        aria-controls="panel1a-content"
-                    >
-                        <Typography variant="h6">{collection.title}</Typography>
+                    <AccordionSummary expandIcon={<ExpandMore/>} aria-controls="panel1a-content">
+                        <Box display="flex" flexDirection="column" flexGrow={1}>
+                            <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
+                                {(props.editingCollectionId === collection.collectionId) ? (
+                                    <TextField wasSubmitted={wasSubmitted} size="medium" style={{width: "100%"}} fullWidth
+                                    defaultValue={collection?.title} name="title" label="Title" onClick={e => e.stopPropagation()}/>
+                                    ) : 
+                                    <Typography variant="h6">{collection.title}</Typography>
+                                }
+                                {props.editableCollection && !(props.editingCollectionId === collection.collectionId) && !(props.editingCollectionId) && (
+                                    <Edit onClick={(event) => { event.stopPropagation(); props.onCollectionEditClick?.(collection); }}/>
+                                )}
+                            </Box>
+                            {props.editingCollectionId === collection.collectionId && (
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" width="97%" mt={1}>
+                                        <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
+                                        <Button onClick={(event) => { event.stopPropagation(); props.onCollectionCancelClick?.()}}>Cancel</Button>
+                                        <Button onClick={(event) => { event.stopPropagation(); props.onCollectionDeleteClick?.() }} 
+                                            style={{backgroundColor: theme.palette.error.main}} >Delete</Button>
+                                    </Box>
+                                )}
+                        </Box>
                     </AccordionSummary>
                     <AccordionDetails>
                         <SubCard elevation={0}>
@@ -180,75 +205,107 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                             </SubAccordion>
 
                             <ListItem>
-                                <ListItemText primary="Description" secondary={collection.description} />
+                                <ListItemText primary="Description" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                    <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                    defaultValue={collection.description} multiline rows={4} name="description"/> : 
+                                    collection?.description
+                                } />                                
                             </ListItem>
+                                                        
+                            {(collection.globalNotes || props.editingCollectionId === collection.collectionId) && (
+                                <ListItem>
+                                    <ListItemText primary="Global Notes" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                        defaultValue={collection.globalNotes} name="globalNotes"/> : 
+                                        collection.globalNotes} />
+                                </ListItem>
+                            )}
     
-                            {collection.position && (
+                            {(collection.position || props.editingCollectionId === collection.collectionId) && (
                                 <SubAccordion elevation={0} disableGutters square>
                                     <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
                                         <ListItem>
-                                            <ListItemText primary="Position" secondary={collection.position.title} />
+                                            <ListItemText primary="Position" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                                <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                                defaultValue={collection.position?.title} name="position"/> : 
+                                                collection.position?.title} />
                                         </ListItem>
                                     </AccordionSummary>
 
                                     <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
                                         <ListItem >
-                                            <ListItemText secondary={collection.position.description} />
+                                            <ListItemText secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                                <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                                defaultValue={collection.position?.description} multiline rows={4} name="positionDescription"/> :
+                                                collection.position?.description} />
                                         </ListItem>
                                     </AccordionDetails>
                                 </SubAccordion>
                             )}
 
-                            {collection.hierarchy && (
+                            {(collection.hierarchy || props.editingCollectionId === collection.collectionId) && (
                                 <ListItem>
-                                    <ListItemText primary=" Hierarchy" secondary={collection.hierarchy} />
+                                    <ListItemText primary=" Hierarchy" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                        defaultValue={collection.hierarchy} name="hierarchy"/> :
+                                        collection.hierarchy} />
                                 </ListItem>
                             )}
 
-                            {collection.type && (
+                            {(collection.type || props.editingCollectionId === collection.collectionId) && (
                                 <SubAccordion elevation={0} disableGutters square>
                                     <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
                                         <ListItem>
-                                            <ListItemText primary="Type" secondary={collection.type.title} />
+                                            <ListItemText primary="Type" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                        defaultValue={collection.type?.title} name="type"/> :
+                                        collection.type?.title} />
                                         </ListItem>
                                     </AccordionSummary>
 
                                     <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
                                         <ListItem>
-                                            <ListItemText secondary={collection.type.description} />
+                                            <ListItemText secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                        defaultValue={collection.type?.description} multiline rows={4} name="typeDescription"/> :
+                                        collection.type?.description} />
                                         </ListItem>
                                     </AccordionDetails>
                                 </SubAccordion>
                             )}
 
-                            {collection.openGuard && (
+                            {(collection.openGuard || props.editingCollectionId === collection.collectionId) && (
                                 <SubAccordion elevation={0} disableGutters square>
                                     <ListItem>
-                                        <ListItemText primary="Open Guard" secondary={collection.openGuard.title} />
+                                        <ListItemText primary="Open Guard" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                        defaultValue={collection.openGuard?.title} name="openGuard"/> :
+                                        collection.openGuard?.title} />
                                     </ListItem>
 
                                     <ListItem>
-                                        <ListItemText secondary={collection.openGuard.description} />
+                                        <ListItemText secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                        defaultValue={collection.openGuard?.description} multiline rows={4} name="openGuardDescription"/> :
+                                        collection.openGuard?.description} />
                                     </ListItem>
                                 </SubAccordion>
                             )}
 
-                            {collection.gi && (
+                            {(collection.gi || props.editingCollectionId === collection.collectionId) && (
                                 <ListItem>
-                                    <ListItemText primary="Gi or No Gi" secondary={collection.gi} />
+                                    <ListItemText primary="Gi or No Gi" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                        defaultValue={collection.gi} name="gi"/> :
+                                        collection.gi} />
                                 </ListItem>
                             )}
-                            
-                            {collection.globalNotes && (
-                                <ListItem>
-                                    <ListItemText primary="Global Notes" secondary={collection.globalNotes} />
-                                </ListItem>
-                            )}
+
                         </SubCard>
                     </AccordionDetails>
                 </Accordion>
             )})}
-        </React.Fragment>
+        </form>
     )
 }
 

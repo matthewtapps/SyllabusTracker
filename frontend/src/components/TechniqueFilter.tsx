@@ -122,13 +122,15 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
         gi: null as null | string,
     });
 
+    let onTechniqueFiltersChange = props.onTechniqueFiltersChange
+
     const handleMatchFiltersClick = () => {
         props.matchTechniqueFilters && setFilters(props.matchTechniqueFilters)
     }
 
     React.useEffect(() => {
-        props.onTechniqueFiltersChange(filters);
-    }, [props.onTechniqueFiltersChange, filters]);
+        onTechniqueFiltersChange(filters);
+    }, [onTechniqueFiltersChange, filters]);
 
     return (
         <Accordion disableGutters>

@@ -13,13 +13,13 @@ import CollectionList from '../../../components/CollectionList'
 import CollectionFilter, { useDetermineCollectionFilterOptions, useHandleCollectionFilterChange } from '../../../components/CollectionFilter'
 import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
 import { Technique } from 'common'
-import { postCollectionTechniques } from '../../../util/Utilities'
 import Dialog from '@mui/material/Dialog'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange} from '../../../components/TechniqueFilter'
 import TechniqueList from '../../../components/TechniqueList'
 import MuiButton, { ButtonProps } from '@mui/material/Button'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
+import { postCollectionTechniques, transformCollectionForBackend, postCollection } from '../../../util/Utilities'
 
 
 interface TechniqueDTO {
@@ -347,6 +347,47 @@ function CoachCollections(): JSX.Element {
         return collectionObject
     }
 
+    const handleCollectionEditClick = (collection: Collection) => {
+        setEditingCollectionId(collection.collectionId);
+        setEditingCollection(collection);
+        setEditingTechniqueId("Changing this to stop editing techniques at the same time");
+        setShowFab(false);
+    }
+
+    const handleCollectionCancelClick = () => {
+        setEditingCollectionId(null);
+        setEditingCollection(null);
+        setShowFab(true);
+        setEditingTechniqueId(null);
+    }
+
+    const handleCollectionSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        
+        const formData = new FormData(event.currentTarget)
+        const fieldValues = Object.fromEntries(formData.entries())
+        const validCollection = transformCollectionForBackend(fieldValues);
+        if (!validCollection) {
+            alert('Not a valid technique posted')
+            return
+        };
+
+        await postCollection(validCollection);
+
+        setEditingCollectionId(null);
+        setEditingCollection(null);
+        setShowFab(true);
+        setEditingTechniqueId(null);
+        
+        fetchCollections().then(collections => {
+            if (collections) setCollectionsList(collections);
+        });
+    }
+    
+    const handleCollectionDeleteClick = () => {
+        //TODO
+    }
+
     React.useEffect(() => {
         fetchCollections().then(collections => {
             if (collections) setCollectionsList(collections);
@@ -403,6 +444,10 @@ function CoachCollections(): JSX.Element {
                     editingCollection={editingCollection}
                     collectionTechniques={collectionTechniques}
                     onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
+                    onCollectionEditClick={handleCollectionEditClick}
+                    onCollectionCancelClick={handleCollectionCancelClick}
+                    onCollectionSaveClick={handleCollectionSaveClick}
+                    onCollectionDeleteClick={handleCollectionDeleteClick}
                     onReorderDragDropTechniques={handleOnReorderDragDropTechniques}
                     dragDropTechniques={dragDropTechniques}
                     onDragDropSaveClick={handleDragDropSaveClick}

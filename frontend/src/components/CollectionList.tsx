@@ -58,9 +58,29 @@ const ListItem = styled(MuiListItem)({
     paddingLeft: "0px"
 })
 
-const ListItemText = styled(({ ...props }: ListItemTextProps) => (
-    <MuiListItemText primaryTypographyProps={{variant: 'body1'}} secondaryTypographyProps={{variant: 'body2'}}{...props} />
-))(({ theme }) => ({}))
+const BaseListItemText: React.FC<ListItemTextProps> = (props) => {
+    return (
+        <MuiListItemText 
+            {...props} 
+            secondaryTypographyProps={{ component: 'div'}}
+            primaryTypographyProps={{ component: 'div'}}
+        />
+    );
+}
+
+const ListItemText = styled(BaseListItemText)<ListItemTextProps>(({ theme }) => {
+    let primaryVariant = 'h6';
+    let secondaryVariant = 'body1';
+    
+    return {
+        '& .MuiTypography-root': {
+            variant: primaryVariant
+        },
+        '& .MuiTypography-colorTextSecondary': {
+            variant: secondaryVariant
+        }
+    };
+});
 
 const SubCard = styled(MuiCard)({
     backgroundColor: 'inherit'
@@ -83,6 +103,14 @@ interface CollectionsListProps {
     onTechniqueSubmitClick?: (event: React.FormEvent<HTMLFormElement>) => void;
     onTechniqueCancelClick?: () => void;
     onTechniqueDeleteClick?: (techniqueId: string) => void;
+    editingTechniqueOptions: {
+        techniqueTitleOptions: string[],
+        techniquePositionOptions: string[],
+        techniqueHierarchyOptions: string[],
+        techniqueTypeOptions: string[],
+        techniqueOpenGuardOptions: string[],
+        techniqueGiOptions: string[]
+    } | null;
 
     editableCollection: boolean;
     editingTechniquesCollection: Collection | null;
@@ -99,6 +127,14 @@ interface CollectionsListProps {
     onDragDropCancelClick?: () => void;
     onAddNewTechniqueClick?: () => void;
     onDragDropDeleteClick?: (deletedTechnique: {index: number, technique: Technique}) => void;
+    editingCollectionOptions: {
+        collectionTitleOptions: string[],
+        collectionPositionOptions: string[],
+        collectionHierarchyOptions: string[],
+        colectionTypeOptions: string[],
+        collectionOpenGuardOptions: string[],
+        collectionGiOptions: string[]
+    } | null;
 }
 
 CollectionList.defaultProps = {
@@ -112,6 +148,8 @@ CollectionList.defaultProps = {
     editingCollectionId: null,
     editingCollection: null,
     dragDropTechniques: null,
+    editingTechniqueOptions: null,
+    editingCollectionOptions: null,
 }
 
 function CollectionList(props: CollectionsListProps): JSX.Element {
@@ -147,7 +185,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                     ) : 
                                     <Typography variant="h6">{collection.title}</Typography>
                                 }
-                                {props.editableCollection && !(props.editingCollectionId === collection.collectionId) && !(props.editingCollectionId) && (
+                                {props.editableCollection && !(props.editingTechniqueId) && !(props.editingCollectionId) && !(props.editingTechniquesCollection) && (
                                     <Edit onClick={(event) => { event.stopPropagation(); props.onCollectionEditClick?.(collection); }}/>
                                 )}
                             </Box>
@@ -199,6 +237,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                         onSubmitClick={props.onTechniqueSubmitClick}
                                         onCancelClick={props.onTechniqueCancelClick}
                                         onDeleteClick={props.onTechniqueDeleteClick}
+                                        editingTechniqueOptions={props.editingTechniqueOptions}
                                         />)
                                     }
                                 </AccordionDetails>
@@ -276,19 +315,23 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
 
                             {(collection.openGuard || props.editingCollectionId === collection.collectionId) && (
                                 <SubAccordion elevation={0} disableGutters square>
-                                    <ListItem>
-                                        <ListItemText primary="Open Guard" secondary={(props.editingCollectionId === collection.collectionId) ? 
-                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
-                                        defaultValue={collection.openGuard?.title} name="openGuard"/> :
-                                        collection.openGuard?.title} />
-                                    </ListItem>
+                                    <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
+                                        <ListItem>
+                                            <ListItemText primary="Open Guard" secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                            <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                            defaultValue={collection.openGuard?.title} name="openGuard"/> :
+                                            collection.openGuard?.title} />
+                                        </ListItem>
+                                    </AccordionSummary>
 
-                                    <ListItem>
-                                        <ListItemText secondary={(props.editingCollectionId === collection.collectionId) ? 
-                                        <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
-                                        defaultValue={collection.openGuard?.description} multiline rows={4} name="openGuardDescription"/> :
-                                        collection.openGuard?.description} />
-                                    </ListItem>
+                                    <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
+                                        <ListItem>
+                                            <ListItemText secondary={(props.editingCollectionId === collection.collectionId) ? 
+                                            <TextField wasSubmitted={wasSubmitted} size="small" fullWidth style={{marginRight: "20px"}} 
+                                            defaultValue={collection.openGuard?.description} multiline rows={4} name="openGuardDescription"/> :
+                                            collection.openGuard?.description} />
+                                        </ListItem>
+                                    </AccordionDetails>
                                 </SubAccordion>
                             )}
 

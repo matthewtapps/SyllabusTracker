@@ -122,7 +122,7 @@ const NewCollection: React.FC = () => {
             return
         };
 
-        await postCollection(validCollection);
+        await postCollection(null, validCollection);
         
         if (selectedTechniques) { await postCollectionTechniques(validCollection, selectedTechniques) }
 

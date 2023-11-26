@@ -41,36 +41,50 @@ export class CollectionService {
         return await collectionTechniqueRepo.save(collectionTechniques);
     }
 
-    async createNewCollection(data: CollectionDTO): Promise<Collection> {
+    async createOrUpdateCollection(data: {collectionId: string, collection: CollectionDTO}): Promise<Collection> {
         const collectionRepo = AppDataSource.getRepository(Collection);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
 
-        let collection = new Collection();
-        collection.title = data.title;
-        collection.description = data.description;
-        collection.globalNotes = data.globalNotes ?? null;
-        collection.gi = data.gi ?? null;
-        collection.hierarchy = data.hierarchy ?? null;
+        let collection = await collectionRepo.findOne({ where: { collectionId: data.collectionId }});
+        if (!collection) collection = new Collection();
 
-        if (data.type) {
-            let type = await typeRepo.findOne({ where: { title: data.type }});
+        collection.title = data.collection.title;
+        collection.description = data.collection.description;
+        collection.globalNotes = data.collection.globalNotes ?? null;
+        collection.gi = data.collection.gi ?? null;
+        collection.hierarchy = data.collection.hierarchy ?? null;
+
+        if (data.collection.type) {
+            let type = await typeRepo.findOne({ where: { title: data.collection.type }});
             collection.type = type;
         } else collection.type = null;
 
-        if (data.position) {
-            let position = await positionRepo.findOne({ where: { title: data.position }});
+        if (data.collection.position) {
+            let position = await positionRepo.findOne({ where: { title: data.collection.position }});
             collection.position = position;
         } else collection.position = null;
 
-        if (data.openGuard) {
-            let openGuard = await openGuardRepo.findOne({ where: { title: data.openGuard } });
+        if (data.collection.openGuard) {
+            let openGuard = await openGuardRepo.findOne({ where: { title: data.collection.openGuard } });
             collection.openGuard = openGuard
         } else collection.openGuard = null;
 
         return await collectionRepo.save(collection)        
     };
+
+    async deleteCollection(data: {collectionId: string}) {
+        const collectionRepo = AppDataSource.getRepository(Collection);
+
+        const collection = await collectionRepo.findOne({ where: { collectionId: data.collectionId} })
+
+        if (collection) {await collectionRepo.createQueryBuilder()
+            .delete()
+            .from(Collection)
+            .where("collectionId = :collectionId", { collectionId: data.collectionId })
+            .execute();}
+    }
 
     async getAllCollectionTitles(): Promise<Collection[]> {
         const collectionRepo = AppDataSource.getRepository(Collection);

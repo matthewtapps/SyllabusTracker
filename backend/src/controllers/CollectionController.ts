@@ -5,7 +5,7 @@ export class CollectionController {
     static async createNewCollection(req: Request, res: Response) {
         const collectionService = new CollectionService();
         try {
-            const collection = await collectionService.createNewCollection(req.body);
+            const collection = await collectionService.createOrUpdateCollection(req.body);
             res.json(collection);
         } catch (error) {
             res.status(400).json({ error: error.message });
@@ -19,6 +19,16 @@ export class CollectionController {
             res.json(collectionTechniques);
         } catch (error) {
             res.status(400).json({ error: error.message })
+        }
+    }
+
+    static async deleteCollection(req: Request, res: Response) {
+        const collectionService = new CollectionService()
+        try {
+            await collectionService.deleteCollection(req.body)
+            res.status(200)
+        } catch (error) {
+            res.status(400).json({error: error.message})
         }
     }
 

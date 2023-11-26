@@ -84,14 +84,14 @@ export const transformCollectionForBackend = (collection: any): Collection | nul
     };
   }
 
-  export const postCollection = async (collection: Collection) => {
+  export const postCollection = async (collectionId: string | null, collection: Collection) => {
     try {
         const response = await fetch('http://localhost:3000/api/newCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(collection),
+            body: JSON.stringify({collection: collection, collectionId: collectionId}),
         });
   
         if (!response.ok) {
@@ -107,3 +107,27 @@ export const transformCollectionForBackend = (collection: any): Collection | nul
             return error
         }
 };
+
+export const deleteCollection = async (collectionId: string) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/deleteCollection', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({collectionId: collectionId}),
+        });
+
+    if (!response.ok) {
+        throw new Error(`Failed with status ${response.status}`);
+    }
+
+    const responseData = await response.json();
+        console.log('Success:', responseData);
+        return response.status
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Error deleting collection: ${error}`);
+            return error
+        }
+}

@@ -11,7 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import CollectionList from '../../../components/CollectionList'
 import CollectionFilter, { useDetermineCollectionFilterOptions, useHandleCollectionFilterChange } from '../../../components/CollectionFilter'
-import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
+import { transformTechniqueForBackend, postTechnique, deleteCollection } from '../../../util/Utilities'
 import { Technique } from 'common'
 import Dialog from '@mui/material/Dialog'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange} from '../../../components/TechniqueFilter'
@@ -136,6 +136,55 @@ function CoachCollections(): JSX.Element {
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
     const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange(cleanedTechniques)
+
+    // Suggestions for editing techniques in-place
+    const [techniqueSuggestions, setTechniqueSuggestions] = React.useState<{
+        techniqueTitleOptions: string[],
+        techniquePositionOptions: string[],
+        techniqueHierarchyOptions: string[],
+        techniqueTypeOptions: string[],
+        techniqueOpenGuardOptions: string[],
+        techniqueGiOptions: string[]
+    }>({
+        techniqueTitleOptions: [],
+        techniquePositionOptions: [],
+        techniqueHierarchyOptions: [],
+        techniqueTypeOptions: [],
+        techniqueOpenGuardOptions: [],
+        techniqueGiOptions: []
+    })
+
+    const generateTechniqueSuggestions = (techniqueList: Technique[]): {
+        techniqueTitleOptions: string[],
+        techniquePositionOptions: string[],
+        techniqueHierarchyOptions: string[],
+        techniqueTypeOptions: string[],
+        techniqueOpenGuardOptions: string[],
+        techniqueGiOptions: string[]
+    } => {
+        let generatedSuggestions: {
+            techniqueTitleOptions: string[],
+            techniquePositionOptions: string[],
+            techniqueHierarchyOptions: string[],
+            techniqueTypeOptions: string[],
+            techniqueOpenGuardOptions: string[],
+            techniqueGiOptions: string[]
+        } = { 
+            techniqueTitleOptions: [],
+            techniquePositionOptions: [],
+            techniqueHierarchyOptions: ["Top", "Bottom"],
+            techniqueTypeOptions: [],
+            techniqueOpenGuardOptions: [],
+            techniqueGiOptions: ["Gi", "No Gi", "Both"]
+        }
+        techniqueList.forEach(technique => {
+            if (!generatedSuggestions.techniqueTitleOptions.includes(technique.title)) {generatedSuggestions.techniqueTitleOptions.push(technique.title)}
+            if (!generatedSuggestions.techniquePositionOptions.includes(technique.position?.title)) {generatedSuggestions.techniquePositionOptions.push(technique.position.title)}
+            if (!generatedSuggestions.techniqueTypeOptions.includes(technique.type?.title)) {generatedSuggestions.techniqueTypeOptions.push(technique.type.title)}
+            if (technique.openGuard && (!generatedSuggestions.techniqueOpenGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.techniqueOpenGuardOptions.push(technique.openGuard?.title)}
+        })
+        return generatedSuggestions
+    }
 
     // Selected techniques for adding to collection
     const [selectedTechniques, setSelectedTechniques] = React.useState<{ index: number, technique: Technique }[]>([]);
@@ -372,7 +421,7 @@ function CoachCollections(): JSX.Element {
             return
         };
 
-        await postCollection(validCollection);
+        await postCollection(editingCollectionId, validCollection);
 
         setEditingCollectionId(null);
         setEditingCollection(null);
@@ -385,7 +434,15 @@ function CoachCollections(): JSX.Element {
     }
     
     const handleCollectionDeleteClick = () => {
-        //TODO
+        editingCollectionId && deleteCollection(editingCollectionId)
+
+        setEditingCollectionId(null);
+        setEditingCollection(null);
+        setShowFab(true);
+        setEditingTechniqueId(null);
+        fetchCollections().then(collections => {
+            if (collections) setCollectionsList(collections);
+        });
     }
 
     React.useEffect(() => {
@@ -398,7 +455,10 @@ function CoachCollections(): JSX.Element {
         });
 
         fetchTechniques().then(techniques => {
-            if (techniques) setTechniques(techniques)
+            if (techniques) {
+                setTechniques(techniques);
+                setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
+            }
         });
         
     }, []);
@@ -409,6 +469,8 @@ function CoachCollections(): JSX.Element {
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
     const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collectionsList)
+
+    
 
     return (
         <div>
@@ -438,6 +500,7 @@ function CoachCollections(): JSX.Element {
                     onTechniqueSubmitClick={handleTechniqueSaveClick}
                     onTechniqueCancelClick={handleTechniqueCancelClick}
                     onTechniqueDeleteClick={handleTechniqueDeleteClick}
+                    editingTechniqueOptions={techniqueSuggestions}
 
                     editingTechniquesCollection={editingTechniquesCollection}
                     editingCollectionId={editingCollectionId}

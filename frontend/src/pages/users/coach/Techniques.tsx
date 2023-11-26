@@ -54,8 +54,6 @@ const Card = styled(MuiCard)({
     }
 });
 
-
-
 function CoachTechniques(): JSX.Element {
     const navigate = useNavigate();
     const navigateToNewTechnique = () => { navigate('/newtechnique') }
@@ -94,15 +92,15 @@ function CoachTechniques(): JSX.Element {
         
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
+        console.log(fieldValues)
         const validTechnique = transformTechniqueForBackend(fieldValues);
+        console.log(validTechnique)
         if (!validTechnique) {
             alert('Not a valid technique posted')
             return
         };
         
-        const status = await postTechnique(editingTechniqueId, validTechnique);
-
-        
+        const status = await postTechnique(editingTechniqueId, validTechnique);        
 
         if (status === 200) {
             const techniques = await fetchTechniques()
@@ -141,18 +139,70 @@ function CoachTechniques(): JSX.Element {
         }
     }
 
-    React.useEffect(() => {
-        fetchTechniques().then(techniques => {
-            if (techniques) setTechniquesList(techniques); // Only update state if fetchTechniques returns a value
-        });
-    }, []);
-
     // Generate options for the filters based on the full techniques list
     const options = useDetermineTechniqueFilterOptions(techniquesList)
-
+    
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
     const { filteredTechniques, handleTechniqueFilterChange: handleFilterChange } = useHandleTechniqueFilterChange(techniquesList)
+
+    // Autocomplete suggestions when editing techniques
+    const [techniqueSuggestions, setTechniqueSuggestions] = React.useState<{
+        techniqueTitleOptions: string[],
+        techniquePositionOptions: string[],
+        techniqueHierarchyOptions: string[],
+        techniqueTypeOptions: string[],
+        techniqueOpenGuardOptions: string[],
+        techniqueGiOptions: string[]
+    }>({
+        techniqueTitleOptions: [],
+        techniquePositionOptions: [],
+        techniqueHierarchyOptions: [],
+        techniqueTypeOptions: [],
+        techniqueOpenGuardOptions: [],
+        techniqueGiOptions: []
+    })
+
+    const generateTechniqueSuggestions = (techniqueList: Technique[]): {
+        techniqueTitleOptions: string[],
+        techniquePositionOptions: string[],
+        techniqueHierarchyOptions: string[],
+        techniqueTypeOptions: string[],
+        techniqueOpenGuardOptions: string[],
+        techniqueGiOptions: string[]
+    } => {
+        let generatedSuggestions: {
+            techniqueTitleOptions: string[],
+            techniquePositionOptions: string[],
+            techniqueHierarchyOptions: string[],
+            techniqueTypeOptions: string[],
+            techniqueOpenGuardOptions: string[],
+            techniqueGiOptions: string[]
+        } = { 
+            techniqueTitleOptions: [],
+            techniquePositionOptions: [],
+            techniqueHierarchyOptions: ["Top", "Bottom"],
+            techniqueTypeOptions: [],
+            techniqueOpenGuardOptions: [],
+            techniqueGiOptions: ["Gi", "No Gi", "Both"]
+        }
+        techniqueList.forEach(technique => {
+            if (!generatedSuggestions.techniqueTitleOptions.includes(technique.title)) {generatedSuggestions.techniqueTitleOptions.push(technique.title)}
+            if (!generatedSuggestions.techniquePositionOptions.includes(technique.position?.title)) {generatedSuggestions.techniquePositionOptions.push(technique.position.title)}
+            if (!generatedSuggestions.techniqueTypeOptions.includes(technique.type?.title)) {generatedSuggestions.techniqueTypeOptions.push(technique.type.title)}
+            if (technique.openGuard && (!generatedSuggestions.techniqueOpenGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.techniqueOpenGuardOptions.push(technique.openGuard?.title)}
+        })
+        return generatedSuggestions
+    }
+
+    React.useEffect(() => {
+        fetchTechniques().then(techniques => {
+            if (techniques) {
+                setTechniquesList(techniques); // Sets list of techniques
+                setTechniqueSuggestions(generateTechniqueSuggestions(techniques)) // Also generates technique suggestions used for editing techniques
+            }; // Only update state if fetchTechniques returns a value
+        });
+    }, []);
 
     return (
         <div>
@@ -180,6 +230,7 @@ function CoachTechniques(): JSX.Element {
                 onSubmitClick={handleSaveClick}
                 onCancelClick={handleCancelClick}
                 onDeleteClick={handleDeleteClick}
+                editingTechniqueOptions={techniqueSuggestions}
                 />
             )}
             </Card>

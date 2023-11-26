@@ -6,7 +6,7 @@ import { AppDataSource } from '../data-source';
 import TechniqueDTO from '../dtos/TechniqueDTO';
 
 export class TechniqueService {
-    async createTechnique(data: {techniqueId: string, technique: TechniqueDTO}): Promise<Technique> {
+    async createOrUpdateTechnique(data: {techniqueId: string, technique: TechniqueDTO}): Promise<Technique> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);

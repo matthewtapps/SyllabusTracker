@@ -16,6 +16,7 @@ export function FastTextField({ name, wasSubmitted, ...otherProps }: FastTextFie
             name={name}
             type="text"
             onBlur={() => setTouched(true)}
+            size="small"
             aria-describedby={displayErrorMessage ? `${name}-error` : undefined}
         />
     )

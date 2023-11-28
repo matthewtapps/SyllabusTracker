@@ -12,6 +12,7 @@ import Box from '@mui/material/Box'
 import TechniqueList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/TechniqueFilter'
 import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
+import { EditTechniqueDialog } from '../../../components/EditTechniqueDialog'
 
 
 interface TechniqueDTO {
@@ -120,6 +121,11 @@ function CoachTechniques(): JSX.Element {
         // Handle the UI update after deletion (e.g., remove the technique from the list)
     }
 
+    const handleClose = () => {
+        setEditingTechniqueId(null);
+        setEditedTechnique(emptyTechniqueDTO);
+    }
+
     const fetchTechniques = async () => {
         setLoading(true);
         try {
@@ -221,16 +227,10 @@ function CoachTechniques(): JSX.Element {
                     <Typography>{placeholderContent}</Typography>
                 </CardContent>
             ) : (
-                <TechniqueList 
-                filteredTechniques={filteredTechniques} 
+                <TechniqueList
+                filteredTechniques={filteredTechniques}
                 editable
-                editingTechniqueId={editingTechniqueId}
-                editingTechnique={editedTechnique}
                 onEditClick={handleEditClick}
-                onSubmitClick={handleSaveClick}
-                onCancelClick={handleCancelClick}
-                onDeleteClick={handleDeleteClick}
-                editingTechniqueOptions={techniqueSuggestions}
                 />
             )}
             </Card>
@@ -242,6 +242,18 @@ function CoachTechniques(): JSX.Element {
             >
                 <AddIcon/>
             </Fab>
+            <EditTechniqueDialog
+                dialogOpen={editingTechniqueId ? true : false}
+                onClose={handleClose}
+                onCancel={handleCancelClick}
+                onDelete={handleDeleteClick}
+                onSave={handleSaveClick}
+                editingTechnique={editedTechnique}
+                editingTechniqueId={editingTechniqueId || ""}
+                editingTechniqueOptions={techniqueSuggestions}
+                wasSubmitted={false}
+                techniqueList={techniquesList}
+            />
         </div>
     );
 };

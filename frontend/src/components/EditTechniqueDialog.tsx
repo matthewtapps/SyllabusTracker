@@ -101,8 +101,6 @@ interface Descriptions {
 
 export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
     const [localPositionState, setLocalPositionState] = React.useState(props.editingTechnique?.position || '')
-    const [localTypeState, setLocalTypeState] = React.useState(props.editingTechnique?.type || '')
-    const [localOpenGuardState, setLocalOpenGuardState] = React.useState(props.editingTechnique?.openGuard || '')
 
     const [localPositionDescriptionState, setLocalPositionDescriptionState] = React.useState<null | string>(null)
     const [localTypeDescriptionState, setLocalTypeDescriptionState] = React.useState<null | string>(null)
@@ -116,13 +114,11 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
 
     const handleTypeBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         const newType = event.target.value || '';
-        setLocalTypeState(newType);
         setLocalTypeDescriptionState(descriptions.types[newType] ||'')
     };
 
     const handleOpenGuardBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         const newOpenGuard = event.target.value || '';
-        setLocalOpenGuardState(newOpenGuard);
         setLocalOpenGuardDescriptionState(descriptions.types[newOpenGuard] ||'')
     };
 
@@ -163,20 +159,21 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
     
     return (
         <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="lg">
-            <DialogTitle sx={{padding: "0px", marginBottom: "10px"}}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
-                    <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
-                    <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
-                    <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingTechniqueId); }}
-                        style={{backgroundColor: theme.palette.error.main}}
-                    >Delete</Button>
-                </Box>
-            </DialogTitle>
-
-            <DialogContent dividers={true} sx={{padding: "0px", borderBottom: "none"}}>
-                <Card>
-                    <CardContent>
-                        <form noValidate onSubmit={props.onSave}>
+            <form noValidate onSubmit={props.onSave}>
+                <DialogTitle sx={{padding: "0px", marginBottom: "10px"}}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
+                        <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
+                        <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
+                        <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingTechniqueId); }}
+                            style={{backgroundColor: theme.palette.error.main}}
+                        >Delete</Button>
+                    </Box>
+                </DialogTitle>
+        
+                <DialogContent dividers={true} sx={{padding: "0px", borderBottom: "none"}}>
+                    <Card>
+                        <CardContent>
+                        
                             <Autocomplete
                                 options={props.editingTechniqueOptions?.techniqueTitleOptions || []}
                                 defaultValue={props.editingTechnique?.title || ''}
@@ -292,17 +289,17 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
                                 <AccordionDetails>
                                     <TextField wasSubmitted={props.wasSubmitted} size="small" placeholder='Open Guard Description' fullWidth disabled={!isPositionOpenGuard}
                                     value={localOpenGuardDescriptionState || ''}
-                                        onChange={e => setLocalOpenGuardDescriptionState(e.target.value)} multiline rows={4} name='openGuardDescription' label="Open Guard Description"
-                                    required={isPositionOpenGuard}/> 
+                                        onChange={e => setLocalOpenGuardDescriptionState(e.target.value)} multiline rows={4} 
+                                        name='openGuardDescription' label="Open Guard Description" required={isPositionOpenGuard}/> 
                                 </AccordionDetails>
                             </Accordion>
 
                             <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth label="Video Source"
                             defaultValue={props.editingTechnique?.videoSrc} name="videoSrc"/>
-                        </form>
-                    </CardContent>
-                </Card>
-            </DialogContent>
+                        </CardContent>
+                    </Card>
+                </DialogContent>
+            </form>
         </Dialog>
     )
 }

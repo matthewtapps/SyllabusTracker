@@ -12,24 +12,26 @@ export class TechniqueService {
         const positionRepo = AppDataSource.getRepository(Position);
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
       
-        let type = await typeRepo.findOne({ where: { title: data.technique.type }});
-        if (!type && data.technique.typeDescription) {
-            type = typeRepo.create({ title: data.technique.type, description: data.technique.typeDescription });
+        let type = await typeRepo.findOne({ where: { title: data.technique.type.title }});
+        if (!type && data.technique.type.title && data.technique.type.description) {
+            type = typeRepo.create({ title: data.technique.type.title, description: data.technique.type.description });
             await typeRepo.save(type);
         }
 
-        let position = await positionRepo.findOne({ where: { title: data.technique.position }});
-        if (!position && data.technique.positionDescription) {
-            position = positionRepo.create({ title: data.technique.position, description: data.technique.positionDescription });
+        let position = await positionRepo.findOne({ where: { title: data.technique.position.title }});
+        if (!position&& data.technique.position.title && data.technique.position.description) {
+            position = positionRepo.create({ title: data.technique.position.title, description: data.technique.position.description });
             await positionRepo.save(position);
         }
 
-        let openGuard = null;
+        let openGuard = null
         if (data.technique.openGuard) {
-            openGuard = await openGuardRepo.findOne({ where: { title: data.technique.openGuard } });
-            if (!openGuard) {
-                openGuard = openGuardRepo.create({ title: data.technique.openGuard, description: data.technique.openGuardDescription });
-                await openGuardRepo.save(openGuard);
+            openGuard = await openGuardRepo.findOne({ where: { title: data.technique.openGuard.title } });
+            if (!openGuard && data.technique.openGuard.title && data.technique.openGuard.description) {
+                if (!openGuard && data.technique.openGuard.title) {
+                    openGuard = openGuardRepo.create({ title: data.technique.openGuard.title, description: data.technique.openGuard.description });
+                    await openGuardRepo.save(openGuard);
+                }
             }
         }
 

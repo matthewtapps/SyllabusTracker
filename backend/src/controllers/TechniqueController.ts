@@ -8,7 +8,8 @@ export class TechniqueController {
             const technique = await techniqueService.createOrUpdateTechnique(req.body);
             res.json(technique);
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            console.log(error)
+            res.status(400).json({ error: error });
         }
     }
 

@@ -7,10 +7,16 @@ export default class TechniqueDTO {
     globalNotes: string | undefined;
     gi: Gi;
     hierarchy: Hierarchy;
-    type: string;
-    typeDescription: string | undefined;
-    position: string;
-    positionDescription: string | undefined;
-    openGuard: string | undefined;
-    openGuardDescription: string | undefined;
+    type: {
+        title: string,
+        description: string
+    }
+    position: {
+        title: string,
+        description: string
+    }
+    openGuard: {
+        title: string,
+        description: string
+    } | null
 }

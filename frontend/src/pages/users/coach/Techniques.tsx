@@ -80,7 +80,7 @@ function CoachTechniques(): JSX.Element {
             gi: technique.gi,
             hierarchy: technique.hierarchy,
             type: technique.type.title,
-            typeDescription: technique.type.description|| undefined,
+            typeDescription: technique.type.description || undefined,
             position: technique.position.title,
             positionDescription: technique.position.description,
             openGuard: technique.openGuard?.title || undefined,
@@ -104,8 +104,38 @@ function CoachTechniques(): JSX.Element {
         const status = await postTechnique(editingTechniqueId, validTechnique);        
 
         if (status === 200) {
-            const techniques = await fetchTechniques()
-            if (techniques) {setTechniquesList(techniques)}
+            setTechniquesList((prevTechniques) => {
+                const updatedTechniques = [...prevTechniques];
+                const indexToUpdate = updatedTechniques.findIndex(technique => technique.techniqueId === editingTechniqueId);
+                
+                if ((indexToUpdate !== -1) && (editingTechniqueId)) {
+                    updatedTechniques[indexToUpdate] = { 
+                        ...validTechnique, 
+                        techniqueId: editingTechniqueId,
+                        position: {
+                            title: validTechnique.position.title,
+                            description: validTechnique.position.description
+                        },
+                        type: {
+                            title: validTechnique.type.title,
+                            description: validTechnique.type.description
+                        },
+                    };
+                }
+
+                if (validTechnique.openGuard) {
+                    updatedTechniques[indexToUpdate] = {
+                        ...updatedTechniques[indexToUpdate],
+                        openGuard: {
+                            title: validTechnique.openGuard.title,
+                            description: validTechnique.openGuard.description
+                        }
+                    }
+                }
+
+                return updatedTechniques;
+            });
+    
             setEditingTechniqueId(null);
             setEditedTechnique(emptyTechniqueDTO);
         }

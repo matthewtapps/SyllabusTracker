@@ -1,5 +1,18 @@
 import { Technique, Hierarchy, Gi, Collection } from "common";
-import { SetStateAction, useEffect, useState } from 'react';
+
+
+interface TechniqueDTO {
+    title: string;
+    videoSrc: string | null;
+    description: string;
+    globalNotes: string | null;
+    gi: Gi;
+    hierarchy: Hierarchy;
+    type: {title: string, description: string};
+    position: {title: string, description: string};
+    openGuard: {title: string, description: string} | null;
+    techniqueId: string
+}
 
 export const transformTechniqueForBackend = (technique: any): Technique | null => {
     if (!Object.values(Gi).includes(technique.gi)) {
@@ -12,12 +25,34 @@ export const transformTechniqueForBackend = (technique: any): Technique | null =
         return null;
     }
 
-    return {
-        ...technique,
+    const transformedTechnique: TechniqueDTO = {
+        title: technique.title,
+        videoSrc: technique.videoSrc,
+        description: technique.description,
+        globalNotes: technique.globalNotes,
         gi: technique.gi as Gi,
         hierarchy: technique.hierarchy as Hierarchy,
+        type: {
+            title: technique.type,
+            description: technique.typeDescription
+        },
+        position: {
+            title: technique.position,
+            description: technique.positionDescription
+        },
+        openGuard: null,
+        techniqueId: ""
     };
-}
+
+    if (technique.openGuard && technique.openGuardDescription) {
+        transformedTechnique.openGuard = {
+            title: technique.openGuard,
+            description: technique.openGuardDescription
+        };
+    }
+
+    return transformedTechnique;
+};
 
 export const postTechnique = async (techniqueId: string | null, technique: Technique) => {
     try {

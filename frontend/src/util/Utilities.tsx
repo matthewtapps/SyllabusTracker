@@ -54,7 +54,7 @@ export const transformTechniqueForBackend = (technique: any): Technique | null =
     return transformedTechnique;
 };
 
-export const postTechnique = async (techniqueId: string | null, technique: Technique) => {
+export const postTechnique = async (techniqueId: string | null, technique: Technique): Promise<Technique | null> => {
     try {
         const response = await fetch('http://192.168.0.156:3000/api/technique', {
             method: 'POST',
@@ -71,11 +71,11 @@ export const postTechnique = async (techniqueId: string | null, technique: Techn
         const responseData = await response.json();
         console.log('Success:', responseData);
         
-        return response.status
+        return responseData
         } catch (error) {
             console.error('Error:', error);
             alert(`Error posting technique: ${error}`);
-            return error
+            return null
         }
 };
 
@@ -175,7 +175,7 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
         }
 };
 
-export const deleteCollection = async (collectionId: string) => {
+export const deleteCollection = async (collectionId: string): Promise<number | null> => {
     try {
         const response = await fetch('http://192.168.0.156:3000/api/deleteCollection', {
             method: 'POST',
@@ -195,6 +195,30 @@ export const deleteCollection = async (collectionId: string) => {
         } catch (error) {
             console.error('Error:', error);
             alert(`Error deleting collection: ${error}`);
-            return error
+            return null
+        }
+}
+
+export const deleteTechnique = async (techniqueId: string): Promise<number | null> => {
+    try {
+        const response = await fetch('http://192.168.0.156:3000/api/deleteTechnique', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({techniqueId: techniqueId}),
+        });
+
+    if (!response.ok) {
+        throw new Error(`Failed with status ${response.status}`);
+    }
+
+    const responseData = await response.json();
+        console.log('Success:', responseData);
+        return response.status
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Error deleting technique: ${error}`);
+            return null
         }
 }

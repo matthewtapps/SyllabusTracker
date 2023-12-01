@@ -1,8 +1,9 @@
 import React from 'react';
-import { Role, Belt, Stripes } from 'common'
+import { Role } from 'common'
 import { ThemeProvider } from '@emotion/react';
 import theme from '../../theme/Theme';
 import StudentDashboard from '../users/student/Home';
+import CoachDashboard from '../users/coach/Home';
 
 
 interface HomePageProps {
@@ -19,12 +20,7 @@ const HomePage: React.FC<HomePageProps> = (props) => {
         break;
 
         case Role.Coach:
-            content = (
-                <div>
-                    <p>Hello Coach!</p>
-                    <p>Home page placeholder</p>
-                </div>
-        )
+            content = <CoachDashboard/>
         break;
         
         case Role.Admin:

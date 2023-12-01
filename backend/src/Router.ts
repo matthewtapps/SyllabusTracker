@@ -16,5 +16,6 @@ router.get('/collection', CollectionController.getAllCollections);
 router.get('/collection/titles', CollectionController.getAllCollectionTitles);
 router.get('/collectiontechnique', CollectionController.getCollectionTechniques);
 router.post('/deleteCollection', CollectionController.deleteCollection);
+router.post('/deleteTechnique', TechniqueController.deleteTechnique)
 
 export default router;

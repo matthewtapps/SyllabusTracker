@@ -4,6 +4,7 @@ import { Position } from '../entities/Position';
 import { OpenGuard } from '../entities/OpenGuard';
 import { AppDataSource } from '../data-source';
 import TechniqueDTO from '../dtos/TechniqueDTO';
+import { CollectionTechnique } from '../entities/CollectionTechnique';
 
 export class TechniqueService {
     async createOrUpdateTechnique(data: {techniqueId: string, technique: TechniqueDTO}): Promise<Technique> {
@@ -35,8 +36,16 @@ export class TechniqueService {
             }
         }
 
-        let technique = await techniqueRepo.findOne({ where: { techniqueId: data.techniqueId }});
-        if (!technique) technique = new Technique();
+        let technique; 
+        if (data.techniqueId) {
+            technique = await techniqueRepo.findOne({ where: { techniqueId: data.techniqueId }});
+                if (!technique) {
+                    throw new Error('Technique not found');
+                } 
+            } else {
+                technique = new Technique();
+        }
+
         
         technique.title = data.technique.title;
         technique.videoSrc = data.technique.videoSrc ?? null;
@@ -52,6 +61,25 @@ export class TechniqueService {
 
         return await techniqueRepo.save(technique);
     };
+
+    async deleteTechnique(data: {techniqueId: string}) {
+        const techniqueRepo = AppDataSource.getRepository(Technique);
+        const collectionTechniqueRepo = AppDataSource.getRepository(CollectionTechnique)
+
+        const technique = await techniqueRepo.findOne({ where: { techniqueId: data.techniqueId} })
+
+        if (technique) {await collectionTechniqueRepo.createQueryBuilder()
+            .delete()
+            .from(CollectionTechnique)
+            .where("technique = :technique", { technique: technique.techniqueId })
+            .execute();}
+
+        if (technique) {await techniqueRepo.createQueryBuilder()
+            .delete()
+            .from(Technique)
+            .where("techniqueId = :techniqueId", { techniqueId: data.techniqueId })
+            .execute();}
+    }
 
     async getAllTechniqueTitles(): Promise<Technique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);

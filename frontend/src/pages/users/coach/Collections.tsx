@@ -4,8 +4,7 @@ import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { useNavigate } from 'react-router-dom'
-import { Collection, CollectionTechnique, CollectionWithoutTechniquesOrId } from 'common'
+import { Collection, CollectionTechnique } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
@@ -142,49 +141,49 @@ function CoachCollections(): JSX.Element {
 
     // Suggestions for editing techniques in-place
     const [techniqueSuggestions, setTechniqueSuggestions] = React.useState<{
-        techniqueTitleOptions: string[],
-        techniquePositionOptions: string[],
-        techniqueHierarchyOptions: string[],
-        techniqueTypeOptions: string[],
-        techniqueOpenGuardOptions: string[],
-        techniqueGiOptions: string[]
+        titleOptions: string[],
+        positionOptions: string[],
+        hierarchyOptions: string[],
+        typeOptions: string[],
+        openGuardOptions: string[],
+        giOptions: string[]
     }>({
-        techniqueTitleOptions: [],
-        techniquePositionOptions: [],
-        techniqueHierarchyOptions: [],
-        techniqueTypeOptions: [],
-        techniqueOpenGuardOptions: [],
-        techniqueGiOptions: []
+        titleOptions: [],
+        positionOptions: [],
+        hierarchyOptions: [],
+        typeOptions: [],
+        openGuardOptions: [],
+        giOptions: []
     })
 
     const generateTechniqueSuggestions = (techniqueList: Technique[]): {
-        techniqueTitleOptions: string[],
-        techniquePositionOptions: string[],
-        techniqueHierarchyOptions: string[],
-        techniqueTypeOptions: string[],
-        techniqueOpenGuardOptions: string[],
-        techniqueGiOptions: string[]
+        titleOptions: string[],
+        positionOptions: string[],
+        hierarchyOptions: string[],
+        typeOptions: string[],
+        openGuardOptions: string[],
+        giOptions: string[]
     } => {
         let generatedSuggestions: {
-            techniqueTitleOptions: string[],
-            techniquePositionOptions: string[],
-            techniqueHierarchyOptions: string[],
-            techniqueTypeOptions: string[],
-            techniqueOpenGuardOptions: string[],
-            techniqueGiOptions: string[]
+            titleOptions: string[],
+            positionOptions: string[],
+            hierarchyOptions: string[],
+            typeOptions: string[],
+            openGuardOptions: string[],
+            giOptions: string[]
         } = { 
-            techniqueTitleOptions: [],
-            techniquePositionOptions: [],
-            techniqueHierarchyOptions: ["Top", "Bottom"],
-            techniqueTypeOptions: [],
-            techniqueOpenGuardOptions: [],
-            techniqueGiOptions: ["Gi", "No Gi", "Both"]
+            titleOptions: [],
+            positionOptions: [],
+            hierarchyOptions: ["Top", "Bottom"],
+            typeOptions: [],
+            openGuardOptions: [],
+            giOptions: ["Gi", "No Gi", "Both"]
         }
         techniqueList.forEach(technique => {
-            if (!generatedSuggestions.techniqueTitleOptions.includes(technique.title)) {generatedSuggestions.techniqueTitleOptions.push(technique.title)}
-            if (!generatedSuggestions.techniquePositionOptions.includes(technique.position?.title)) {generatedSuggestions.techniquePositionOptions.push(technique.position.title)}
-            if (!generatedSuggestions.techniqueTypeOptions.includes(technique.type?.title)) {generatedSuggestions.techniqueTypeOptions.push(technique.type.title)}
-            if (technique.openGuard && (!generatedSuggestions.techniqueOpenGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.techniqueOpenGuardOptions.push(technique.openGuard?.title)}
+            if (!generatedSuggestions.titleOptions.includes(technique.title)) {generatedSuggestions.titleOptions.push(technique.title)}
+            if (!generatedSuggestions.positionOptions.includes(technique.position?.title)) {generatedSuggestions.positionOptions.push(technique.position.title)}
+            if (!generatedSuggestions.typeOptions.includes(technique.type?.title)) {generatedSuggestions.typeOptions.push(technique.type.title)}
+            if (technique.openGuard && (!generatedSuggestions.openGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.openGuardOptions.push(technique.openGuard?.title)}
         })
         return generatedSuggestions
     }
@@ -241,9 +240,9 @@ function CoachCollections(): JSX.Element {
             return
         };
         
-        const status = await postTechnique(editingTechniqueId, validTechnique);        
+        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique);        
 
-        if (status === 200) {
+        if (postedTechnique) {
             setCollectionTechniques((prevTechniques) => {
                 const updatedTechniques = [...prevTechniques as CollectionTechnique[]];
                 const indexToUpdate = updatedTechniques.findIndex(collectionTechnique => collectionTechnique.technique.techniqueId === editingTechniqueId);
@@ -457,7 +456,6 @@ function CoachCollections(): JSX.Element {
         };
         
         const postedCollection = await postCollection(editingCollectionId, validCollection);
-        console.log(postedCollection)
 
         if (postedCollection) {
             setCollectionsList((prevCollections) => {
@@ -478,8 +476,9 @@ function CoachCollections(): JSX.Element {
     }
     
     const handleCollectionDeleteClick = () => {
-        deleteCollection(editingCollectionId)
-        setCollectionsList((prevCollections) => {
+        const status = deleteCollection(editingCollectionId)
+        
+        if (status !== null) {setCollectionsList((prevCollections) => {
             let newCollections = [
                 ...prevCollections.filter(collection => {
                     return collection.collectionId !== editingCollectionId
@@ -491,6 +490,7 @@ function CoachCollections(): JSX.Element {
 
         setEditingCollectionDialogOpen(false)
         setShowFab(true);
+        }
     }
         
     // Generated list of filtered collections which is held at this level, and function for handling filter

@@ -4,15 +4,15 @@ import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { useNavigate } from 'react-router-dom'
 import { Technique } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import TechniqueList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/TechniqueFilter'
-import { transformTechniqueForBackend, postTechnique } from '../../../util/Utilities'
+import { transformTechniqueForBackend, postTechnique, deleteTechnique } from '../../../util/Utilities'
 import { EditTechniqueDialog } from '../../../components/EditTechniqueDialog'
+import { NewTechniqueDialog } from '../../../components/NewTechniqueDialog'
 
 
 interface TechniqueDTO {
@@ -56,12 +56,11 @@ const Card = styled(MuiCard)({
 });
 
 function CoachTechniques(): JSX.Element {
-    const navigate = useNavigate();
-    const navigateToNewTechnique = () => { navigate('/newtechnique') }
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
     const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
+    const [showFab, setShowFab] = React.useState(true)
 
     // List of techniques state
     const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
@@ -69,6 +68,9 @@ function CoachTechniques(): JSX.Element {
     // Technique editing states and functions
     const [editingTechniqueId, setEditingTechniqueId] = React.useState<string | null>(null);
     const [editedTechnique, setEditedTechnique] = React.useState<TechniqueDTO>(emptyTechniqueDTO);
+    const [editingTechniqueDialogOpen, setEditingTechniqueDialogOpen] = React.useState(false)
+
+    const [newTechniqueDialogOpen, setNewTechniqueDialogOpen] = React.useState(false)
     
     const handleEditClick = (technique: Technique) => {
         setEditingTechniqueId(technique.techniqueId);
@@ -86,14 +88,16 @@ function CoachTechniques(): JSX.Element {
             openGuard: technique.openGuard?.title || undefined,
             openGuardDescription: technique.openGuard?.description || undefined,
         });
+        setEditingTechniqueDialogOpen(true)
+        setShowFab(false)
     }
 
-    const handleSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleEditSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
-        console.log(fieldValues)
+        console.log(fieldValues, editingTechniqueId)
         const validTechnique = transformTechniqueForBackend(fieldValues);
         console.log(validTechnique)
         if (!validTechnique) {
@@ -101,59 +105,79 @@ function CoachTechniques(): JSX.Element {
             return
         };
         
-        const status = await postTechnique(editingTechniqueId, validTechnique);        
+        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique);        
 
-        if (status === 200) {
+        if (postedTechnique) {
             setTechniquesList((prevTechniques) => {
                 const updatedTechniques = [...prevTechniques];
                 const indexToUpdate = updatedTechniques.findIndex(technique => technique.techniqueId === editingTechniqueId);
                 
                 if ((indexToUpdate !== -1) && (editingTechniqueId)) {
                     updatedTechniques[indexToUpdate] = { 
-                        ...validTechnique, 
-                        techniqueId: editingTechniqueId,
-                        position: {
-                            title: validTechnique.position.title,
-                            description: validTechnique.position.description
-                        },
-                        type: {
-                            title: validTechnique.type.title,
-                            description: validTechnique.type.description
-                        },
+                        ...postedTechnique
                     };
-                }
-
-                if (validTechnique.openGuard) {
-                    updatedTechniques[indexToUpdate] = {
-                        ...updatedTechniques[indexToUpdate],
-                        openGuard: {
-                            title: validTechnique.openGuard.title,
-                            description: validTechnique.openGuard.description
-                        }
-                    }
                 }
 
                 return updatedTechniques;
             });
     
-            setEditingTechniqueId(null);
-            setEditedTechnique(emptyTechniqueDTO);
+            setEditingTechniqueDialogOpen(false)
         }
     }
     
     const handleCancelClick = () => {
-        setEditingTechniqueId(null);
-        setEditedTechnique(emptyTechniqueDTO);
-    }
+        setEditingTechniqueDialogOpen(false)
+        setNewTechniqueDialogOpen(false)
+    } // Doesn't care which dialog is getting cancelled
 
     const handleDeleteClick = (techniqueId: string) => {
-        // TODO: Call the backend API to delete the technique
-        // Handle the UI update after deletion (e.g., remove the technique from the list)
+        const status = deleteTechnique(techniqueId)
+        
+        if (status !== null) {setTechniquesList((techniques) => {
+            let newTechniques = [
+                ...techniques.filter(technique => {
+                    return technique.techniqueId !== editingTechniqueId
+                })
+            ]
+
+            return newTechniques
+        });
+
+        setEditingTechniqueDialogOpen(false)
+        setShowFab(true);
+        }
     }
 
-    const handleClose = () => {
-        setEditingTechniqueId(null);
-        setEditedTechnique(emptyTechniqueDTO);
+    const handleNewTechniqueClick = () => {
+        setNewTechniqueDialogOpen(true)
+        setEditedTechnique(emptyTechniqueDTO)
+        setEditingTechniqueId(null)
+        setShowFab(false)
+    }
+
+    const handleNewTechniqueSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        
+        const formData = new FormData(event.currentTarget)
+        const fieldValues = Object.fromEntries(formData.entries())
+        const validTechnique = transformTechniqueForBackend(fieldValues);
+        if (!validTechnique) {
+            alert('Not a valid technique posted')
+            return
+        };
+        
+        const postedTechnique = await postTechnique(null, validTechnique);        
+
+        if (postedTechnique) {
+            setTechniquesList((prevTechniques) => {
+                const updatedTechniques = [...prevTechniques];
+                updatedTechniques.unshift(postedTechnique)
+                return updatedTechniques
+            });
+    
+            setNewTechniqueDialogOpen(false)
+            setShowFab(true);
+        }
     }
 
     const fetchTechniques = async () => {
@@ -184,49 +208,49 @@ function CoachTechniques(): JSX.Element {
 
     // Autocomplete suggestions when editing techniques
     const [techniqueSuggestions, setTechniqueSuggestions] = React.useState<{
-        techniqueTitleOptions: string[],
-        techniquePositionOptions: string[],
-        techniqueHierarchyOptions: string[],
-        techniqueTypeOptions: string[],
-        techniqueOpenGuardOptions: string[],
-        techniqueGiOptions: string[]
+        titleOptions: string[],
+        positionOptions: string[],
+        hierarchyOptions: string[],
+        typeOptions: string[],
+        openGuardOptions: string[],
+        giOptions: string[]
     }>({
-        techniqueTitleOptions: [],
-        techniquePositionOptions: [],
-        techniqueHierarchyOptions: [],
-        techniqueTypeOptions: [],
-        techniqueOpenGuardOptions: [],
-        techniqueGiOptions: []
+        titleOptions: [],
+        positionOptions: [],
+        hierarchyOptions: [],
+        typeOptions: [],
+        openGuardOptions: [],
+        giOptions: []
     })
 
     const generateTechniqueSuggestions = (techniqueList: Technique[]): {
-        techniqueTitleOptions: string[],
-        techniquePositionOptions: string[],
-        techniqueHierarchyOptions: string[],
-        techniqueTypeOptions: string[],
-        techniqueOpenGuardOptions: string[],
-        techniqueGiOptions: string[]
+        titleOptions: string[],
+        positionOptions: string[],
+        hierarchyOptions: string[],
+        typeOptions: string[],
+        openGuardOptions: string[],
+        giOptions: string[]
     } => {
         let generatedSuggestions: {
-            techniqueTitleOptions: string[],
-            techniquePositionOptions: string[],
-            techniqueHierarchyOptions: string[],
-            techniqueTypeOptions: string[],
-            techniqueOpenGuardOptions: string[],
-            techniqueGiOptions: string[]
+            titleOptions: string[],
+            positionOptions: string[],
+            hierarchyOptions: string[],
+            typeOptions: string[],
+            openGuardOptions: string[],
+            giOptions: string[]
         } = { 
-            techniqueTitleOptions: [],
-            techniquePositionOptions: [],
-            techniqueHierarchyOptions: ["Top", "Bottom"],
-            techniqueTypeOptions: [],
-            techniqueOpenGuardOptions: [],
-            techniqueGiOptions: ["Gi", "No Gi", "Both"]
+            titleOptions: [],
+            positionOptions: [],
+            hierarchyOptions: ["Top", "Bottom"],
+            typeOptions: [],
+            openGuardOptions: [],
+            giOptions: ["Gi", "No Gi", "Both"]
         }
         techniqueList.forEach(technique => {
-            if (!generatedSuggestions.techniqueTitleOptions.includes(technique.title)) {generatedSuggestions.techniqueTitleOptions.push(technique.title)}
-            if (!generatedSuggestions.techniquePositionOptions.includes(technique.position?.title)) {generatedSuggestions.techniquePositionOptions.push(technique.position.title)}
-            if (!generatedSuggestions.techniqueTypeOptions.includes(technique.type?.title)) {generatedSuggestions.techniqueTypeOptions.push(technique.type.title)}
-            if (technique.openGuard && (!generatedSuggestions.techniqueOpenGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.techniqueOpenGuardOptions.push(technique.openGuard?.title)}
+            if (!generatedSuggestions.titleOptions.includes(technique.title)) {generatedSuggestions.titleOptions.push(technique.title)}
+            if (!generatedSuggestions.positionOptions.includes(technique.position?.title)) {generatedSuggestions.positionOptions.push(technique.position.title)}
+            if (!generatedSuggestions.typeOptions.includes(technique.type?.title)) {generatedSuggestions.typeOptions.push(technique.type.title)}
+            if (technique.openGuard && (!generatedSuggestions.openGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.openGuardOptions.push(technique.openGuard?.title)}
         })
         return generatedSuggestions
     }
@@ -268,21 +292,31 @@ function CoachTechniques(): JSX.Element {
             color="primary" 
             aria-label="add" 
             style={{position: 'fixed', bottom: '16px', right: '16px'}}
-            onClick={navigateToNewTechnique}
+            onClick={handleNewTechniqueClick}
+            hidden={!showFab}
             >
                 <AddIcon/>
             </Fab>
             <EditTechniqueDialog
-                dialogOpen={editingTechniqueId ? true : false}
-                onClose={handleClose}
+                dialogOpen={editingTechniqueDialogOpen}
+                onClose={handleCancelClick}
                 onCancel={handleCancelClick}
                 onDelete={handleDeleteClick}
-                onSave={handleSaveClick}
+                onSave={handleEditSaveClick}
                 editingTechnique={editedTechnique}
                 editingTechniqueId={editingTechniqueId || ""}
                 editingTechniqueOptions={techniqueSuggestions}
                 wasSubmitted={false}
                 techniqueList={techniquesList}
+            />
+            <NewTechniqueDialog
+                dialogOpen={newTechniqueDialogOpen}
+                onClose={handleCancelClick}
+                onCancel={handleCancelClick}
+                onSave={handleNewTechniqueSaveClick}
+                wasSubmitted={false}
+                techniqueList={techniquesList}
+                techniqueOptions={techniqueSuggestions}
             />
         </div>
     );

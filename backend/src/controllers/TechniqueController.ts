@@ -13,6 +13,16 @@ export class TechniqueController {
         }
     }
 
+    static async deleteTechnique(req: Request, res: Response) {
+        const techniqueService = new TechniqueService()
+        try {
+            await techniqueService.deleteTechnique(req.body)
+            res.status(200)
+        } catch (error) {
+            res.status(400).json({error: error.message})
+        }
+    }
+
     static async getAllTechniques(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {

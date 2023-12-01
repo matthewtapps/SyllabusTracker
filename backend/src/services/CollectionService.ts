@@ -82,8 +82,15 @@ export class CollectionService {
 
     async deleteCollection(data: {collectionId: string}) {
         const collectionRepo = AppDataSource.getRepository(Collection);
+        const collectionTechniqueRepo = AppDataSource.getRepository(CollectionTechnique)
 
         const collection = await collectionRepo.findOne({ where: { collectionId: data.collectionId} })
+
+        if (collection) {await collectionTechniqueRepo.createQueryBuilder()
+            .delete()
+            .from(CollectionTechnique)
+            .where("collection = :collection", { collection: collection.collectionId })
+            .execute();}
 
         if (collection) {await collectionRepo.createQueryBuilder()
             .delete()

@@ -12,6 +12,7 @@ import { Gi } from './enums/Gi'
 import { Hierarchy } from './enums/Hierarchies'
 import { Collection } from './Collection'
 import { CollectionTechnique } from './CollectionTechnique'
+import { CollectionWithoutTechniquesOrId } from './CollectionWithoutTechniquesOrId'
 
 export {
     User, 
@@ -28,5 +29,6 @@ export {
     Gi,
     Hierarchy,
     Collection,
-    CollectionTechnique
+    CollectionTechnique,
+    CollectionWithoutTechniquesOrId
 }

@@ -6,7 +6,6 @@ import NewTechniquePage from "./pages/users/coach/NewTechnique";
 import TechniquesPage from "./pages/navigation/TechniquesPage";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/Theme";
-import NewCollectionPage from "./pages/navigation/NewCollectionPage";
 import CollectionsPage from './pages/navigation/CollectionsPage'
 import BaseLayout from "./components/BaseLayout";
 import { Role, Rank, Belt, Stripes } from 'common';
@@ -59,7 +58,6 @@ function App() {
           <Route path="/newtechnique" element={<BaseLayout onSetRole={handleUserRoleChange} text="New Technique"><NewTechniquePage/></BaseLayout>} />
           <Route path="/techniques" element={<BaseLayout onSetRole={handleUserRoleChange} text="Techniques"><TechniquesPage user={user}/></BaseLayout>} />
           <Route path="/collections" element={<BaseLayout onSetRole={handleUserRoleChange} text="Collections"><CollectionsPage user={user}/></BaseLayout>} />
-          <Route path="/newcollection" element={<BaseLayout onSetRole={handleUserRoleChange} text="New Collection"><NewCollectionPage user={user}/></BaseLayout>}/>
         </Routes>
       </Router>
     </ThemeProvider>

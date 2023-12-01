@@ -17,16 +17,16 @@ export class Collection implements CollectionInterface {
     @Column()
     description: string;
 
-    @Column()
+    @Column({nullable: true})
     globalNotes: string;
 
     @Column({nullable: true})
-    gi?: Gi;
+    gi: Gi;
 
     @Column({nullable: true})
-    hierarchy?: Hierarchy;
+    hierarchy: Hierarchy;
 
-    @OneToMany(() => CollectionTechnique, ct => ct.collection)
+    @OneToMany(() => CollectionTechnique, ct => ct.collection, {nullable: true})
     collectionTechniques: CollectionTechnique[];
 
     @ManyToOne(type => Position, position => position.title, {nullable: true})

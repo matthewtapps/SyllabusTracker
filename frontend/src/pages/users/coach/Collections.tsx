@@ -5,12 +5,12 @@ import CardContent from '@mui/material/CardContent'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import { useNavigate } from 'react-router-dom'
-import { Collection, CollectionTechnique } from 'common'
+import { Collection, CollectionTechnique, CollectionWithoutTechniquesOrId } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import CollectionList from '../../../components/CollectionList'
-import CollectionFilter, { useDetermineCollectionFilterOptions, useHandleCollectionFilterChange } from '../../../components/CollectionFilter'
+import CollectionFilter, { useHandleCollectionFilterChange } from '../../../components/CollectionFilter'
 import { transformTechniqueForBackend, postTechnique, deleteCollection } from '../../../util/Utilities'
 import { Technique } from 'common'
 import Dialog from '@mui/material/Dialog'
@@ -20,6 +20,9 @@ import MuiButton, { ButtonProps } from '@mui/material/Button'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { postCollectionTechniques, transformCollectionForBackend, postCollection } from '../../../util/Utilities'
+import { EditTechniqueDialog } from '../../../components/EditTechniqueDialog'
+import { EditCollectionDialog } from '../../../components/EditCollectionDialog'
+import { NewCollectionDialog } from '../../../components/NewCollectionDialog'
 
 
 interface TechniqueDTO {
@@ -67,8 +70,6 @@ const Button = styled((props: ButtonProps) => (
 ))(({ theme }) => ({}));
 
 function CoachCollections(): JSX.Element {
-    const navigate = useNavigate();
-    const navigateToNewCollection = () => { navigate('/newCollection') }
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
@@ -80,14 +81,16 @@ function CoachCollections(): JSX.Element {
     // Technique editing states for in-place technique editing
     const [editingTechniqueId, setEditingTechniqueId] = React.useState<string | null>(null);
     const [editedTechnique, setEditedTechnique] = React.useState<TechniqueDTO>(emptyTechniqueDTO);
+    const [editingTechniqueDialogOpen, setEditingTechniqueDialogOpen] = React.useState(false)
 
     // State containing index, technique pairs for drag and drop
     const [dragDropTechniques, setDragDropTechniques] = React.useState<{ index: number, technique: Technique }[]>([]);
 
     // Collection editing states
-    const [editingCollectionId, setEditingCollectionId] = React.useState<string | null>(null);
+    const [editingCollectionId, setEditingCollectionId] = React.useState<string>("");
     const [editingCollection, setEditingCollection] = React.useState<Collection | null>(null);
     const [editingTechniquesCollection, setEditingTechniquesCollection] = React.useState<Collection | null>(null);
+    const [editingCollectionDialogOpen, setEditingCollectionDialogOpen] = React.useState(false);
 
     // New collection fab state
     const [showFab, setShowFab] = React.useState(true)
@@ -101,7 +104,7 @@ function CoachCollections(): JSX.Element {
     // Autocomplete suggestions for technique filtering
     const [addTechniqueToCollectionDialogueOpen, setAddTechniqueToCollectionDialogueOpen] = React.useState(false);
     
-    const handleOpenTechniqueDialogue = () => {
+    const handleOpenAddTechniqueDialogue = () => {
         setAddTechniqueToCollectionDialogueOpen(true);
     
         const dragDropTechniqueIds = new Set(dragDropTechniques.map(item => item.technique.techniqueId));
@@ -109,12 +112,12 @@ function CoachCollections(): JSX.Element {
         setCleanedTechniques(techniques.filter(t => !dragDropTechniqueIds.has(t.techniqueId)));
     }
 
-    const handleCloseTechniqueDialogue = () => {
+    const handleCloseAddTechniqueDialogue = () => {
         setAddTechniqueToCollectionDialogueOpen(false)
         setSelectedTechniques([])
     }
 
-    const handleSaveTechniqueDialogue = () => {
+    const handleSaveAddTechniqueDialogue = () => {
         let updatedCollectionTechniques = dragDropTechniques
         let length = updatedCollectionTechniques?.length
         
@@ -206,6 +209,7 @@ function CoachCollections(): JSX.Element {
     };
 
     const handleTechniqueEditClick = (technique: Technique) => {
+        setEditingTechniqueDialogOpen(true)
         setEditingTechniqueId(technique.techniqueId);
         setEditedTechnique({
             title: technique.title,
@@ -215,7 +219,7 @@ function CoachCollections(): JSX.Element {
             gi: technique.gi,
             hierarchy: technique.hierarchy,
             type: technique.type.title,
-            typeDescription: technique.type.description|| undefined,
+            typeDescription: technique.type.description || undefined,
             position: technique.position.title,
             positionDescription: technique.position.description,
             openGuard: technique.openGuard?.title || undefined,
@@ -229,27 +233,62 @@ function CoachCollections(): JSX.Element {
         
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
+        console.log(fieldValues)
         const validTechnique = transformTechniqueForBackend(fieldValues);
+        console.log(validTechnique)
         if (!validTechnique) {
             alert('Not a valid technique posted')
             return
         };
-
-        const status = await postTechnique(editingTechniqueId, validTechnique);
+        
+        const status = await postTechnique(editingTechniqueId, validTechnique);        
 
         if (status === 200) {
-            const collections = await fetchCollections()
-            if (collections) {setCollectionsList(collections)}
-            setEditingTechniqueId(null);
-            setEditedTechnique(emptyTechniqueDTO);
-        }
+            setCollectionTechniques((prevTechniques) => {
+                const updatedTechniques = [...prevTechniques as CollectionTechnique[]];
+                const indexToUpdate = updatedTechniques.findIndex(collectionTechnique => collectionTechnique.technique.techniqueId === editingTechniqueId);
+                
+                if ((indexToUpdate !== -1) && (editingTechniqueId)) {
+                    updatedTechniques[indexToUpdate] = { 
+                        ...updatedTechniques[indexToUpdate],
+                        technique : {
+                            ...validTechnique, 
+                            techniqueId: editingTechniqueId,
+                            position: {
+                                title: validTechnique.position.title,
+                                description: validTechnique.position.description
+                            },
+                            type: {
+                                title: validTechnique.type.title,
+                                description: validTechnique.type.description
+                            },
+                        }
+                    }
+                }
 
-        setShowFab(true)
+                if (validTechnique.openGuard) {
+                    updatedTechniques[indexToUpdate] = {
+                        ...updatedTechniques[indexToUpdate],
+                        technique: {
+                            ...updatedTechniques[indexToUpdate].technique,
+                            openGuard: {
+                                title: validTechnique.openGuard.title,
+                                description: validTechnique.openGuard.description
+                            }
+                        }
+                    }
+                }
+
+                return updatedTechniques;
+            });
+    
+            setEditingTechniqueDialogOpen(false);
+            setShowFab(true);
+        }
     }
     
     const handleTechniqueCancelClick = () => {
-        setEditingTechniqueId(null);
-        setEditedTechnique(emptyTechniqueDTO);
+        setEditingTechniqueDialogOpen(false);
         setShowFab(true)
     }
 
@@ -333,17 +372,15 @@ function CoachCollections(): JSX.Element {
         setDragDropTechniques(newOrder)
     }
 
-    const handleDragDropSaveClick = () => {
-        setTimeout(async () => {
-            editingTechniquesCollection && await postCollectionTechniques(editingTechniquesCollection, dragDropTechniques);
-            setEditingTechniquesCollection(null);
-            setDragDropTechniques([]);
-    
-            const collections = await fetchCollectionTechniques();
-            if (collections) {
-                setCollectionTechniques(collections);
-            }
-        }, 500);
+    const handleDragDropSaveClick = async () => {
+        editingTechniquesCollection && await postCollectionTechniques(editingTechniquesCollection.collectionId, dragDropTechniques);
+        setEditingTechniquesCollection(null);
+        setDragDropTechniques([]);
+
+        const collections = await fetchCollectionTechniques();
+        if (collections) {
+            setCollectionTechniques(collections);
+        }
         setShowFab(true)
         setSelectedTechniques([])
     };
@@ -399,15 +436,13 @@ function CoachCollections(): JSX.Element {
     const handleCollectionEditClick = (collection: Collection) => {
         setEditingCollectionId(collection.collectionId);
         setEditingCollection(collection);
-        setEditingTechniqueId("Changing this to stop editing techniques at the same time");
+        setEditingCollectionDialogOpen(true)
         setShowFab(false);
     }
 
     const handleCollectionCancelClick = () => {
-        setEditingCollectionId(null);
-        setEditingCollection(null);
+        setEditingCollectionDialogOpen(false)
         setShowFab(true);
-        setEditingTechniqueId(null);
     }
 
     const handleCollectionSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -420,64 +455,165 @@ function CoachCollections(): JSX.Element {
             alert('Not a valid technique posted')
             return
         };
-
-        await postCollection(editingCollectionId, validCollection);
-
-        setEditingCollectionId(null);
-        setEditingCollection(null);
-        setShowFab(true);
-        setEditingTechniqueId(null);
         
-        fetchCollections().then(collections => {
-            if (collections) setCollectionsList(collections);
-        });
+        const postedCollection = await postCollection(editingCollectionId, validCollection);
+        console.log(postedCollection)
+
+        if (postedCollection) {
+            setCollectionsList((prevCollections) => {
+                const updatedCollections = [...prevCollections];
+                const indexToUpdate = updatedCollections.findIndex(collection => collection.collectionId === postedCollection.collectionId);
+                
+                if (indexToUpdate !== -1) {
+                    updatedCollections[indexToUpdate] = { 
+                        ...postedCollection, 
+                    };
+                }
+                return updatedCollections;
+            });
+    
+            setEditingCollectionDialogOpen(false)
+            setShowFab(true);
+        }
     }
     
     const handleCollectionDeleteClick = () => {
-        editingCollectionId && deleteCollection(editingCollectionId)
+        deleteCollection(editingCollectionId)
+        setCollectionsList((prevCollections) => {
+            let newCollections = [
+                ...prevCollections.filter(collection => {
+                    return collection.collectionId !== editingCollectionId
+                })
+            ]
 
-        setEditingCollectionId(null);
-        setEditingCollection(null);
-        setShowFab(true);
-        setEditingTechniqueId(null);
-        fetchCollections().then(collections => {
-            if (collections) setCollectionsList(collections);
+            return newCollections
         });
+
+        setEditingCollectionDialogOpen(false)
+        setShowFab(true);
     }
+        
+    // Generated list of filtered collections which is held at this level, and function for handling filter
+    // changes which is passed to the onFiltersChange prop on TechniqueFilter
+    const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collectionsList)
+
+    const [collectionSuggestions, setCollectionSuggestions] = React.useState<{
+        titleOptions: string[],
+        positionOptions: string[],
+        hierarchyOptions: string[],
+        typeOptions: string[],
+        openGuardOptions: string[],
+        giOptions: string[]
+    }>({
+        titleOptions: [],
+        positionOptions: [],
+        hierarchyOptions: [],
+        typeOptions: [],
+        openGuardOptions: [],
+        giOptions: []
+    })
+
+    const generateCollectionSuggestions = (collectionList: Collection[], techniqueList: Technique[]): {
+        titleOptions: string[],
+        positionOptions: string[],
+        hierarchyOptions: string[],
+        typeOptions: string[],
+        openGuardOptions: string[],
+        giOptions: string[]
+    } => {
+        let generatedSuggestions: {
+            titleOptions: string[],
+            positionOptions: string[],
+            hierarchyOptions: string[],
+            typeOptions: string[],
+            openGuardOptions: string[],
+            giOptions: string[]
+        } = { 
+            titleOptions: [],
+            positionOptions: [],
+            hierarchyOptions: ["Top", "Bottom"],
+            typeOptions: [],
+            openGuardOptions: [],
+            giOptions: ["Gi", "No Gi", "Both"]
+        }
+        collectionList.forEach(collection => {
+            if (!generatedSuggestions.titleOptions.includes(collection.title)) {generatedSuggestions.titleOptions.push(collection.title)}
+
+        })
+
+        techniqueList.forEach(technique => {
+            if (!generatedSuggestions.positionOptions.includes(technique.position?.title)) {generatedSuggestions.positionOptions.push(technique.position.title)}
+            if (!generatedSuggestions.typeOptions.includes(technique.type?.title)) {generatedSuggestions.typeOptions.push(technique.type.title)}
+            if (technique.openGuard && (!generatedSuggestions.openGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.openGuardOptions.push(technique.openGuard?.title)}
+        })
+
+        return generatedSuggestions
+    }
+
+    // New collection states and functions below
+    // New collection dialog state
+    const [newCollectionDialogOpen, setNewCollectionDialogOpen] = React.useState(false);
+
+    const handleNewCollectionOpen = () => {
+        setNewCollectionDialogOpen(true)
+    }
+
+    const handleNewCollectionCancel = () => {
+        setNewCollectionDialogOpen(false)
+    }
+
+    const handleNewCollectionSave = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        
+        const formData = new FormData(event.currentTarget)
+        const fieldValues = Object.fromEntries(formData.entries())
+        const validCollection = transformCollectionForBackend(fieldValues);
+        if (!validCollection) {
+            alert('Not a valid technique posted')
+            return
+        };
+        
+        const postedCollection = await postCollection(null, validCollection)
+
+        if (postedCollection) {
+            setCollectionsList((prevCollections) => {
+                const updatedCollections = [...prevCollections];
+                updatedCollections.unshift(postedCollection)
+                return updatedCollections
+            });
+    
+            setShowFab(true);
+            setNewCollectionDialogOpen(false);
+        }
+    }
+
 
     React.useEffect(() => {
         fetchCollections().then(collections => {
             if (collections) setCollectionsList(collections);
+            fetchTechniques().then(techniques => {
+                if (techniques) {
+                    setTechniques(techniques);
+                    setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
+                    if (collections && techniques) setCollectionSuggestions(generateCollectionSuggestions(collections, techniques))
+                }
+            });
         });
         
         fetchCollectionTechniques().then(collectionTechniques => {
             if (collectionTechniques) setCollectionTechniques(collectionTechniques);
         });
 
-        fetchTechniques().then(techniques => {
-            if (techniques) {
-                setTechniques(techniques);
-                setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
-            }
-        });
         
-    }, []);
-
-    // Options for the filters based on the full collections list
-    const collectionOptions = useDetermineCollectionFilterOptions(collectionsList)
-
-    // Generated list of filtered techniques which is held at this level, and function for handling filter
-    // changes which is passed to the onFiltersChange prop on TechniqueFilter
-    const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collectionsList)
-
-    
+        
+    }, []);   
 
     return (
         <div>
             <Card>
                 <CollectionFilter 
                 onCollectionFiltersChange={handleCollectionFilterChange} 
-                options={collectionOptions}/>
+                options={collectionSuggestions}/>
             </Card>
             <Card>
             {loading ? (
@@ -494,28 +630,18 @@ function CoachCollections(): JSX.Element {
                     editableCollection
                     filteredCollections={filteredCollections}
                     editableTechniques
-                    editingTechniqueId={editingTechniqueId}
-                    editingTechnique={editedTechnique}
                     onTechniqueEditClick={handleTechniqueEditClick}
-                    onTechniqueSubmitClick={handleTechniqueSaveClick}
-                    onTechniqueCancelClick={handleTechniqueCancelClick}
-                    onTechniqueDeleteClick={handleTechniqueDeleteClick}
-                    editingTechniqueOptions={techniqueSuggestions}
-
                     editingTechniquesCollection={editingTechniquesCollection}
-                    editingCollectionId={editingCollectionId}
-                    editingCollection={editingCollection}
+
                     collectionTechniques={collectionTechniques}
                     onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
                     onCollectionEditClick={handleCollectionEditClick}
-                    onCollectionCancelClick={handleCollectionCancelClick}
-                    onCollectionSaveClick={handleCollectionSaveClick}
-                    onCollectionDeleteClick={handleCollectionDeleteClick}
+
                     onReorderDragDropTechniques={handleOnReorderDragDropTechniques}
                     dragDropTechniques={dragDropTechniques}
                     onDragDropSaveClick={handleDragDropSaveClick}
                     onDragDropCancelClick={handleDragDropCancelClick}
-                    onAddNewTechniqueClick={handleOpenTechniqueDialogue}
+                    onAddNewTechniqueClick={handleOpenAddTechniqueDialogue}
                     onDragDropDeleteClick={handleDragDropDeleteClick}/>
                 </Box>
             )}
@@ -525,12 +651,13 @@ function CoachCollections(): JSX.Element {
                 color="primary" 
                 aria-label="add" 
                 style={{position: 'fixed', bottom: '16px', right: '16px'}}
-                onClick={navigateToNewCollection}
+                onClick={handleNewCollectionOpen}
                 >
                     <AddIcon/>
                 </Fab>
             )}
-            <Dialog open={addTechniqueToCollectionDialogueOpen} onClose={handleCloseTechniqueDialogue} scroll="paper">
+
+            <Dialog open={addTechniqueToCollectionDialogueOpen} onClose={handleCloseAddTechniqueDialogue} scroll="paper">
                 <DialogTitle sx={{padding: "0px", marginBottom: "10px"}}>
                     <Card>
                         <TechniqueFilter 
@@ -539,8 +666,8 @@ function CoachCollections(): JSX.Element {
                             matchTechniqueFilters={editingTechniquesCollection && (handleTechniqueFilterMatchClick(editingTechniquesCollection))}/>
                     </Card> 
                     <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                        <Button disabled={(selectedTechniques.length === 0)} onClick={(event) => { event.stopPropagation(); handleSaveTechniqueDialogue(); handleCloseTechniqueDialogue(); }}>Add</Button>
-                        <Button onClick={(event) => { event.stopPropagation(); handleCloseTechniqueDialogue(); }}>Cancel</Button>
+                        <Button disabled={(selectedTechniques.length === 0)} onClick={(event) => { event.stopPropagation(); handleSaveAddTechniqueDialogue(); handleCloseAddTechniqueDialogue(); }}>Add</Button>
+                        <Button onClick={(event) => { event.stopPropagation(); handleCloseAddTechniqueDialogue(); }}>Cancel</Button>
                     </Box>  
                 </DialogTitle>
 
@@ -557,6 +684,42 @@ function CoachCollections(): JSX.Element {
                     <div style={{paddingTop: "10px"}}/>
                 </DialogContent>
             </Dialog>
+
+            <EditTechniqueDialog
+                dialogOpen={editingTechniqueDialogOpen}
+                onClose={handleTechniqueCancelClick}
+                onCancel={handleTechniqueCancelClick}
+                onDelete={handleTechniqueDeleteClick}
+                onSave={handleTechniqueSaveClick}
+                editingTechnique={editedTechnique}
+                editingTechniqueId={editingTechniqueId || ""}
+                editingTechniqueOptions={techniqueSuggestions}
+                wasSubmitted={false}
+                techniqueList={techniques}
+            />
+
+            <EditCollectionDialog
+                dialogOpen={editingCollectionDialogOpen}
+                onClose={handleCollectionCancelClick}
+                onCancel={handleCollectionCancelClick}
+                onDelete={handleCollectionDeleteClick}
+                onSave={handleCollectionSaveClick}
+                editingCollection={editingCollection}
+                editingCollectionId={editingCollectionId}
+                editingCollectionOptions={collectionSuggestions}
+                wasSubmitted={false}
+                techniqueList={techniques}
+            />
+
+            <NewCollectionDialog
+                dialogOpen={newCollectionDialogOpen}
+                onClose={handleNewCollectionCancel}
+                onSave={handleNewCollectionSave}
+                onCancel={handleNewCollectionCancel}
+                wasSubmitted={false}
+                techniqueList={techniques}
+                collectionOptions={collectionSuggestions}
+            />
         </div>
     );
 };

@@ -1,12 +1,21 @@
-import { Gi, Hierarchy, CollectionTechnique } from 'common';
+import { Gi, Hierarchy } from 'common';
 
 export default class CollectionDTO {
     title: string;
     description: string;
-    globalNotes: string;
-    gi?: Gi | undefined;
-    hierarchy?: Hierarchy | undefined;
-    position?: string | undefined;
-    type?: string | undefined;
-    openGuard?: string | undefined;
+    globalNotes: string | null;
+    gi: Gi | null;
+    hierarchy: Hierarchy | null;
+    type: {
+        title: string,
+        description: string
+    } | null
+    position: {
+        title: string,
+        description: string
+    } | null
+    openGuard: {
+        title: string,
+        description: string
+    } | null
 } 

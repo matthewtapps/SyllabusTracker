@@ -1,4 +1,4 @@
-import { Technique, Hierarchy, Gi, Collection } from "common";
+import { Technique, Hierarchy, Gi, Collection, CollectionTechnique, CollectionWithoutTechniquesOrId } from "common";
 
 
 interface TechniqueDTO {
@@ -79,14 +79,14 @@ export const postTechnique = async (techniqueId: string | null, technique: Techn
         }
 };
 
-export const postCollectionTechniques = async (collection: Collection, collectionTechniques: { index: number, technique: Technique }[]) => {
+export const postCollectionTechniques = async (collectionId: string, collectionTechniques: { index: number, technique: Technique }[]) => {
     try {
         const response = await fetch('http://192.168.0.156:3000/api/addToCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({collection: collection, techniques: collectionTechniques}),
+            body: JSON.stringify({collectionId: collectionId, techniques: collectionTechniques}),
         });
   
         if (!response.ok) {
@@ -101,32 +101,65 @@ export const postCollectionTechniques = async (collection: Collection, collectio
         }
 };
 
-export const transformCollectionForBackend = (collection: any): Collection | null => {
+export const transformCollectionForBackend = (collection: any): CollectionWithoutTechniquesOrId | null => {
+    if (!collection.title) {
+        alert('Invalid title value')
+        return null;
+    }
+
+    if (!collection.description) {
+        alert('Invalid description value')
+        return null;
+    }
+
     if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
-      alert('Invalid Gi value');
-      return null;
+        alert('Invalid Gi value');
+        return null;
     }
   
     if (collection.hierarchy && !Object.values(Hierarchy).includes(collection.hierarchy)) {
       alert('Invalid Hierarchy value');
-      return null;
+        return null;
+    }
+ 
+    const transformedCollection: CollectionWithoutTechniquesOrId = {
+        title: collection.title,
+        description: collection.description,
+        globalNotes: collection.globalNotes || null,
+        gi: collection.gi as Gi || null,
+        hierarchy: collection.hierarchy as Hierarchy || null, 
+        type: {
+            title: collection.type,
+            description: collection.typeDescription
+        } || null,
+        position: {
+            title: collection.position,
+            description: collection.positionDescription
+        } || null,
+        openGuard: {
+            title: collection.openGuard,
+            description: collection.openGuardDescription
+        } || null,
+    };
+
+    if (collection.openGuard && collection.openGuardDescription) {
+        transformedCollection.openGuard = {
+            title: collection.openGuard,
+            description: collection.openGuardDescription
+        };
     }
 
-    return {
-      ...collection,
-      gi: collection.gi as Gi,
-      hierarchy: collection.hierarchy as Hierarchy,
-    };
-  }
+    return transformedCollection;
+};
 
-  export const postCollection = async (collectionId: string | null, collection: Collection) => {
+  export const postCollection = async (collectionId: string | null, collection: CollectionWithoutTechniquesOrId): Promise<Collection | null> => {
     try {
-        const response = await fetch('http://localhost:3000/api/newCollection', {
+        const response = await fetch('http://192.168.0.156:3000/api/newCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({collection: collection, collectionId: collectionId}),
+            body: JSON.stringify({collectionId: collectionId, collection: collection}),
         });
   
         if (!response.ok) {
@@ -134,18 +167,17 @@ export const transformCollectionForBackend = (collection: any): Collection | nul
         }
   
         const responseData = await response.json();
-        console.log('Success:', responseData);
-        return response.status
+        return responseData
         } catch (error) {
             console.error('Error:', error);
             alert(`Error posting collection: ${error}`);
-            return error
+            return null
         }
 };
 
 export const deleteCollection = async (collectionId: string) => {
     try {
-        const response = await fetch('http://localhost:3000/api/deleteCollection', {
+        const response = await fetch('http://192.168.0.156:3000/api/deleteCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

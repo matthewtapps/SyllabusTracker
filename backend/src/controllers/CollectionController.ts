@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CollectionService } from '../services/CollectionService';
 
 export class CollectionController {
-    static async createNewCollection(req: Request, res: Response) {
+    static async createOrUpdateCollection(req: Request, res: Response) {
         const collectionService = new CollectionService();
         try {
             const collection = await collectionService.createOrUpdateCollection(req.body);
@@ -19,6 +19,7 @@ export class CollectionController {
             res.json(collectionTechniques);
         } catch (error) {
             res.status(400).json({ error: error.message })
+            console.log(error)
         }
     }
 

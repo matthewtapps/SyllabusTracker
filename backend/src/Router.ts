@@ -10,7 +10,7 @@ router.get('/technique/types', TechniqueController.getAllTechniqueTypes);
 router.get('/technique/titles', TechniqueController.getAllTechniqueTitles)
 router.get('/technique/positions', TechniqueController.getAllTechniquePositions);
 router.get('/technique/openguards', TechniqueController.getAllTechniqueOpenGuards);
-router.post('/newCollection', CollectionController.createNewCollection);
+router.post('/newCollection', CollectionController.createOrUpdateCollection);
 router.post('/addToCollection', CollectionController.setCollectionTechniques);
 router.get('/collection', CollectionController.getAllCollections);
 router.get('/collection/titles', CollectionController.getAllCollectionTitles);

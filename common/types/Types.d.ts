@@ -12,4 +12,5 @@ import { Gi } from './enums/Gi';
 import { Hierarchy } from './enums/Hierarchies';
 import { Collection } from './Collection';
 import { CollectionTechnique } from './CollectionTechnique';
-export { User, Technique, InstanceTechnique, Rank, Belt, Permission, Role, Stripes, TechniqueStatus, stringToTechniqueStatus, StudentTechnique, Gi, Hierarchy, Collection, CollectionTechnique };
+import { CollectionWithoutTechniquesOrId } from './CollectionWithoutTechniquesOrId';
+export { User, Technique, InstanceTechnique, Rank, Belt, Permission, Role, Stripes, TechniqueStatus, stringToTechniqueStatus, StudentTechnique, Gi, Hierarchy, Collection, CollectionTechnique, CollectionWithoutTechniquesOrId };

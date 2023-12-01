@@ -15,7 +15,8 @@ import {
     Gi,
     Hierarchy,
     Collection,
-    CollectionTechnique
+    CollectionTechnique,
+    CollectionWithoutTechniquesOrId
 } from './types/Types'
 
 export { 
@@ -36,5 +37,6 @@ export {
     Gi,
     Hierarchy,
     Collection,
-    CollectionTechnique
+    CollectionTechnique,
+    CollectionWithoutTechniquesOrId
 }

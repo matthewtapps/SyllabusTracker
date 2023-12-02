@@ -14,24 +14,7 @@ import Box from '@mui/material/Box';
 import Edit from '@mui/icons-material/Edit';
 import DragDropTechniquesList from './DragDropTechniques';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
-import { FastTextField as TextField } from './FastTextField';
-import theme from '../theme/Theme';
 
-
-interface TechniqueDTO {
-    title: string,
-    videoSrc: string | undefined,
-    description: string,
-    globalNotes: string | undefined,
-    gi: string,
-    hierarchy: string,
-    type: string,
-    typeDescription: string | undefined,
-    position: string,
-    positionDescription: string | undefined,
-    openGuard: string | undefined,
-    openGuardDescription: string | undefined,
-}
 
 const Accordion = styled(MuiAccordion)({
     backgroundColor: `#3c3836`,

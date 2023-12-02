@@ -1,4 +1,4 @@
-import { Technique, Hierarchy, Gi, Collection, CollectionTechnique, CollectionWithoutTechniquesOrId } from "common";
+import { Technique, Hierarchy, Gi, Collection, CollectionWithoutTechniquesOrId } from "common";
 
 
 interface TechniqueDTO {

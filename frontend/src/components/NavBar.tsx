@@ -1,7 +1,9 @@
 import React from 'react'
-import { AppBar, Toolbar, IconButton, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Drawer } from "@mui/material"
+import { AppBar, Toolbar, IconButton, Typography, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Drawer } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import { Role } from 'common'
+import AuthButtons from './AuthButtons';
+
 
 interface NavBarProps {
     text: string;
@@ -41,6 +43,7 @@ const NavBar = (props: NavBarProps) => {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         {props.text}
                     </Typography>
+                    <AuthButtons/>
                 </Toolbar>
             </AppBar>
             <Drawer open={open} onClose={handleClose} aria-describedby="alert-dialog-slide-description">

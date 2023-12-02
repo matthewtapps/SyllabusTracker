@@ -6,11 +6,11 @@ import StudentDashboard from '../users/student/Home';
 import CoachDashboard from '../users/coach/Home';
 
 
-interface HomePageProps {
+interface DashboardPageProps {
     user: {userId: string, role: Role}
 }
 
-const HomePage: React.FC<HomePageProps> = (props) => {
+const DashboardPage: React.FC<DashboardPageProps> = (props) => {
 
     let content: React.ReactNode
     
@@ -42,4 +42,4 @@ const HomePage: React.FC<HomePageProps> = (props) => {
     );
 };
 
-export default HomePage;
+export default DashboardPage;

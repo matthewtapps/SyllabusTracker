@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Hierarchy = exports.Gi = exports.stringToTechniqueStatus = exports.TechniqueStatus = exports.Stripes = exports.Role = exports.Permission = exports.Belt = void 0;
 var Belt_1 = require("./enums/Belt");

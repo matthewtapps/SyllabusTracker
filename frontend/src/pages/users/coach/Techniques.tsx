@@ -83,7 +83,6 @@ function CoachTechniques(): JSX.Element {
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
-    const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
     const [showFab, setShowFab] = React.useState(true)
 
     // List of techniques state
@@ -274,7 +273,7 @@ function CoachTechniques(): JSX.Element {
                 </Box>
             ) : filteredTechniques.length === 0 ? (
                 <CardContent>
-                    <Typography>{placeholderContent}</Typography>
+                    <Typography>No technique data available</Typography>
                 </CardContent>
             ) : (
                 <TechniqueList

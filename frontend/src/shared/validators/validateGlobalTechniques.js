@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateTechniques = void 0;
 function isValidTechnique(obj) {

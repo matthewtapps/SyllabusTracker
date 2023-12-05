@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateStudentTechniques = void 0;
 var TechniqueStatus_1 = require("../types/enums/TechniqueStatus");

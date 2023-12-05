@@ -109,7 +109,6 @@ function CoachCollections(): JSX.Element {
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
-    const [placeholderContent, setPlaceholderContent] = React.useState('No collection data available')
 
     // List of collections state
     const [collectionsList, setCollectionsList] = React.useState<Collection[]>([])
@@ -591,7 +590,7 @@ function CoachCollections(): JSX.Element {
                 </Box>
             ) : filteredCollections.length === 0 ? (
                 <CardContent>
-                    <Typography>{placeholderContent}</Typography>
+                    <Typography>Loading...</Typography>
                 </CardContent>
             ) : (
                 <Box>

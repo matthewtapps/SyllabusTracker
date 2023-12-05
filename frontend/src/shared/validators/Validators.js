@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateTechniques = exports.validateStudentTechniques = void 0;
 var validateStudentTechniques_1 = require("./validateStudentTechniques");

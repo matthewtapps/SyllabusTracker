@@ -1,4 +1,3 @@
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Hierarchy = exports.Gi = exports.validateTechniques = exports.validateStudentTechniques = exports.stringToTechniqueStatus = exports.TechniqueStatus = exports.Stripes = exports.Role = exports.Permission = exports.Belt = void 0;
 var Validators_1 = require("./validators/Validators");

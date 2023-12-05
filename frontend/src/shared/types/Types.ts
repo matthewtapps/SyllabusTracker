@@ -2,11 +2,6 @@ import {User} from './User'
 import {Technique} from './Technique'
 import { InstanceTechnique } from './InstanceTechnique'
 import { Rank } from './Rank'
-import {Belt} from './enums/Belt'
-import {Permission} from './enums/Permission'
-import {Role} from './enums/Role'
-import {Stripes} from './enums/Stripes'
-import { TechniqueStatus, stringToTechniqueStatus } from './enums/TechniqueStatus'
 import { StudentTechnique } from './StudentTechnique'
 import { Gi } from './enums/Gi'
 import { Hierarchy } from './enums/Hierarchies'
@@ -19,12 +14,6 @@ export {
     Technique, 
     InstanceTechnique, 
     Rank, 
-    Belt, 
-    Permission, 
-    Role, 
-    Stripes, 
-    TechniqueStatus,
-    stringToTechniqueStatus,
     StudentTechnique,
     Gi,
     Hierarchy,
@@ -32,3 +21,9 @@ export {
     CollectionTechnique,
     CollectionWithoutTechniquesOrId
 }
+
+export { Role } from './enums/Role'
+export {Belt} from './enums/Belt'
+export {Permission} from './enums/Permission'
+export {Stripes} from './enums/Stripes'
+export { TechniqueStatus, stringToTechniqueStatus } from './enums/TechniqueStatus'

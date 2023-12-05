@@ -1,5 +1,5 @@
-import { validateStudentTechniques, validateTechniques } from './validators/Validators'
-import { 
+export { validateStudentTechniques, validateTechniques } from './validators/Validators'
+export { 
     User, 
     Technique, 
     InstanceTechnique, 
@@ -17,24 +17,3 @@ import {
     CollectionTechnique,
     CollectionWithoutTechniquesOrId
 } from './types/Types'
-
-export type { 
-    User, 
-    Technique, 
-    InstanceTechnique, 
-    Rank, 
-    Belt, 
-    Permission, 
-    Role, 
-    Stripes, 
-    TechniqueStatus,
-    stringToTechniqueStatus,
-    StudentTechnique,
-    validateStudentTechniques,
-    validateTechniques,
-    Gi,
-    Hierarchy,
-    Collection,
-    CollectionTechnique,
-    CollectionWithoutTechniquesOrId
-}

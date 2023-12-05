@@ -18,7 +18,7 @@ import {
     CollectionWithoutTechniquesOrId
 } from './types/Types'
 
-export { 
+export type { 
     User, 
     Technique, 
     InstanceTechnique, 

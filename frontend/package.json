@@ -18,7 +18,7 @@
     "@types/node": "^16.18.57",
     "@types/react": "^18.2.25",
     "@types/react-dom": "^18.2.10",
-    "common": "file:../common",
+    "common": "file:./src/shared",
     "fs": "^0.0.1-security",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
@@ -36,7 +36,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "copy-common": "xcopy /E /I ..\\common\\* src\\shared\\"
   },
   "eslintConfig": {
     "extends": [

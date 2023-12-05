@@ -1,18 +1,25 @@
 import React from 'react';
 import { Role } from 'common'
-import { ThemeProvider } from '@emotion/react';
-import theme from '../../theme/Theme';
 import StudentCollections from '../users/student/Collections';
 import CoachCollections from '../users/coach/Collections';
+import { useAuth0 } from '@auth0/auth0-react'
+import BaseLayout from '../../components/BaseLayout';
+import { decodeAndAddRole } from '../../util/Utilities';
 
-interface CollectionsPageProps {
-    user: {userId: string, role: Role}
-}
 
-const CollectionsPage: React.FC<CollectionsPageProps> = (props: CollectionsPageProps) => {
-   
-    let content: React.ReactNode
-    switch(props.user.role) {
+const CollectionsPage: React.FC = () => {
+
+    let { user } = useAuth0();
+
+    if (user) {user = decodeAndAddRole(user)}
+
+    if (!user) {
+      return null;
+    }
+    
+    let content: React.ReactNode = <div></div>
+
+    switch(user.role) {
         case Role.Student:
             content = <StudentCollections/>
         break;
@@ -29,15 +36,15 @@ const CollectionsPage: React.FC<CollectionsPageProps> = (props: CollectionsPageP
                 </div>
         )
         break;
-    }
+        }
 
     return (
-        <ThemeProvider theme={theme}>
+        <BaseLayout text="Collections">
             <div className="home-container">
                 {content}
             </div>
-        </ThemeProvider>
+        </BaseLayout>
     );
-};
+}
 
 export default CollectionsPage;

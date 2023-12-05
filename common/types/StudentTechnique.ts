@@ -2,7 +2,7 @@ import { TechniqueStatus, User, Technique } from "./Types";
 
 export interface StudentTechnique {
     studentTechniqueId: string;
-    user: User;
+    userId: string;
     technique: Technique;
     status: TechniqueStatus;
     studentNotes: string;

@@ -1,12 +1,7 @@
-import { Role, Rank } from './Types';
+import { Role } from './Types';
 export interface User {
     userId: string;
     role: Role;
-    username: string;
-    firstName: string;
-    lastName: string;
-    dateOfBirth: Date;
+    name: string;
     email: string;
-    mobile: string;
-    rank: Rank;
 }

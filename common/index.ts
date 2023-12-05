@@ -1,4 +1,3 @@
-import { fetchUser } from './utils/Utilities'
 import { validateStudentTechniques, validateTechniques } from './validators/Validators'
 import { 
     User, 
@@ -30,7 +29,6 @@ export {
     Stripes, 
     TechniqueStatus,
     stringToTechniqueStatus,
-    fetchUser,
     StudentTechnique,
     validateStudentTechniques,
     validateTechniques,

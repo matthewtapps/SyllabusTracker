@@ -1,4 +1,5 @@
-import { Technique, Hierarchy, Gi, Collection, CollectionWithoutTechniquesOrId } from "common";
+import { Technique, Hierarchy, Gi, Collection, CollectionWithoutTechniquesOrId, CollectionTechnique, Role } from "common";
+import { User as Auth0User } from '@auth0/auth0-react'
 
 
 interface TechniqueDTO {
@@ -12,6 +13,20 @@ interface TechniqueDTO {
     position: {title: string, description: string};
     openGuard: {title: string, description: string} | null;
     techniqueId: string
+}
+
+export const decodeAndAddRole = (userToken: Auth0User) =>  {
+    if (!Object.values(Role).includes(userToken[`https://syllabustracker.matthewtapps.com/roles`][0])) {
+        alert('Invalid user role attached to id token')
+        return undefined
+    }   
+
+    const user = {
+        ...userToken,
+        role: userToken['https://syllabustracker.matthewtapps.com/roles'][0] as Role
+    }
+
+    return user
 }
 
 export const transformTechniqueForBackend = (technique: any): Technique | null => {
@@ -54,14 +69,15 @@ export const transformTechniqueForBackend = (technique: any): Technique | null =
     return transformedTechnique;
 };
 
-export const postTechnique = async (techniqueId: string | null, technique: Technique): Promise<Technique | null> => {
+export const postTechnique = async (techniqueId: string | null, technique: Technique, accessToken: string | null): Promise<Technique | null> => {
     try {
         const response = await fetch('http://192.168.0.156:3000/api/technique', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({technique: technique, techniqueId: techniqueId}),
+            body: JSON.stringify({ technique, techniqueId }),
         });
   
         if (!response.ok) {
@@ -79,12 +95,17 @@ export const postTechnique = async (techniqueId: string | null, technique: Techn
         }
 };
 
-export const postCollectionTechniques = async (collectionId: string, collectionTechniques: { index: number, technique: Technique }[]) => {
+export const postCollectionTechniques = async (
+    collectionId: string, 
+    collectionTechniques: { index: number, technique: Technique }[],
+    accessToken: string | null
+    ) => {
     try {
         const response = await fetch('http://192.168.0.156:3000/api/addToCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify({collectionId: collectionId, techniques: collectionTechniques}),
         });
@@ -152,12 +173,18 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
     return transformedCollection;
 };
 
-  export const postCollection = async (collectionId: string | null, collection: CollectionWithoutTechniquesOrId): Promise<Collection | null> => {
+  export const postCollection = async (
+    collectionId: string | null, 
+    collection: CollectionWithoutTechniquesOrId,
+    accessToken: string | null
+    ): Promise<Collection | null> => {
+    if (!accessToken) {console.log(`Invalid access token on post Collection: ${accessToken}`); return null}
     try {
         const response = await fetch('http://192.168.0.156:3000/api/newCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify({collectionId: collectionId, collection: collection}),
         });
@@ -170,17 +197,18 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
         return responseData
         } catch (error) {
             console.error('Error:', error);
-            alert(`Error posting collection: ${error}`);
             return null
         }
 };
 
-export const deleteCollection = async (collectionId: string): Promise<number | null> => {
+export const deleteCollection = async (collectionId: string, accessToken: string | null): Promise<number | null> => {
+    if (!accessToken) {console.log(`Invalid access token on delete Collection: ${accessToken}`); return null}
     try {
         const response = await fetch('http://192.168.0.156:3000/api/deleteCollection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify({collectionId: collectionId}),
         });
@@ -194,17 +222,18 @@ export const deleteCollection = async (collectionId: string): Promise<number | n
         return response.status
         } catch (error) {
             console.error('Error:', error);
-            alert(`Error deleting collection: ${error}`);
             return null
         }
 }
 
-export const deleteTechnique = async (techniqueId: string): Promise<number | null> => {
+export const deleteTechnique = async (techniqueId: string, accessToken: string | null): Promise<number | null> => {
+    if (!accessToken) {console.log(`Invalid access token on delete Technique: ${accessToken}`); return null}
     try {
         const response = await fetch('http://192.168.0.156:3000/api/deleteTechnique', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify({techniqueId: techniqueId}),
         });
@@ -218,7 +247,50 @@ export const deleteTechnique = async (techniqueId: string): Promise<number | nul
         return response.status
         } catch (error) {
             console.error('Error:', error);
-            alert(`Error deleting technique: ${error}`);
             return null
         }
+}
+
+export const fetchCollections = async (accessToken: string | null) => {
+    if (!accessToken) {console.log(`Invalid access token on fetch Collections: ${accessToken}`); return null}
+
+    try {
+        const [collectionResponse] = await Promise.all([
+            fetch('http://192.168.0.156:3000/api/collection', { headers: { 'Authorization': `Bearer ${accessToken}` }})
+        ]);
+
+        const collections: Collection[] = await (collectionResponse.json())
+        collections.sort((a, b) => a.title.localeCompare(b.title));
+
+        return collections
+    } catch (error) { console.log(`Error on fetch collections: ${error}`)}
+}
+
+export const fetchCollectionTechniques = async (accessToken: string | null) => {
+    if (!accessToken) {console.log(`Invalid access token on fetch Collections: ${accessToken}`); return null}
+
+
+    try {
+        const [collectionTechniqueResponse] = await Promise.all([
+            fetch('http://192.168.0.156:3000/api/collectiontechnique', { headers: { 'Authorization': `Bearer ${accessToken}` }})
+        ]);
+
+        const collectionTechniques: CollectionTechnique[] = await (collectionTechniqueResponse.json())
+
+        return collectionTechniques
+    } catch (error) { console.log(`Error on fetch collection techniques: ${error}`) }
+}
+
+export const fetchTechniques = async (accessToken: string | null) => {
+    if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
+
+    try {
+        const techniqueResponse = await fetch('http://192.168.0.156:3000/api/technique',
+            { headers: { 'Authorization': `Bearer ${accessToken}` },
+        
+    })
+        const techniques = (await techniqueResponse.json())
+        
+        return techniques
+    } catch (error) { console.log(`Error on fetch techniques: ${error}`)}
 }

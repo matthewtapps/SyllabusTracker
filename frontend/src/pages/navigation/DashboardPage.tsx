@@ -1,20 +1,25 @@
 import React from 'react';
 import { Role } from 'common'
-import { ThemeProvider } from '@emotion/react';
-import theme from '../../theme/Theme';
 import StudentDashboard from '../users/student/Home';
 import CoachDashboard from '../users/coach/Home';
+import { useAuth0 } from '@auth0/auth0-react'
+import BaseLayout from '../../components/BaseLayout';
+import { decodeAndAddRole } from '../../util/Utilities';
 
 
-interface DashboardPageProps {
-    user: {userId: string, role: Role}
-}
-
-const DashboardPage: React.FC<DashboardPageProps> = (props) => {
-
-    let content: React.ReactNode
+const DashboardPage: React.FC = () => {
     
-    switch(props.user.role) {
+    let { user } = useAuth0();
+
+    if (user) {user = decodeAndAddRole(user)}
+
+    if (!user) {
+      return null;
+    }
+    
+    let content: React.ReactNode = <div></div>
+
+    switch(user.role) {
         case Role.Student:
         content = <StudentDashboard/>
         break;
@@ -22,7 +27,7 @@ const DashboardPage: React.FC<DashboardPageProps> = (props) => {
         case Role.Coach:
             content = <CoachDashboard/>
         break;
-        
+
         case Role.Admin:
             content = (
                 <div>
@@ -34,11 +39,11 @@ const DashboardPage: React.FC<DashboardPageProps> = (props) => {
     }
 
     return (
-        <ThemeProvider theme={theme}>
+        <BaseLayout text="Dashboard">
             <div className="home-container">
                 {content}
             </div>
-        </ThemeProvider>
+        </BaseLayout>
     );
 };
 

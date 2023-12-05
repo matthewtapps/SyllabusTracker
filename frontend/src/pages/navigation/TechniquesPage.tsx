@@ -1,20 +1,25 @@
 import React from 'react';
 import { Role } from 'common'
-import { ThemeProvider } from '@emotion/react';
-import theme from '../../theme/Theme';
 import StudentTechniques from '../users/student/Techniques';
 import CoachTechniques from '../users/coach/Techniques';
+import { useAuth0 } from '@auth0/auth0-react'
+import BaseLayout from '../../components/BaseLayout';
+import { decodeAndAddRole } from '../../util/Utilities';
 
 
-interface TechniquesPageProps {
-    user: {userId: string, role: Role}
-}
+const TechniquesPage: React.FC = () => {
 
-const TechniquesPage: React.FC<TechniquesPageProps> = (props) => {
+    let { user } = useAuth0();
 
-    let content: React.ReactNode
+    if (user) {user = decodeAndAddRole(user)}
 
-    switch(props.user.role) {
+    if (!user) {
+      return null;
+    }
+    
+    let content: React.ReactNode = <div></div>
+
+    if (user) {switch(user.role) {
         case Role.Student:
         content = <StudentTechniques/>
         break;
@@ -32,13 +37,14 @@ const TechniquesPage: React.FC<TechniquesPageProps> = (props) => {
         )
         break;
     }
+}
 
     return (
-        <ThemeProvider theme={theme}>
+        <BaseLayout text="Techniques">
             <div className="home-container">
                 {content}
             </div>
-        </ThemeProvider>
+        </BaseLayout>
     );
 };
 

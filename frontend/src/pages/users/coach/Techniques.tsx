@@ -10,9 +10,10 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import TechniqueList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/TechniqueFilter'
-import { transformTechniqueForBackend, postTechnique, deleteTechnique } from '../../../util/Utilities'
+import { transformTechniqueForBackend, postTechnique, deleteTechnique, fetchTechniques } from '../../../util/Utilities'
 import { EditTechniqueDialog } from '../../../components/EditTechniqueDialog'
 import { NewTechniqueDialog } from '../../../components/NewTechniqueDialog'
+import { useAuth0 } from '@auth0/auth0-react'
 
 
 interface TechniqueDTO {
@@ -56,6 +57,29 @@ const Card = styled(MuiCard)({
 });
 
 function CoachTechniques(): JSX.Element {
+    const { getAccessTokenSilently } = useAuth0();
+    const [accessToken, setAccessToken] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        const getAccessToken = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+                setAccessToken(token);
+
+                const techniques = await fetchTechniques(token);
+                if (techniques) {
+                    setTechniquesList(techniques);
+                    setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
+                    setLoading(false);                    
+                }
+
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        getAccessToken();
+    }, [getAccessTokenSilently]);
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
@@ -105,7 +129,7 @@ function CoachTechniques(): JSX.Element {
             return
         };
         
-        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique);        
+        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique, accessToken);        
 
         if (postedTechnique) {
             setTechniquesList((prevTechniques) => {
@@ -131,7 +155,7 @@ function CoachTechniques(): JSX.Element {
     } // Doesn't care which dialog is getting cancelled
 
     const handleDeleteClick = (techniqueId: string) => {
-        const status = deleteTechnique(techniqueId)
+        const status = deleteTechnique(techniqueId, accessToken)
         
         if (status !== null) {setTechniquesList((techniques) => {
             let newTechniques = [
@@ -166,7 +190,7 @@ function CoachTechniques(): JSX.Element {
             return
         };
         
-        const postedTechnique = await postTechnique(null, validTechnique);        
+        const postedTechnique = await postTechnique(null, validTechnique, accessToken);        
 
         if (postedTechnique) {
             setTechniquesList((prevTechniques) => {
@@ -177,25 +201,6 @@ function CoachTechniques(): JSX.Element {
     
             setNewTechniqueDialogOpen(false)
             setShowFab(true);
-        }
-    }
-
-    const fetchTechniques = async () => {
-        setLoading(true);
-        try {
-            const [techniqueResponse] = await Promise.all([
-                fetch('http://192.168.0.156:3000/api/technique')
-            ]);
-
-            const techniques: Technique[] = await (techniqueResponse.json())
-            techniques.sort((a, b) => a.title.localeCompare(b.title));
-
-            return techniques
-        } catch (error) {
-            setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-            return null
-        } finally {
-            setLoading(false); // Set loading to false in both cases
         }
     }
 
@@ -254,15 +259,6 @@ function CoachTechniques(): JSX.Element {
         })
         return generatedSuggestions
     }
-
-    React.useEffect(() => {
-        fetchTechniques().then(techniques => {
-            if (techniques) {
-                setTechniquesList(techniques); // Sets list of techniques
-                setTechniqueSuggestions(generateTechniqueSuggestions(techniques)) // Also generates technique suggestions used for editing techniques
-            }; // Only update state if fetchTechniques returns a value
-        });
-    }, []);
 
     return (
         <div>

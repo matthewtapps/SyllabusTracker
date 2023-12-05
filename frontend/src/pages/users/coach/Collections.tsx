@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import CollectionList from '../../../components/CollectionList'
 import CollectionFilter, { useHandleCollectionFilterChange } from '../../../components/CollectionFilter'
-import { transformTechniqueForBackend, postTechnique, deleteCollection } from '../../../util/Utilities'
+import { transformTechniqueForBackend, postTechnique, deleteCollection, fetchCollectionTechniques, fetchCollections, fetchTechniques } from '../../../util/Utilities'
 import { Technique } from 'common'
 import Dialog from '@mui/material/Dialog'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange} from '../../../components/TechniqueFilter'
@@ -22,6 +22,7 @@ import { postCollectionTechniques, transformCollectionForBackend, postCollection
 import { EditTechniqueDialog } from '../../../components/EditTechniqueDialog'
 import { EditCollectionDialog } from '../../../components/EditCollectionDialog'
 import { NewCollectionDialog } from '../../../components/NewCollectionDialog'
+import { useAuth0 } from '@auth0/auth0-react'
 
 
 interface TechniqueDTO {
@@ -69,6 +70,42 @@ const Button = styled((props: ButtonProps) => (
 ))(({ theme }) => ({}));
 
 function CoachCollections(): JSX.Element {
+    const { getAccessTokenSilently } = useAuth0();
+    const [accessToken, setAccessToken] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        const getAccessToken = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+                setAccessToken(token);
+
+                // Now that we have the token, we can fetch data
+                const collections = await fetchCollections(token);
+                if (collections) {
+                    setCollectionsList(collections);
+                    setLoading(false);
+
+                    const techniques = await fetchTechniques(token);
+                    if (techniques) {
+                        setTechniques(techniques);
+                        setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
+                        if (collections && techniques) {
+                            setCollectionSuggestions(generateCollectionSuggestions(collections, techniques));
+                        }
+                    }
+                }
+
+                const collectionTechniques = await fetchCollectionTechniques(token);
+                if (collectionTechniques) {
+                    setCollectionTechniques(collectionTechniques);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        getAccessToken();
+    }, [getAccessTokenSilently]);
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
@@ -96,8 +133,6 @@ function CoachCollections(): JSX.Element {
 
     // Collection technique states
     const [collectionTechniques, setCollectionTechniques] = React.useState<CollectionTechnique[] | null>(null);
-    const [collectionTechniquesLoading, setCollectionTechniquesLoading] = React.useState<boolean>(false);
-    const [collectionTechniquesPlaceholderContent, setCollectionTechniquesPlaceholderContent] = React.useState<string>("");
 
     // Technique filtering and selecting dialogue box below //
     // Autocomplete suggestions for technique filtering
@@ -240,7 +275,7 @@ function CoachCollections(): JSX.Element {
             return
         };
         
-        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique);        
+        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique, accessToken);        
 
         if (postedTechnique) {
             setCollectionTechniques((prevTechniques) => {
@@ -295,52 +330,7 @@ function CoachCollections(): JSX.Element {
         // TODO: Call the backend API to delete the technique
         // Handle the UI update after deletion (e.g., remove the technique from the list)
     }
-
-    const fetchCollections = async () => {
-        setLoading(true);
-        try {
-            const [collectionResponse] = await Promise.all([
-                fetch('http://192.168.0.156:3000/api/collection')
-            ]);
-
-            const collections: Collection[] = await (collectionResponse.json())
-            collections.sort((a, b) => a.title.localeCompare(b.title));
-
-            return collections
-        } catch (error) {
-            setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-            return null
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const fetchCollectionTechniques = async () => {
-        setCollectionTechniquesLoading(true);
-        try {
-            const [collectionTechniqueResponse] = await Promise.all([
-                fetch('http://192.168.0.156:3000/api/collectiontechnique')
-            ]);
-
-            const collectionTechniques: CollectionTechnique[] = await (collectionTechniqueResponse.json())
-
-            return collectionTechniques
-        } catch (error) {
-            setCollectionTechniquesPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-            return null
-        } finally {
-            setCollectionTechniquesLoading(false);
-        }
-    }
-
-    const fetchTechniques = async () => {
-        try {
-            const techniqueResponse = await fetch('http://192.168.0.156:3000/api/technique')
-            const techniques = (await techniqueResponse.json())
-            
-            return techniques
-        } catch (error) { alert(`Error fetching technique data: ${error}`);}
-    }
+    
 
     const handleCollectionTechniqueEditClick = (collection: Collection) => {
         
@@ -372,11 +362,11 @@ function CoachCollections(): JSX.Element {
     }
 
     const handleDragDropSaveClick = async () => {
-        editingTechniquesCollection && await postCollectionTechniques(editingTechniquesCollection.collectionId, dragDropTechniques);
+        editingTechniquesCollection && await postCollectionTechniques(editingTechniquesCollection.collectionId, dragDropTechniques, accessToken);
         setEditingTechniquesCollection(null);
         setDragDropTechniques([]);
 
-        const collections = await fetchCollectionTechniques();
+        const collections = await fetchCollectionTechniques(accessToken);
         if (collections) {
             setCollectionTechniques(collections);
         }
@@ -455,7 +445,7 @@ function CoachCollections(): JSX.Element {
             return
         };
         
-        const postedCollection = await postCollection(editingCollectionId, validCollection);
+        const postedCollection = await postCollection(editingCollectionId, validCollection, accessToken);
 
         if (postedCollection) {
             setCollectionsList((prevCollections) => {
@@ -476,7 +466,7 @@ function CoachCollections(): JSX.Element {
     }
     
     const handleCollectionDeleteClick = () => {
-        const status = deleteCollection(editingCollectionId)
+        const status = deleteCollection(editingCollectionId, accessToken)
         
         if (status !== null) {setCollectionsList((prevCollections) => {
             let newCollections = [
@@ -573,7 +563,7 @@ function CoachCollections(): JSX.Element {
             return
         };
         
-        const postedCollection = await postCollection(null, validCollection)
+        const postedCollection = await postCollection(null, validCollection, accessToken)
 
         if (postedCollection) {
             setCollectionsList((prevCollections) => {
@@ -586,27 +576,6 @@ function CoachCollections(): JSX.Element {
             setNewCollectionDialogOpen(false);
         }
     }
-
-
-    React.useEffect(() => {
-        fetchCollections().then(collections => {
-            if (collections) setCollectionsList(collections);
-            fetchTechniques().then(techniques => {
-                if (techniques) {
-                    setTechniques(techniques);
-                    setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
-                    if (collections && techniques) setCollectionSuggestions(generateCollectionSuggestions(collections, techniques))
-                }
-            });
-        });
-        
-        fetchCollectionTechniques().then(collectionTechniques => {
-            if (collectionTechniques) setCollectionTechniques(collectionTechniques);
-        });
-
-        
-        
-    }, []);   
 
     return (
         <div>

@@ -7,7 +7,6 @@ import AuthButtons from './AuthButtons';
 
 interface NavBarProps {
     text: string;
-    onSetRole: (role: Role) => void;
 }
 
 const NavBar = (props: NavBarProps) => {
@@ -20,11 +19,6 @@ const NavBar = (props: NavBarProps) => {
     
     const handleClose = () => {
         setOpen(false)
-    }
-
-    const handleSetRole = (role: Role) => () => {
-        props.onSetRole(role);
-        handleClose();
     }
 
     return (
@@ -52,9 +46,6 @@ const NavBar = (props: NavBarProps) => {
                     <DialogContentText>Set current user role</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleSetRole(Role.Student)}>Student</Button>
-                    <Button onClick={handleSetRole(Role.Coach)}>Coach</Button>
-                    <Button onClick={handleSetRole(Role.Admin)}>Admin</Button>
                 </DialogActions>
             </Drawer>
         </React.Fragment>

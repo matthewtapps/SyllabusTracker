@@ -1,5 +1,5 @@
 function Pageloader(): JSX.Element {
-    return <div></div>
+    return <div>Loading...</div>
 }
 
 export default Pageloader

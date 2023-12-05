@@ -3,20 +3,19 @@ import {Technique} from './Technique'
 import { InstanceTechnique } from './InstanceTechnique'
 import { Rank } from './Rank'
 import { StudentTechnique } from './StudentTechnique'
-import { Gi } from './enums/Gi'
-import { Hierarchy } from './enums/Hierarchies'
 import { Collection } from './Collection'
 import { CollectionTechnique } from './CollectionTechnique'
 import { CollectionWithoutTechniquesOrId } from './CollectionWithoutTechniquesOrId'
+export { Gi } from './enums/Gi'
+export { Hierarchy } from './enums/Hierarchies'
 
-export {
+
+export type {
     User, 
     Technique, 
     InstanceTechnique, 
     Rank, 
     StudentTechnique,
-    Gi,
-    Hierarchy,
     Collection,
     CollectionTechnique,
     CollectionWithoutTechniquesOrId

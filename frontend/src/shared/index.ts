@@ -7,13 +7,13 @@ export type {
     StudentTechnique,
     Collection,
     CollectionTechnique,
-    CollectionWithoutTechniquesOrId
+    CollectionWithoutTechniquesOrId,
+    Rank, 
 } from './types/Types'
 
 export {
     Gi,
     Hierarchy,
-    Rank, 
     Belt, 
     Permission, 
     Role, 

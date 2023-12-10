@@ -294,3 +294,17 @@ export const fetchTechniques = async (accessToken: string | null) => {
         return techniques
     } catch (error) { console.log(`Error on fetch techniques: ${error}`)}
 }
+
+export const fetchStudents = async (accessToken: string | null) => {
+    if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
+
+    try {
+        const studentsResponse = await fetch('http://192.168.0.156:3000/api/students',
+        { headers: { 'Authorization': `Bearer ${accessToken}` }
+
+    })
+        const students = (await studentsResponse.json())
+
+        return students
+    } catch (error) { console.log(`Error on fetch students: ${error}`)}
+}

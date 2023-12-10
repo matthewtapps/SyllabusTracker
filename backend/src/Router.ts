@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { TechniqueController } from './controllers/TechniqueController';
 import { CollectionController } from './controllers/CollectionController';
+import { StudentController } from './controllers/StudentController';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.get('/collection/titles', CollectionController.getAllCollectionTitles);
 router.get('/collectiontechnique', CollectionController.getCollectionTechniques);
 router.post('/deleteCollection', CollectionController.deleteCollection);
 router.post('/deleteTechnique', TechniqueController.deleteTechnique)
+router.get('/students', StudentController.fetchStudents);
 
 export default router;

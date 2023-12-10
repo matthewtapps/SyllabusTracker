@@ -33,13 +33,19 @@ const CoachDashboard: React.FC = () => {
     const navigate = useNavigate();
     const navigateToTechniques = () => { navigate('/techniques') }
     const navigateToCollections = () => { navigate('/collections') }
+    const navigateToStudents = () => { navigate('/students')}
 
     return (
         <div>
             <Grid container spacing={1} padding={1}>
                 <Grid item xs={12}>
-                    <Card>
-                        <Typography variant='h6' className="DashboardCard-heading">Progress</Typography>
+                    <Card onClick={navigateToStudents}>
+                        <CardActionArea>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant='h6' className="DashboardCard-heading">Students</Typography>
+                                <ArrowForwardIosIcon/>
+                            </Box>
+                        </CardActionArea>
                     </Card>
                 </Grid>
                 <Grid item xs={6}>

@@ -3,12 +3,16 @@ import cors from "cors";
 import router from "./src/Router";
 import { AppDataSource } from "./src/data-source";
 import { auth } from 'express-oauth2-jwt-bearer';
+import 'dotenv/config';
 
 const app = express();
 
+const jwtAudience = process.env.JWT_AUDIENCE
+const issuerBaseURL = process.env.ISSUER_BASE_URL
+
 const jwtCheck = auth({
-    audience: 'https://syllabustracker.matthewtapps.com',
-    issuerBaseURL: 'https://dev-2q58mg30s0wp6ggd.au.auth0.com/',
+    audience: jwtAudience,
+    issuerBaseURL: issuerBaseURL,
     tokenSigningAlg: 'RS256',
   });
 

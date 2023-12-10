@@ -1,3 +1,5 @@
 import { validateStudentTechniques, validateTechniques } from './validators/Validators';
-import { User, Technique, InstanceTechnique, Rank, Belt, Permission, Role, Stripes, TechniqueStatus, stringToTechniqueStatus, StudentTechnique, Gi, Hierarchy, Collection, CollectionTechnique, CollectionWithoutTechniquesOrId } from './types/Types';
-export { User, Technique, InstanceTechnique, Rank, Belt, Permission, Role, Stripes, TechniqueStatus, stringToTechniqueStatus, StudentTechnique, validateStudentTechniques, validateTechniques, Gi, Hierarchy, Collection, CollectionTechnique, CollectionWithoutTechniquesOrId };
+import { Collection, CollectionTechnique, CollectionWithoutTechniquesOrId, InstanceTechnique, Rank, StudentTechnique, Technique, User } from "./types/Types";
+export type { Collection, CollectionTechnique, CollectionWithoutTechniquesOrId, InstanceTechnique, Rank, StudentTechnique, Technique, User };
+export { validateStudentTechniques, validateTechniques };
+export { Belt, Gi, Hierarchy, Permission, Role, Stripes, TechniqueStatus } from "./types/Types";

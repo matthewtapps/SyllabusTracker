@@ -8,6 +8,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import TechniqueList from '../../../components/TechniqueList'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/TechniqueFilter'
+import { useAuth0 } from '@auth0/auth0-react'
+import { fetchTechniques } from '../../../util/Utilities'
 
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
@@ -27,27 +29,28 @@ function StudentTechniques(): JSX.Element {
     // List of techniques state
     const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
 
+    const { getAccessTokenSilently } = useAuth0();
+
     React.useEffect(() => {
-        (async () => {
+        const getAccessToken = async () => {
             try {
-                const [techniqueResponse] = await Promise.all([
-                    fetch('http://192.168.0.156:3000/api/technique')
-                ]);
+                const token = await getAccessTokenSilently();
 
-                const techniques: Technique[] = await (techniqueResponse.json())
-                techniques.sort((a, b) => a.title.localeCompare(b.title));
-
-                setTechniquesList(techniques)
-                
-                setLoading(false)
+                const techniques = await fetchTechniques(token);
+                if (techniques) {
+                    setTechniquesList(techniques);
+                    setLoading(false);                    
+                }
 
             } catch (error) {
+                console.log(error);
                 setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-                
                 setLoading(false)
             }
-        })();
-    }, []);
+        };
+
+        getAccessToken();
+    }, [getAccessTokenSilently]);
 
     // Generate options for the filters based on the full techniques list
     const options = useDetermineTechniqueFilterOptions(techniquesList)

@@ -75,6 +75,8 @@ function CoachTechniques(): JSX.Element {
 
             } catch (error) {
                 console.log(error);
+                setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
+                setLoading(false)
             }
         };
 

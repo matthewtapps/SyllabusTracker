@@ -2,15 +2,14 @@ import React from 'react'
 import Typography from '@mui/material/Typography'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Fab from '@mui/material/Fab'
-import AddIcon from '@mui/icons-material/Add'
-import { useNavigate } from 'react-router-dom'
 import { Collection } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import CollectionList from '../../../components/CollectionList'
 import CollectionFilter, { useDetermineCollectionFilterOptions, useHandleCollectionFilterChange } from '../../../components/CollectionFilter'
+import { useAuth0 } from '@auth0/auth0-react'
+import { fetchCollections } from '../../../util/Utilities'
 
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
@@ -23,9 +22,6 @@ const Card = styled(MuiCard)({
 });
 
 function StudentCollections(): JSX.Element {
-    const navigate = useNavigate();
-    const navigateToNewCollection = () => { navigate('/newCollection') }
-
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
     const [placeholderContent, setPlaceholderContent] = React.useState('No collection data available')
@@ -33,25 +29,28 @@ function StudentCollections(): JSX.Element {
     // List of techniques state
     const [collectionsList, setCollectionsList] = React.useState<Collection[]>([])
 
-    React.useEffect(() => {
-        (async () => {
-            try {
-                const [collectionResponse] = await Promise.all([
-                    fetch('http://192.168.0.156:3000/api/collection')
-                ]);
+    const { getAccessTokenSilently } = useAuth0();
 
-                const collections: Collection[] = await (collectionResponse.json())
-                setCollectionsList(collections)
-                
-                setLoading(false)
+    React.useEffect(() => {
+        const getAccessToken = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+
+                const collections = await fetchCollections(token);
+                if (collections) {
+                    setCollectionsList(collections);
+                    setLoading(false);
+                }
 
             } catch (error) {
                 setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-                
+                console.log(error);
                 setLoading(false)
             }
-        })();
-    }, []);
+        };
+
+        getAccessToken();
+    }, [getAccessTokenSilently]);
 
     // Generate options for the filters based on the full techniques list
     const options = useDetermineCollectionFilterOptions(collectionsList)
@@ -80,14 +79,6 @@ function StudentCollections(): JSX.Element {
                 <CollectionList filteredCollections={filteredCollections}/>
             )}
             </Card>
-            <Fab // Should only exist on coach version of techniques
-            color="primary" 
-            aria-label="add" 
-            style={{position: 'fixed', bottom: '16px', right: '16px'}}
-            onClick={navigateToNewCollection}
-            >
-                <AddIcon/>
-            </Fab>
         </div>
     );
 };

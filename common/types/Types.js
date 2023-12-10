@@ -1,8 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Hierarchy = exports.Gi = exports.stringToTechniqueStatus = exports.TechniqueStatus = exports.Stripes = exports.Role = exports.Permission = exports.Belt = void 0;
+exports.stringToTechniqueStatus = exports.TechniqueStatus = exports.Stripes = exports.Role = exports.Permission = exports.Hierarchy = exports.Gi = exports.Belt = void 0;
 var Belt_1 = require("./enums/Belt");
 Object.defineProperty(exports, "Belt", { enumerable: true, get: function () { return Belt_1.Belt; } });
+var Gi_1 = require("./enums/Gi");
+Object.defineProperty(exports, "Gi", { enumerable: true, get: function () { return Gi_1.Gi; } });
+var Hierarchies_1 = require("./enums/Hierarchies");
+Object.defineProperty(exports, "Hierarchy", { enumerable: true, get: function () { return Hierarchies_1.Hierarchy; } });
 var Permission_1 = require("./enums/Permission");
 Object.defineProperty(exports, "Permission", { enumerable: true, get: function () { return Permission_1.Permission; } });
 var Role_1 = require("./enums/Role");
@@ -12,7 +16,3 @@ Object.defineProperty(exports, "Stripes", { enumerable: true, get: function () {
 var TechniqueStatus_1 = require("./enums/TechniqueStatus");
 Object.defineProperty(exports, "TechniqueStatus", { enumerable: true, get: function () { return TechniqueStatus_1.TechniqueStatus; } });
 Object.defineProperty(exports, "stringToTechniqueStatus", { enumerable: true, get: function () { return TechniqueStatus_1.stringToTechniqueStatus; } });
-var Gi_1 = require("./enums/Gi");
-Object.defineProperty(exports, "Gi", { enumerable: true, get: function () { return Gi_1.Gi; } });
-var Hierarchies_1 = require("./enums/Hierarchies");
-Object.defineProperty(exports, "Hierarchy", { enumerable: true, get: function () { return Hierarchies_1.Hierarchy; } });

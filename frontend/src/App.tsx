@@ -10,6 +10,7 @@ import Pageloader from './components/PageLoader';
 import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from './components/AuthenticationGuard';
 import { ProfilePage } from './pages/navigation/ProfilePage';
+import StudentsPage from './pages/navigation/StudentsPage';
 
 
 function App() {
@@ -41,6 +42,9 @@ function App() {
           />
           <Route path="/callback" element={<CallbackPage/>}
           />
+          <Route path="/students"
+            element={<AuthenticationGuard component={StudentsPage}/>}
+            />
         </Routes>
     </ThemeProvider>
   );

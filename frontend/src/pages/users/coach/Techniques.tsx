@@ -74,7 +74,6 @@ function CoachTechniques(): JSX.Element {
                 }
 
             } catch (error) {
-                console.log(error);
                 setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
                 setLoading(false)
             }
@@ -123,9 +122,7 @@ function CoachTechniques(): JSX.Element {
         
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
-        console.log(fieldValues, editingTechniqueId)
         const validTechnique = transformTechniqueForBackend(fieldValues);
-        console.log(validTechnique)
         if (!validTechnique) {
             alert('Not a valid technique posted')
             return

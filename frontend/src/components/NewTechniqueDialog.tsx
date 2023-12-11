@@ -131,9 +131,18 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
     
     const descriptions = generateDescriptionObjects(props.techniqueList)
 
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (event.currentTarget.checkValidity()) {
+            await props.onSave(event);
+        } else {
+            console.log("Form is invalid");
+        }
+    };
+
     return (
         <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="lg">
-            <form noValidate onSubmit={props.onSave}>
+            <form noValidate onSubmit={handleSubmit}>
                 <DialogTitle sx={{padding: "0px", marginBottom: "10px"}}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
                         <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
@@ -257,6 +266,8 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                                     </MenuItem>
                                 ))}
                             </TextField>
+
+                            <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth name="videoSrc" label="Video Link"/>
                         </CardContent>
                     </Card>
                 </DialogContent>

@@ -214,7 +214,7 @@ function CoachCollections(): JSX.Element {
             hierarchyOptions: ["Top", "Bottom"],
             typeOptions: [],
             openGuardOptions: [],
-            giOptions: ["Gi", "No Gi", "Both"]
+            giOptions: ["Yes Gi", "No Gi", "Both"]
         }
         techniqueList.forEach(technique => {
             if (!generatedSuggestions.titleOptions.includes(technique.title)) {generatedSuggestions.titleOptions.push(technique.title)}
@@ -526,7 +526,7 @@ function CoachCollections(): JSX.Element {
             hierarchyOptions: ["Top", "Bottom"],
             typeOptions: [],
             openGuardOptions: [],
-            giOptions: ["Gi", "No Gi", "Both"]
+            giOptions: ["Yes Gi", "No Gi", "Both"]
         }
         collectionList.forEach(collection => {
             if (!generatedSuggestions.titleOptions.includes(collection.title)) {generatedSuggestions.titleOptions.push(collection.title)}

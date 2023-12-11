@@ -29,7 +29,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "copy-common": "xcopy /E /I ..\\common\\* src\\shared\\"
+    "copy-common": "xcopy /E /I ..\\common\\* src\\common\\"
   },
   "eslintConfig": {
     "extends": [

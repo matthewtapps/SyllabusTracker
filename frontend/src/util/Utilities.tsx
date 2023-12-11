@@ -2,6 +2,8 @@ import { Technique, Hierarchy, Gi, Collection, CollectionWithoutTechniquesOrId, 
 import { User as Auth0User } from '@auth0/auth0-react'
 
 
+const API_SERVER_URL = process.env.REACT_APP_API_SERVER_URL
+
 interface TechniqueDTO {
     title: string;
     videoSrc: string | null;
@@ -71,7 +73,7 @@ export const transformTechniqueForBackend = (technique: any): Technique | null =
 
 export const postTechnique = async (techniqueId: string | null, technique: Technique, accessToken: string | null): Promise<Technique | null> => {
     try {
-        const response = await fetch('http://192.168.0.156:3000/api/technique', {
+        const response = await fetch(`${API_SERVER_URL}technique`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -101,7 +103,7 @@ export const postCollectionTechniques = async (
     accessToken: string | null
     ) => {
     try {
-        const response = await fetch('http://192.168.0.156:3000/api/addToCollection', {
+        const response = await fetch(`${API_SERVER_URL}addToCollection`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -180,7 +182,7 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
     ): Promise<Collection | null> => {
     if (!accessToken) {console.log(`Invalid access token on post Collection: ${accessToken}`); return null}
     try {
-        const response = await fetch('http://192.168.0.156:3000/api/newCollection', {
+        const response = await fetch(`${API_SERVER_URL}newCollection`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -204,7 +206,7 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
 export const deleteCollection = async (collectionId: string, accessToken: string | null): Promise<number | null> => {
     if (!accessToken) {console.log(`Invalid access token on delete Collection: ${accessToken}`); return null}
     try {
-        const response = await fetch('http://192.168.0.156:3000/api/deleteCollection', {
+        const response = await fetch(`${API_SERVER_URL}deleteCollection`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -229,7 +231,7 @@ export const deleteCollection = async (collectionId: string, accessToken: string
 export const deleteTechnique = async (techniqueId: string, accessToken: string | null): Promise<number | null> => {
     if (!accessToken) {console.log(`Invalid access token on delete Technique: ${accessToken}`); return null}
     try {
-        const response = await fetch('http://192.168.0.156:3000/api/deleteTechnique', {
+        const response = await fetch(`${API_SERVER_URL}deleteTechnique`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -256,7 +258,7 @@ export const fetchCollections = async (accessToken: string | null) => {
 
     try {
         const [collectionResponse] = await Promise.all([
-            fetch('http://192.168.0.156:3000/api/collection', { headers: { 'Authorization': `Bearer ${accessToken}` }})
+            fetch(`${API_SERVER_URL}collection`, { headers: { 'Authorization': `Bearer ${accessToken}` }})
         ]);
 
         const collections: Collection[] = await (collectionResponse.json())
@@ -272,7 +274,7 @@ export const fetchCollectionTechniques = async (accessToken: string | null) => {
 
     try {
         const [collectionTechniqueResponse] = await Promise.all([
-            fetch('http://192.168.0.156:3000/api/collectiontechnique', { headers: { 'Authorization': `Bearer ${accessToken}` }})
+            fetch(`${API_SERVER_URL}collectiontechnique`, { headers: { 'Authorization': `Bearer ${accessToken}` }})
         ]);
 
         const collectionTechniques: CollectionTechnique[] = await (collectionTechniqueResponse.json())
@@ -285,7 +287,7 @@ export const fetchTechniques = async (accessToken: string | null) => {
     if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
 
     try {
-        const techniqueResponse = await fetch('http://192.168.0.156:3000/api/technique',
+        const techniqueResponse = await fetch(`${API_SERVER_URL}technique`,
             { headers: { 'Authorization': `Bearer ${accessToken}` },
         
     })
@@ -299,7 +301,7 @@ export const fetchStudents = async (accessToken: string | null) => {
     if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
 
     try {
-        const studentsResponse = await fetch('http://192.168.0.156:3000/api/students',
+        const studentsResponse = await fetch(`${API_SERVER_URL}students`,
         { headers: { 'Authorization': `Bearer ${accessToken}` }
 
     })

@@ -1,13 +1,13 @@
 
 
 import * as React from 'react';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import { styled } from '@mui/material/styles'
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { styled } from '@mui/material/styles';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -63,7 +63,9 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
     const [descriptionValue, setDescriptionValue] = React.useState('');
     const [touched, setTouched] = React.useState(false);
     const [descriptionExpanded, setDescriptionExpanded] = React.useState(false);
-    const displayErrorMessage = ((wasSubmitted || touched) && required && (titleValue === '' || descriptionValue === ''));
+
+    const titleError = ((wasSubmitted || touched) && required && titleValue === '');
+    const descriptionError = ((wasSubmitted || touched) && (titleValue.length > 0 || required) && descriptionValue === '');
 
     const handleTitleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         setTouched(true);
@@ -86,10 +88,10 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
     };
 
     React.useEffect(() => {
-        if (displayErrorMessage && descriptionValue === '') {
+        if (descriptionError) {
             setDescriptionExpanded(true);
         }
-    }, [displayErrorMessage, descriptionValue]);
+    }, [descriptionError]);
 
     return (
         <Accordion hidden={hidden} disableGutters expanded={descriptionExpanded} onChange={handleAccordionChange}>
@@ -113,9 +115,9 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
                             type="text"
                             size="small"
                             onClick={(e) => e.stopPropagation()}
-                            aria-describedby={displayErrorMessage ? `${name}-error` : undefined}
-                            error={displayErrorMessage}
-                            helperText={displayErrorMessage ? "Required" : undefined}
+                            aria-describedby={titleError ? `${name}-error` : undefined}
+                            error={titleError}
+                            helperText={titleError ? "Required" : ''}
                         />
                     )}
                 />
@@ -125,7 +127,7 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
                 <TextField
                     {...otherProps}
                     id={`${name}-description-input`}
-                    required={required}
+                    required={required || titleValue.length > 0}
                     name={`${name}Description`}
                     type="text"
                     onBlur={handleDescriptionBlur}
@@ -136,8 +138,8 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
                     onChange={handleDescriptionChange}
                     rows={4}
                     label={descriptionLabel}
-                    error={displayErrorMessage && descriptionValue === ''}
-                    helperText={displayErrorMessage && descriptionValue === '' ? "Required" : undefined}
+                    error={descriptionError}
+                    helperText={descriptionError ? "Required" : ''}
                 />
             </AccordionDetails>
         </Accordion>

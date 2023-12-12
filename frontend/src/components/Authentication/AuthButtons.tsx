@@ -1,8 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
-import { LoginButton } from "../LoginButton";
-import { SignupButton } from "../SignUpButton";
-import { LogoutButton } from "../LogoutButton";
+import { LoginButton } from "../Buttons/LoginButton";
+import { SignupButton } from "../Buttons/SignUpButton";
+import { LogoutButton } from "../Buttons/LogoutButton";
 
 
 const AuthButtons = () => {

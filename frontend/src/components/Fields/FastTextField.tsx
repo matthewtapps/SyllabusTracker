@@ -1,5 +1,10 @@
 import * as React from 'react';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
+import MuiTextField, { TextFieldProps } from '@mui/material/TextField';
+import { styled } from '@mui/material/styles';
+
+const TextField = styled(MuiTextField)({
+    marginTop: "15px"
+})
 
 type FastTextFieldProps = {
     name: string,

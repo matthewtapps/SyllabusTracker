@@ -5,17 +5,13 @@ import DialogContent from '@mui/material/DialogContent';
 import MuiCard from '@mui/material/Card'
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
-import { FastTextField } from '../Fields/FastTextField';
+import { FastTextField as TextField } from '../Fields/FastTextField';
 import { CardContent, styled } from '@mui/material';
 import { Technique } from 'common';
 import { TitleTextField } from '../Fields/TitleTextField';
 import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { SelectField } from '../Fields/SelectField';
 
-
-const TextField = styled(FastTextField)({
-    marginTop: "15px"
-})
 
 const Card = styled(MuiCard)({
     backgroundColor: `#3c3836`,
@@ -128,7 +124,7 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                             label="Position" descriptionLabel="Position Description" options={props.techniqueOptions?.positionOptions} descriptions={descriptions} 
                             onPositionBlur={handlePositionBlur} />
 
-                            <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" options={props.techniqueOptions?.giOptions} required/>
+                            <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" options={props.techniqueOptions?.hierarchyOptions} required/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type" 
                             label="Type" descriptionLabel="Type Description" options={props.techniqueOptions?.typeOptions} descriptions={descriptions} />

@@ -687,7 +687,6 @@ function CoachCollections(): JSX.Element {
                 onClose={handleNewCollectionCancel}
                 onSave={handleNewCollectionSave}
                 onCancel={handleNewCollectionCancel}
-                wasSubmitted={false}
                 techniqueList={techniques}
                 collectionOptions={collectionSuggestions}
             />

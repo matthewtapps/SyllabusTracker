@@ -40,6 +40,8 @@ type TextFieldWithDescriptionFieldProps = {
     onPositionBlur: (event: React.FocusEvent<HTMLInputElement>) => void | undefined;
     hidden: boolean,
     disabled: boolean,
+    defaultValue: string | undefined,
+    descriptionDefaultValue: string | undefined,
 } & TextFieldProps;
 
 TextFieldWithDescriptionField.defaultProps = {
@@ -48,6 +50,8 @@ TextFieldWithDescriptionField.defaultProps = {
     hidden: false,
     disabled: false,
     onPositionBlur: undefined,
+    defaultValue: undefined,
+    descriptionDefaultValue: undefined,
 }
 
 interface DescriptionMap {
@@ -58,9 +62,9 @@ interface Descriptions {
     [key: string]: DescriptionMap;
 }
 
-export function TextFieldWithDescriptionField({ name, wasSubmitted, required, options, descriptions, descriptionLabel, hidden, disabled, onPositionBlur, ...otherProps }: TextFieldWithDescriptionFieldProps) {
-    const [titleValue, setTitleValue] = React.useState('');
-    const [descriptionValue, setDescriptionValue] = React.useState('');
+export function TextFieldWithDescriptionField({ name, wasSubmitted, required, options, descriptions, descriptionLabel, hidden, disabled, onPositionBlur, defaultValue, descriptionDefaultValue, ...otherProps }: TextFieldWithDescriptionFieldProps) {
+    const [titleValue, setTitleValue] = React.useState(defaultValue || '');
+    const [descriptionValue, setDescriptionValue] = React.useState(descriptionDefaultValue || '');
     const [touched, setTouched] = React.useState(false);
     const [descriptionExpanded, setDescriptionExpanded] = React.useState(false);
 
@@ -103,6 +107,7 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
                     autoSelect
                     fullWidth
                     freeSolo
+                    defaultValue={defaultValue}
                     disabled={disabled}
                     onBlur={handleTitleBlur}
                     renderInput={(params) => (

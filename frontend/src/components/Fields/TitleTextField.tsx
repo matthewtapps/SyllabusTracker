@@ -4,20 +4,23 @@ import * as React from 'react';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
+
 type TitleTextFieldProps = {
     name: string,
     wasSubmitted: boolean,
     required: boolean,
     options: string[] | undefined,
+    defaultValue: string | undefined,
 } & TextFieldProps;
 
 TitleTextField.defaultProps = {
     required: false,
-    options: undefined
+    options: undefined,
+    defaultValue: undefined,
 }
 
-export function TitleTextField({ name, wasSubmitted, required, options, ...otherProps }: TitleTextFieldProps) {
-    const [fieldValue, setFieldValue] = React.useState('');
+export function TitleTextField({ name, wasSubmitted, required, options, defaultValue, ...otherProps }: TitleTextFieldProps) {
+    const [fieldValue, setFieldValue] = React.useState(defaultValue || '');
     const [touched, setTouched] = React.useState(false);
     const displayErrorMessage = ((wasSubmitted || touched) && required && fieldValue === '');
 
@@ -28,6 +31,7 @@ export function TitleTextField({ name, wasSubmitted, required, options, ...other
         <Autocomplete
             options={options || []}
             ListboxProps={{onClick: event => event?.stopPropagation()}}
+            defaultValue={defaultValue}
             autoComplete
             autoSelect
             fullWidth

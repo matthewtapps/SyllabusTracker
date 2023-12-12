@@ -181,7 +181,7 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                             defaultValue={props.editingCollection?.description} multiline rows={4} name="description" label="Collection Description"/>
 
                             <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth 
-                            defaultValue={props.editingCollection?.globalNotes} multiline rows={4} name="globalNotes" label="Global Notes"/>
+                            defaultValue={props.editingCollection?.globalNotes || ''} multiline rows={4} name="globalNotes" label="Global Notes"/>
                                     
                             <Accordion disableGutters >
                                 <AccordionSummary expandIcon={<ExpandMore />}  aria-controls="panel1a-content">

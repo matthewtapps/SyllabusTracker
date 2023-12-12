@@ -13,14 +13,16 @@ type SelectFieldProps = {
     wasSubmitted: boolean,
     required: boolean,
     options: string[],
+    defaultValue: string | undefined,
 } & TextFieldProps;
 
 SelectField.defaultProps = {
     required: false,
-    options: undefined
+    options: undefined,
+    defaultValue: undefined,
 }
 
-export function SelectField({ name, wasSubmitted, required, options, ...otherProps }: SelectFieldProps) {
+export function SelectField({ name, wasSubmitted, required, options, defaultValue, ...otherProps }: SelectFieldProps) {
     const [fieldValue, setFieldValue] = React.useState('');
     const [touched, setTouched] = React.useState(false);
     const displayErrorMessage = ((wasSubmitted || touched) && required && fieldValue === '');
@@ -33,10 +35,10 @@ export function SelectField({ name, wasSubmitted, required, options, ...otherPro
         <TextField 
             {...otherProps} 
             id={`${name}-input`} 
-            select 
+            select
             fullWidth 
             name={name} 
-            defaultValue="" 
+            defaultValue={defaultValue || ''}
             required={required} 
             error={displayErrorMessage} 
             aria-describedby={displayErrorMessage ? `${name}-error` : undefined}

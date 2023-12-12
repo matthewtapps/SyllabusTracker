@@ -5,14 +5,8 @@ import DialogContent from '@mui/material/DialogContent';
 import MuiCard from '@mui/material/Card'
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete'
-import MuiAccordion from '@mui/material/Accordion'
-import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import { FastTextField } from './FastTextField';
 import { CardContent, styled } from '@mui/material';
-import MenuItem from '@mui/material/MenuItem'
 import { Technique } from 'common';
 import { TitleTextField } from './TitleTextField';
 import { TextFieldWithDescriptionField } from './TextFieldWithDescriptionField';
@@ -36,26 +30,6 @@ const Button = styled((props: ButtonProps) => (
     <MuiButton sx={{width: "100%", margin: "10px"}} variant='contained' {...props} />
 ))(({ theme }) => ({}));
 
-const Accordion = styled(MuiAccordion)({
-    backgroundColor: `#3c3836`,
-    margin: "0px",
-    padding: "0px",
-    boxShadow: 'none',
-    '&:before': {
-        display: 'none'
-    },
-});
-
-const AccordionSummary = styled(MuiAccordionSummary)({
-    margin: "0px",
-    padding: "0px"
-})
-
-const AccordionDetails = styled(MuiAccordionDetails)({
-    margin: "0px",
-    padding: "0px"
-})
-
 interface NewTechniqueDialogProps {
     dialogOpen: boolean;
     onClose: () => void;
@@ -70,20 +44,20 @@ interface NewTechniqueDialogProps {
         openGuardOptions: string[];
     } | null;
     techniqueList: Technique[];
-}
+};
 
 interface DescriptionMap {
     [key: string]: string | undefined;
-}
+};
 
 interface Descriptions {
     [key: string]: DescriptionMap
-}
+};
 
 export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
-    const [wasSubmitted, setWasSubmitted] = React.useState(false)
+    const [wasSubmitted, setWasSubmitted] = React.useState(false);
     
-    const [localPositionState, setLocalPositionState] = React.useState('')
+    const [localPositionState, setLocalPositionState] = React.useState('');
 
     const handlePositionBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         const newPosition = event.target.value || '';
@@ -97,7 +71,7 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
             position: {},
             type: {},
             openGuard: {},
-        }
+        };
 
         techniques.forEach(technique => {
             if (technique.position && technique.position.title) {
@@ -114,9 +88,9 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
         });
 
         return descriptions
-    }
+    };
     
-    const descriptions = generateDescriptionObjects(props.techniqueList)
+    const descriptions = generateDescriptionObjects(props.techniqueList);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -171,5 +145,5 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                 </DialogContent>
             </form>
         </Dialog>
-    )
-}
+    );
+};

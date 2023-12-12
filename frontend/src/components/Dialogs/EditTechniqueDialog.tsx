@@ -5,16 +5,16 @@ import DialogContent from '@mui/material/DialogContent';
 import MuiCard from '@mui/material/Card'
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
-import theme from '../theme/Theme';
+import theme from '../../theme/Theme';
 import Autocomplete from '@mui/material/Autocomplete'
 import MuiAccordion from '@mui/material/Accordion'
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { FastTextField } from './FastTextField';
+import { FastTextField } from '../Fields/FastTextField';
 import { CardContent, styled } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem'
-import { Collection, Technique } from 'common';
+import { Technique } from 'common';
 
 
 const TextField = styled(FastTextField)({
@@ -54,22 +54,37 @@ const AccordionDetails = styled(MuiAccordionDetails)({
     padding: "0px"
 })
 
-interface EditCollectionDialogProps {
+interface TechniqueDTO {
+    title: string,
+    videoSrc: string | undefined,
+    description: string,
+    globalNotes: string | undefined,
+    gi: string,
+    hierarchy: string,
+    type: string,
+    typeDescription: string | undefined,
+    position: string,
+    positionDescription: string | undefined,
+    openGuard: string | undefined,
+    openGuardDescription: string | undefined,
+}
+
+interface EditTechniqueDialogProps {
     dialogOpen: boolean;
     onClose: () => void;
     onCancel: () => void;
     onDelete: (techniqueId: string) => void;
     onSave: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     wasSubmitted: boolean;
-    editingCollection: Collection | null;
-    editingCollectionId: string;
-    editingCollectionOptions: {
-        titleOptions: string[];
-        giOptions: string[];
-        hierarchyOptions: string[];
-        typeOptions: string[];
-        positionOptions: string[];
-        openGuardOptions: string[];
+    editingTechnique: TechniqueDTO;
+    editingTechniqueId: string;
+    editingTechniqueOptions: {
+        titleOptions: string[],
+        positionOptions: string[],
+        hierarchyOptions: string[],
+        typeOptions: string[],
+        openGuardOptions: string[],
+        giOptions: string[]
     } | null;
     techniqueList: Technique[];
 }
@@ -84,8 +99,8 @@ interface Descriptions {
     openGuards: DescriptionMap;
 }
 
-export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
-    const [localPositionState, setLocalPositionState] = React.useState(props.editingCollection?.position?.title || '')
+export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
+    const [localPositionState, setLocalPositionState] = React.useState(props.editingTechnique?.position || '')
 
     const [localPositionDescriptionState, setLocalPositionDescriptionState] = React.useState<null | string>(null)
     const [localTypeDescriptionState, setLocalTypeDescriptionState] = React.useState<null | string>(null)
@@ -136,10 +151,10 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
     const descriptions = generateDescriptionObjects(props.techniqueList)
 
     React.useEffect(() => {
-        if (props.editingCollection?.openGuard?.description) setLocalOpenGuardDescriptionState(props.editingCollection?.openGuard.description)
-        if (props.editingCollection?.position?.description) setLocalPositionDescriptionState(props.editingCollection?.position?.description)
-        if (props.editingCollection?.type?.description) setLocalTypeDescriptionState(props.editingCollection?.type?.description)
-    },[props.editingCollection?.openGuard?.description, props.editingCollection?.position?.description, props.editingCollection?.type?.description]
+        if (props.editingTechnique?.openGuardDescription) setLocalOpenGuardDescriptionState(props.editingTechnique?.openGuardDescription)
+        if (props.editingTechnique?.positionDescription) setLocalPositionDescriptionState(props.editingTechnique?.positionDescription)
+        if (props.editingTechnique?.typeDescription) setLocalTypeDescriptionState(props.editingTechnique?.typeDescription)
+    },[props.editingTechnique?.openGuardDescription, props.editingTechnique?.positionDescription, props.editingTechnique?.typeDescription]
     )
     
     return (
@@ -149,7 +164,7 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
                         <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
                         <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
-                        <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingCollectionId); }}
+                        <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingTechniqueId); }}
                             style={{backgroundColor: theme.palette.error.main}}
                         >Delete</Button>
                     </Box>
@@ -158,9 +173,10 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                 <DialogContent dividers={true} sx={{padding: "0px", borderBottom: "none"}}>
                     <Card>
                         <CardContent>
+                        
                             <Autocomplete
-                                options={props.editingCollectionOptions?.titleOptions || ['']}
-                                defaultValue={props.editingCollection?.title || ''}
+                                options={props.editingTechniqueOptions?.titleOptions || []}
+                                defaultValue={props.editingTechnique?.title || ''}
                                 ListboxProps={{onClick: event => event?.stopPropagation()}}
                                 autoComplete
                                 autoSelect
@@ -173,21 +189,21 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                                 }}
                                 renderInput={(params) => (
                                     <TextField name="title" onClick={event => event?.stopPropagation()} required
-                                    wasSubmitted={props.wasSubmitted} {...params} label="Collection Title" onBlur={handlePositionBlur}/>
+                                    wasSubmitted={props.wasSubmitted} {...params} label="Technique Title" onBlur={handlePositionBlur}/>
                                 )}
                             />
 
                             <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth required
-                            defaultValue={props.editingCollection?.description} multiline rows={4} name="description" label="Collection Description"/>
+                            defaultValue={props.editingTechnique?.description} multiline rows={4} name="description" label="Technique Description"/>
 
                             <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth 
-                            defaultValue={props.editingCollection?.globalNotes} multiline rows={4} name="globalNotes" label="Global Notes"/>
+                            defaultValue={props.editingTechnique?.globalNotes} multiline rows={4} name="globalNotes" label="Global Notes"/>
                                     
                             <Accordion disableGutters >
                                 <AccordionSummary expandIcon={<ExpandMore />}  aria-controls="panel1a-content">
                                     <Autocomplete
-                                        options={props.editingCollectionOptions?.positionOptions || ['']}
-                                        defaultValue={props.editingCollection?.position?.title || ''}
+                                        options={props.editingTechniqueOptions?.positionOptions || []}
+                                        defaultValue={props.editingTechnique?.position || ''}
                                         ListboxProps={{onClick: event => event?.stopPropagation()}}
                                         autoComplete
                                         autoSelect
@@ -208,9 +224,9 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                                 </AccordionDetails>
                             </Accordion>
 
-                            <TextField wasSubmitted={props.wasSubmitted} select defaultValue={props.editingCollection?.hierarchy || ''} 
+                            <TextField wasSubmitted={props.wasSubmitted} select defaultValue={props.editingTechnique?.hierarchy || ''} 
                             fullWidth name="hierarchy" label="Hierarchy" required> 
-                                {props.editingCollectionOptions?.hierarchyOptions.map(option => (
+                                {props.editingTechniqueOptions?.hierarchyOptions.map(option => (
                                     <MenuItem key={option} value={option}>
                                         {option}
                                     </MenuItem>
@@ -220,8 +236,8 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                             <Accordion disableGutters>
                                 <AccordionSummary expandIcon={<ExpandMore/>} aria-controls="panel1a-content">
                                     <Autocomplete
-                                        options={props.editingCollectionOptions?.typeOptions || ['']}
-                                        defaultValue={props.editingCollection?.type?.title || ''}
+                                        options={props.editingTechniqueOptions?.typeOptions || []}
+                                        defaultValue={props.editingTechnique?.type || ''}
                                         ListboxProps={{onClick: event => event?.stopPropagation()}}
                                         autoComplete
                                         autoSelect
@@ -242,11 +258,20 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                                 </AccordionDetails>
                             </Accordion>
 
+                            <TextField wasSubmitted={props.wasSubmitted} select defaultValue={props.editingTechnique?.gi || ''} 
+                            fullWidth name="gi" label="Gi" required>
+                                {props.editingTechniqueOptions?.giOptions.map(option => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+
                             <Accordion disableGutters hidden={!isPositionOpenGuard}>
                                     <AccordionSummary expandIcon={<ExpandMore/>} aria-controls="panel1a-content">
                                     <Autocomplete
-                                        options={props.editingCollectionOptions?.openGuardOptions || ['']}
-                                        defaultValue={props.editingCollection?.openGuard?.title || ''}
+                                        options={props.editingTechniqueOptions?.openGuardOptions || []}
+                                        defaultValue={props.editingTechnique?.openGuard || ''}
                                         ListboxProps={{onClick: event => event?.stopPropagation()}}
                                         autoComplete
                                         autoSelect
@@ -269,14 +294,8 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                                 </AccordionDetails>
                             </Accordion>
 
-                            <TextField wasSubmitted={props.wasSubmitted} select defaultValue={props.editingCollection?.gi || ''} 
-                            fullWidth name="gi" label="Gi" required>
-                                {props.editingCollectionOptions?.giOptions.map(option => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                            <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth label="Video Source"
+                            defaultValue={props.editingTechnique?.videoSrc} name="videoSrc"/>
                         </CardContent>
                     </Card>
                 </DialogContent>

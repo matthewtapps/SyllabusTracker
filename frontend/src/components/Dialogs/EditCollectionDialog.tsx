@@ -5,15 +5,16 @@ import DialogContent from '@mui/material/DialogContent';
 import MuiCard from '@mui/material/Card'
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
+import theme from '../../theme/Theme';
 import Autocomplete from '@mui/material/Autocomplete'
 import MuiAccordion from '@mui/material/Accordion'
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { FastTextField } from './FastTextField';
+import { FastTextField } from '../Fields/FastTextField';
 import { CardContent, styled } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem'
-import { Technique } from 'common';
+import { Collection, Technique } from 'common';
 
 
 const TextField = styled(FastTextField)({
@@ -53,13 +54,16 @@ const AccordionDetails = styled(MuiAccordionDetails)({
     padding: "0px"
 })
 
-interface NewCollectionDialogProps {
+interface EditCollectionDialogProps {
     dialogOpen: boolean;
     onClose: () => void;
     onCancel: () => void;
+    onDelete: (techniqueId: string) => void;
     onSave: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     wasSubmitted: boolean;
-    collectionOptions: {
+    editingCollection: Collection | null;
+    editingCollectionId: string;
+    editingCollectionOptions: {
         titleOptions: string[];
         giOptions: string[];
         hierarchyOptions: string[];
@@ -80,8 +84,8 @@ interface Descriptions {
     openGuards: DescriptionMap;
 }
 
-export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
-    const [localPositionState, setLocalPositionState] = React.useState('')
+export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
+    const [localPositionState, setLocalPositionState] = React.useState(props.editingCollection?.position?.title || '')
 
     const [localPositionDescriptionState, setLocalPositionDescriptionState] = React.useState<null | string>(null)
     const [localTypeDescriptionState, setLocalTypeDescriptionState] = React.useState<null | string>(null)
@@ -131,6 +135,13 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
     
     const descriptions = generateDescriptionObjects(props.techniqueList)
 
+    React.useEffect(() => {
+        if (props.editingCollection?.openGuard?.description) setLocalOpenGuardDescriptionState(props.editingCollection?.openGuard.description)
+        if (props.editingCollection?.position?.description) setLocalPositionDescriptionState(props.editingCollection?.position?.description)
+        if (props.editingCollection?.type?.description) setLocalTypeDescriptionState(props.editingCollection?.type?.description)
+    },[props.editingCollection?.openGuard?.description, props.editingCollection?.position?.description, props.editingCollection?.type?.description]
+    )
+    
     return (
         <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="lg">
             <form noValidate onSubmit={props.onSave}>
@@ -138,6 +149,9 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
                         <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
                         <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
+                        <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingCollectionId); }}
+                            style={{backgroundColor: theme.palette.error.main}}
+                        >Delete</Button>
                     </Box>
                 </DialogTitle>
         
@@ -145,7 +159,8 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                     <Card>
                         <CardContent>
                             <Autocomplete
-                                options={props.collectionOptions?.titleOptions || []}
+                                options={props.editingCollectionOptions?.titleOptions || ['']}
+                                defaultValue={props.editingCollection?.title || ''}
                                 ListboxProps={{onClick: event => event?.stopPropagation()}}
                                 autoComplete
                                 autoSelect
@@ -163,15 +178,16 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                             />
 
                             <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth required
-                            multiline rows={4} name="description" label="Collection Description"/>
+                            defaultValue={props.editingCollection?.description} multiline rows={4} name="description" label="Collection Description"/>
 
                             <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth 
-                            multiline rows={4} name="globalNotes" label="Global Notes"/>
+                            defaultValue={props.editingCollection?.globalNotes} multiline rows={4} name="globalNotes" label="Global Notes"/>
                                     
                             <Accordion disableGutters >
                                 <AccordionSummary expandIcon={<ExpandMore />}  aria-controls="panel1a-content">
                                     <Autocomplete
-                                        options={props.collectionOptions?.positionOptions || []}
+                                        options={props.editingCollectionOptions?.positionOptions || ['']}
+                                        defaultValue={props.editingCollection?.position?.title || ''}
                                         ListboxProps={{onClick: event => event?.stopPropagation()}}
                                         autoComplete
                                         autoSelect
@@ -179,21 +195,22 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                                         freeSolo
                                         onBlur={handlePositionBlur}
                                         renderInput={(params) => (
-                                            <TextField name="position" onClick={event => event?.stopPropagation()}
+                                            <TextField name="position" onClick={event => event?.stopPropagation()} required
                                             wasSubmitted={props.wasSubmitted} {...params} label="Position" />
                                         )}
                                     />
                                 </AccordionSummary>
                                         
                                 <AccordionDetails>
-                                    <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth label="Position Description"
+                                    <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth label="Position Description" required
                                     value={localPositionDescriptionState || ''} 
                                     onChange={e => setLocalPositionDescriptionState(e.target.value)} multiline rows={4} name='positionDescription'/>
                                 </AccordionDetails>
                             </Accordion>
 
-                            <TextField wasSubmitted={props.wasSubmitted} select fullWidth name="hierarchy" label="Hierarchy" defaultValue=""> 
-                                {props.collectionOptions?.hierarchyOptions.map(option => (
+                            <TextField wasSubmitted={props.wasSubmitted} select defaultValue={props.editingCollection?.hierarchy || ''} 
+                            fullWidth name="hierarchy" label="Hierarchy" required> 
+                                {props.editingCollectionOptions?.hierarchyOptions.map(option => (
                                     <MenuItem key={option} value={option}>
                                         {option}
                                     </MenuItem>
@@ -203,7 +220,8 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                             <Accordion disableGutters>
                                 <AccordionSummary expandIcon={<ExpandMore/>} aria-controls="panel1a-content">
                                     <Autocomplete
-                                        options={props.collectionOptions?.typeOptions || []}
+                                        options={props.editingCollectionOptions?.typeOptions || ['']}
+                                        defaultValue={props.editingCollection?.type?.title || ''}
                                         ListboxProps={{onClick: event => event?.stopPropagation()}}
                                         autoComplete
                                         autoSelect
@@ -211,14 +229,14 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                                         freeSolo
                                         onBlur={handleTypeBlur}
                                         renderInput={(params) => (
-                                            <TextField name="type" onClick={event => event?.stopPropagation()}
+                                            <TextField name="type" onClick={event => event?.stopPropagation()} required
                                             wasSubmitted={props.wasSubmitted} {...params} label="Type"/>
                                         )}
                                     />
                                 </AccordionSummary>
                                         
                                 <AccordionDetails>
-                                    <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth label="Type Description"
+                                    <TextField wasSubmitted={props.wasSubmitted} size="small" fullWidth required label="Type Description"
                                     value={localTypeDescriptionState || ''}  
                                         onChange={e => setLocalTypeDescriptionState(e.target.value)} multiline rows={4} name='typeDescription' />
                                 </AccordionDetails>
@@ -227,7 +245,8 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                             <Accordion disableGutters hidden={!isPositionOpenGuard}>
                                     <AccordionSummary expandIcon={<ExpandMore/>} aria-controls="panel1a-content">
                                     <Autocomplete
-                                        options={props.collectionOptions?.openGuardOptions || []}
+                                        options={props.editingCollectionOptions?.openGuardOptions || ['']}
+                                        defaultValue={props.editingCollection?.openGuard?.title || ''}
                                         ListboxProps={{onClick: event => event?.stopPropagation()}}
                                         autoComplete
                                         autoSelect
@@ -250,8 +269,9 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
                                 </AccordionDetails>
                             </Accordion>
 
-                            <TextField wasSubmitted={props.wasSubmitted} select fullWidth name="gi" label="Gi" defaultValue="">
-                                {props.collectionOptions?.giOptions?.map(option => (
+                            <TextField wasSubmitted={props.wasSubmitted} select defaultValue={props.editingCollection?.gi || ''} 
+                            fullWidth name="gi" label="Gi" required>
+                                {props.editingCollectionOptions?.giOptions.map(option => (
                                     <MenuItem key={option} value={option}>
                                         {option}
                                     </MenuItem>

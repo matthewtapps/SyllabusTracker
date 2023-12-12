@@ -3,7 +3,7 @@ import { Role } from 'common'
 import StudentCollections from '../users/student/Collections';
 import CoachCollections from '../users/coach/Collections';
 import { useAuth0 } from '@auth0/auth0-react'
-import BaseLayout from '../../components/BaseLayout';
+import BaseLayout from '../../components/Base/BaseLayout';
 import { decodeAndAddRole } from '../../util/Utilities';
 
 

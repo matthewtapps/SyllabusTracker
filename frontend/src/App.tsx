@@ -6,9 +6,9 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/Theme";
 import CollectionsPage from './pages/navigation/CollectionsPage'
 import { CallbackPage } from './pages/navigation/CallbackPage';
-import Pageloader from './components/PageLoader';
+import Pageloader from './components/Base/PageLoader';
 import { useAuth0 } from "@auth0/auth0-react";
-import { AuthenticationGuard } from './components/AuthenticationGuard';
+import { AuthenticationGuard } from './components/Authentication/AuthenticationGuard';
 import { ProfilePage } from './pages/navigation/ProfilePage';
 import StudentsPage from './pages/navigation/StudentsPage';
 

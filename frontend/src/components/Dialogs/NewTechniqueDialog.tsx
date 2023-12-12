@@ -5,12 +5,12 @@ import DialogContent from '@mui/material/DialogContent';
 import MuiCard from '@mui/material/Card'
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
-import { FastTextField } from './FastTextField';
+import { FastTextField } from '../Fields/FastTextField';
 import { CardContent, styled } from '@mui/material';
 import { Technique } from 'common';
-import { TitleTextField } from './TitleTextField';
-import { TextFieldWithDescriptionField } from './TextFieldWithDescriptionField';
-import { SelectField } from './SelectField';
+import { TitleTextField } from '../Fields/TitleTextField';
+import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
+import { SelectField } from '../Fields/SelectField';
 
 
 const TextField = styled(FastTextField)({

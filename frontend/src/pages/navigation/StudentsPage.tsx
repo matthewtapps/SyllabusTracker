@@ -1,7 +1,7 @@
 import React from 'react';
 import { Role } from 'common'
 import { useAuth0 } from '@auth0/auth0-react'
-import BaseLayout from '../../components/BaseLayout';
+import BaseLayout from '../../components/Base/BaseLayout';
 import { decodeAndAddRole } from '../../util/Utilities';
 import CoachStudents from '../users/coach/Students';
 

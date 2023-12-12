@@ -1,6 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
-import BaseLayout from "../../components/BaseLayout";
+import BaseLayout from "../../components/Base/BaseLayout";
 import Typography from '@mui/material/Typography'
 import { decodeAndAddRole } from "../../util/Utilities";
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppBar, Toolbar, IconButton, Typography, DialogActions, DialogContent, DialogContentText, DialogTitle, Drawer } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
-import AuthButtons from './AuthButtons';
+import AuthButtons from '../Authentication/AuthButtons';
 
 
 interface NavBarProps {

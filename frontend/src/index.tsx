@@ -6,7 +6,7 @@ import './css/main.css';
 import './css/fonts.css'
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Auth0ProviderWithNavigate } from './components/Auth0ProviderWithNavigate';
+import { Auth0ProviderWithNavigate } from './components/Authentication/Auth0ProviderWithNavigate';
 
 
 const root = ReactDOM.createRoot(

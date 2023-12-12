@@ -309,7 +309,6 @@ function CoachTechniques(): JSX.Element {
                 onClose={handleCancelClick}
                 onCancel={handleCancelClick}
                 onSave={handleNewTechniqueSaveClick}
-                wasSubmitted={false}
                 techniqueList={techniquesList}
                 techniqueOptions={techniqueSuggestions}
             />

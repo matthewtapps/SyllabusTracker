@@ -16,6 +16,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { Technique } from 'common';
 import { TitleTextField } from './TitleTextField';
 import { TextFieldWithDescriptionField } from './TextFieldWithDescriptionField';
+import { SelectField } from './SelectField';
 
 
 const TextField = styled(FastTextField)({
@@ -153,13 +154,7 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                             label="Position" descriptionLabel="Position Description" options={props.techniqueOptions?.positionOptions} descriptions={descriptions} 
                             onPositionBlur={handlePositionBlur} />
 
-                            <TextField wasSubmitted={wasSubmitted} select fullWidth name="hierarchy" label="Hierarchy" defaultValue=""> 
-                                {props.techniqueOptions?.hierarchyOptions.map(option => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                            <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" options={props.techniqueOptions?.giOptions} required/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type" 
                             label="Type" descriptionLabel="Type Description" options={props.techniqueOptions?.typeOptions} descriptions={descriptions} />
@@ -168,13 +163,7 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                             label="Open Guard" descriptionLabel="Open Guard Description" options={props.techniqueOptions?.openGuardOptions} 
                             descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard}/>
 
-                            <TextField wasSubmitted={wasSubmitted} select fullWidth name="gi" label="Gi" defaultValue="" required>
-                                {props.techniqueOptions?.giOptions?.map(option => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                            <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" options={props.techniqueOptions?.giOptions} required/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth name="videoSrc" label="Video Link"/>
                         </CardContent>

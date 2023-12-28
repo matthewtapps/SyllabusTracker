@@ -665,7 +665,6 @@ function CoachCollections(): JSX.Element {
                 editingTechnique={editedTechnique}
                 editingTechniqueId={editingTechniqueId || ""}
                 editingTechniqueOptions={techniqueSuggestions}
-                wasSubmitted={false}
                 techniqueList={techniques}
             />
 
@@ -678,7 +677,6 @@ function CoachCollections(): JSX.Element {
                 editingCollection={editingCollection}
                 editingCollectionId={editingCollectionId}
                 editingCollectionOptions={collectionSuggestions}
-                wasSubmitted={false}
                 techniqueList={techniques}
             />
 

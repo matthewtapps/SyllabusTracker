@@ -23,7 +23,7 @@ SelectField.defaultProps = {
 }
 
 export function SelectField({ name, wasSubmitted, required, options, defaultValue, ...otherProps }: SelectFieldProps) {
-    const [fieldValue, setFieldValue] = React.useState('');
+    const [fieldValue, setFieldValue] = React.useState(defaultValue || '');
     const [touched, setTouched] = React.useState(false);
     const displayErrorMessage = ((wasSubmitted || touched) && required && fieldValue === '');
 
@@ -38,7 +38,7 @@ export function SelectField({ name, wasSubmitted, required, options, defaultValu
             select
             fullWidth 
             name={name} 
-            defaultValue={defaultValue || ''}
+            value={fieldValue || ''}
             required={required} 
             error={displayErrorMessage} 
             aria-describedby={displayErrorMessage ? `${name}-error` : undefined}

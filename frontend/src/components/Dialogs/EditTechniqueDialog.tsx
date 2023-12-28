@@ -52,7 +52,6 @@ interface EditTechniqueDialogProps {
     onCancel: () => void;
     onDelete: (techniqueId: string) => void;
     onSave: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
-    wasSubmitted: boolean;
     editingTechnique: TechniqueDTO;
     editingTechniqueId: string;
     editingTechniqueOptions: {
@@ -141,7 +140,7 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
                             name="title" label="Technique Title" options={props.editingTechniqueOptions?.titleOptions}/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingTechnique?.description || ''}
-                             multiline rows={4} name="description" label="Technique Description"/>
+                            multiline rows={4} name="description" label="Technique Description"/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth defaultValue={props.editingTechnique?.globalNotes || ''} 
                             multiline rows={4} name="globalNotes" label="Global Notes"/>

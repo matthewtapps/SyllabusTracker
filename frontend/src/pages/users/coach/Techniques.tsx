@@ -301,7 +301,6 @@ function CoachTechniques(): JSX.Element {
                 editingTechnique={editedTechnique}
                 editingTechniqueId={editingTechniqueId || ""}
                 editingTechniqueOptions={techniqueSuggestions}
-                wasSubmitted={false}
                 techniqueList={techniquesList}
             />
             <NewTechniqueDialog

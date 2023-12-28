@@ -44,7 +44,7 @@ const CoachStudents: React.FC = () => {
             {students ? 
             students.length > 0 ?
             <Card><StudentList students={students}/></Card>
-            : <Card><CardContent><Typography>Empty student data received (this probably shouldn't happen).</Typography></CardContent></Card>
+            : <Card><CardContent><Typography>Empty student data received (this probably shouldn't happen)</Typography></CardContent></Card>
             : <Card><CardContent><Typography>Loading...</Typography></CardContent></Card>}
         </div>
     )

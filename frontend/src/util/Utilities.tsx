@@ -293,12 +293,15 @@ export const postCollection = async (
             },
             body: JSON.stringify({collection: collection}),
         });
+
+        console.log(collection)
   
         if (!response.ok) {
             throw new Error(`Failed with status ${response.status}`);
         }
   
         const responseData = await response.json();
+        
         return responseData
         } catch (error) {
             console.error('Error:', error);

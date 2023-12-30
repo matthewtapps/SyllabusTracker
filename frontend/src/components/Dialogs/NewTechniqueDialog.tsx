@@ -86,7 +86,11 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
         return descriptions
     };
     
-    const descriptions = generateDescriptionObjects(props.techniqueList);
+    const [descriptions, setDescriptions] = React.useState(generateDescriptionObjects(props.techniqueList));
+
+    React.useEffect(() => {
+        setDescriptions(generateDescriptionObjects(props.techniqueList))
+    }, [props.techniqueList]) 
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

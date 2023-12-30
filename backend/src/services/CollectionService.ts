@@ -54,19 +54,31 @@ export class CollectionService {
         collection.globalNotes = data.collection.globalNotes ?? null;
         collection.gi = data.collection.gi ?? null;
         collection.hierarchy = data.collection.hierarchy ?? null;
-
+        
         if (data.collection.type) {
             let type = await typeRepo.findOne({ where: { title: data.collection.type.title }});
-            collection.type = type;
+            if (!type && data.collection.type.title && data.collection.type.description) {
+                type = typeRepo.create({ title: data.collection.type.title, description: data.collection.type.description });
+                type = await typeRepo.save(type);
+            }
+            collection.type = type
         } else collection.type = null;
 
         if (data.collection.position) {
             let position = await positionRepo.findOne({ where: { title: data.collection.position.title }});
-            collection.position = position;
+            if (!position&& data.collection.position.title && data.collection.position.description) {
+                position = positionRepo.create({ title: data.collection.position.title, description: data.collection.position.description });
+                await positionRepo.save(position);
+            }
+            collection.position = position
         } else collection.position = null;
 
         if (data.collection.openGuard) {
             let openGuard = await openGuardRepo.findOne({ where: { title: data.collection.openGuard.title } });
+            if (!openGuard && data.collection.openGuard.title && data.collection.openGuard.description) {
+                openGuard = openGuardRepo.create({ title: data.collection.openGuard.title, description: data.collection.openGuard.description });
+                await openGuardRepo.save(openGuard);
+            }
             collection.openGuard = openGuard
         } else collection.openGuard = null;
 
@@ -94,8 +106,9 @@ export class CollectionService {
             let type = await typeRepo.findOne({ where: { title: data.collection.type.title }});
             if (!type && data.collection.type.title && data.collection.type.description) {
                 type = typeRepo.create({ title: data.collection.type.title, description: data.collection.type.description });
-                await typeRepo.save(type);
+                type = await typeRepo.save(type);
             }
+            collection.type = type
         } else collection.type = null;
 
         if (data.collection.position) {
@@ -104,19 +117,16 @@ export class CollectionService {
                 position = positionRepo.create({ title: data.collection.position.title, description: data.collection.position.description });
                 await positionRepo.save(position);
             }
+            collection.position = position
         } else collection.position = null;
 
         if (data.collection.openGuard) {
-            let openGuard = null
-            if (data.collection.openGuard) {
-                openGuard = await openGuardRepo.findOne({ where: { title: data.collection.openGuard.title } });
-                if (!openGuard && data.collection.openGuard.title && data.collection.openGuard.description) {
-                    if (!openGuard && data.collection.openGuard.title) {
-                        openGuard = openGuardRepo.create({ title: data.collection.openGuard.title, description: data.collection.openGuard.description });
-                        await openGuardRepo.save(openGuard);
-                    }
-                }
+            let openGuard = await openGuardRepo.findOne({ where: { title: data.collection.openGuard.title } });
+            if (!openGuard && data.collection.openGuard.title && data.collection.openGuard.description) {
+                openGuard = openGuardRepo.create({ title: data.collection.openGuard.title, description: data.collection.openGuard.description });
+                await openGuardRepo.save(openGuard);
             }
+            collection.openGuard = openGuard
         } else collection.openGuard = null;
 
         return await collectionRepo.save(collection)        

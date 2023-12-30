@@ -29,10 +29,8 @@ export class TechniqueService {
         if (data.technique.openGuard) {
             openGuard = await openGuardRepo.findOne({ where: { title: data.technique.openGuard.title } });
             if (!openGuard && data.technique.openGuard.title && data.technique.openGuard.description) {
-                if (!openGuard && data.technique.openGuard.title) {
-                    openGuard = openGuardRepo.create({ title: data.technique.openGuard.title, description: data.technique.openGuard.description });
-                    await openGuardRepo.save(openGuard);
-                }
+                openGuard = openGuardRepo.create({ title: data.technique.openGuard.title, description: data.technique.openGuard.description });
+                await openGuardRepo.save(openGuard);
             }
         }
 

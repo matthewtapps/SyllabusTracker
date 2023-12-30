@@ -6,6 +6,7 @@ import { Collection } from '../entities/Collection';
 import { Technique } from '../entities/Technique';
 import { CollectionTechnique } from '../entities/CollectionTechnique';
 import CollectionDTO from '../dtos/CollectionDTO';
+import { NewCollection, UpdateCollection } from 'common';
 
 export class CollectionService {
     async setCollectionTechniques(data: {collectionId: string, techniques: {index: number, technique: Technique}[] }): Promise<CollectionTechnique[]> {
@@ -40,20 +41,47 @@ export class CollectionService {
         return await collectionTechniqueRepo.save(collectionTechniques);
     }
 
-    async createOrUpdateCollection(data: {collectionId: string | null, collection: CollectionDTO}): Promise<Collection> {
+    async createCollection(data: {collection: NewCollection}): Promise<Collection> {
         const collectionRepo = AppDataSource.getRepository(Collection);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
 
-        let collection;
-        if (data.collectionId) {
-            collection = await collectionRepo.findOne({ where: { collectionId: data.collectionId } });
-            if (!collection) {
-                throw new Error('Collection not found');
-            }
-        } else {
-            collection = new Collection();
+        let collection = new Collection();
+
+        collection.title = data.collection.title;
+        collection.description = data.collection.description;
+        collection.globalNotes = data.collection.globalNotes ?? null;
+        collection.gi = data.collection.gi ?? null;
+        collection.hierarchy = data.collection.hierarchy ?? null;
+
+        if (data.collection.type) {
+            let type = await typeRepo.findOne({ where: { title: data.collection.type.title }});
+            collection.type = type;
+        } else collection.type = null;
+
+        if (data.collection.position) {
+            let position = await positionRepo.findOne({ where: { title: data.collection.position.title }});
+            collection.position = position;
+        } else collection.position = null;
+
+        if (data.collection.openGuard) {
+            let openGuard = await openGuardRepo.findOne({ where: { title: data.collection.openGuard.title } });
+            collection.openGuard = openGuard
+        } else collection.openGuard = null;
+
+        return await collectionRepo.save(collection)        
+    };
+
+    async updateCollection(data: {collection: UpdateCollection}): Promise<Collection> {
+        const collectionRepo = AppDataSource.getRepository(Collection);
+        const typeRepo = AppDataSource.getRepository(TechniqueType);
+        const positionRepo = AppDataSource.getRepository(Position);
+        const openGuardRepo = AppDataSource.getRepository(OpenGuard);
+
+        let collection = await collectionRepo.findOne({ where: { collectionId: data.collection.collectionId } });
+        if (!collection) {
+            throw new Error('Collection not found');
         }
 
         collection.title = data.collection.title;

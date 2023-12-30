@@ -7,7 +7,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Technique } from 'common';
-import { FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Button, Box } from '@mui/material';
 
 
 
@@ -135,9 +135,9 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
     return (
         <Accordion disableGutters>
             <AccordionSummary expandIcon={<ExpandMore/>}>
+                <Box display="flex" flexDirection="column" maxWidth="95%">
                 <TextField
                     fullWidth
-                    sx={{maxWidth: "95%"}}
                     label="Filter Techniques"
                     value={filters.title}
                     onChange={e => {
@@ -149,11 +149,13 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                     variant="outlined"
                     size="small"
                 />
+                {props.matchTechniqueFilters && (
+                    <Button variant="contained" fullWidth size="small" sx={{marginTop: "5px"}} onClick={handleMatchFiltersClick}>Match to Collection Filters</Button>
+                )}
+                </Box>
             </AccordionSummary>
             <AccordionDetails>
-                {props.matchTechniqueFilters && (
-                    <Button variant="contained" fullWidth size="small" onClick={handleMatchFiltersClick}>Match to Collection Filters</Button>
-                )}
+                
                 <FormControl fullWidth size="small" sx={{ marginTop: "10px" }}>
                     <InputLabel id="gi-select-label">Yes Gi or No Gi</InputLabel>
                     <Select

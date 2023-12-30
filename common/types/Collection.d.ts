@@ -11,6 +11,8 @@ export interface Collection {
     type?: DTO | null;
     position?: DTO | null;
     openGuard?: DTO | null;
+    lastUpdated: Date;
+    created: Date;
 }
 interface DTO {
     title: string;

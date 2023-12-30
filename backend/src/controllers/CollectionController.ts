@@ -2,10 +2,20 @@ import { Request, Response } from 'express';
 import { CollectionService } from '../services/CollectionService';
 
 export class CollectionController {
-    static async createOrUpdateCollection(req: Request, res: Response) {
+    static async createCollection(req: Request, res: Response) {
         const collectionService = new CollectionService();
         try {
-            const collection = await collectionService.createOrUpdateCollection(req.body);
+            const collection = await collectionService.createCollection(req.body);
+            res.json(collection);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
+
+    static async updateCollection(req: Request, res: Response) {
+        const collectionService = new CollectionService();
+        try {
+            const collection = await collectionService.updateCollection(req.body);
             res.json(collection);
         } catch (error) {
             res.status(400).json({ error: error.message });

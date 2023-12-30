@@ -6,19 +6,21 @@ import { StudentTechniqueController } from './controllers/StudentTechniqueContro
 
 const router = Router();
 
-router.post('/technique', TechniqueController.createOrUpdateTechnique);
+router.post('/technique', TechniqueController.createTechnique);
+router.put('/technique', TechniqueController.updateTechnique);
 router.get('/technique', TechniqueController.getAllTechniques);
+router.delete('/technique', TechniqueController.deleteTechnique);
 router.get('/technique/types', TechniqueController.getAllTechniqueTypes);
 router.get('/technique/titles', TechniqueController.getAllTechniqueTitles)
 router.get('/technique/positions', TechniqueController.getAllTechniquePositions);
 router.get('/technique/openguards', TechniqueController.getAllTechniqueOpenGuards);
-router.post('/newCollection', CollectionController.createOrUpdateCollection);
-router.post('/addToCollection', CollectionController.setCollectionTechniques);
+router.post('/collection', CollectionController.createCollection);
+router.put('/collection', CollectionController.updateCollection);
 router.get('/collection', CollectionController.getAllCollections);
+router.delete('/collection', CollectionController.deleteCollection);
 router.get('/collection/titles', CollectionController.getAllCollectionTitles);
+router.post('/collectionTechnique', CollectionController.setCollectionTechniques);
 router.get('/collectiontechnique', CollectionController.getCollectionTechniques);
-router.post('/deleteCollection', CollectionController.deleteCollection);
-router.post('/deleteTechnique', TechniqueController.deleteTechnique)
 router.get('/students', StudentController.fetchStudents);
 router.post('/student-techniques', StudentTechniqueController.addStudentTechniques)
 router.put('/student-technique/:userId/:techniqueId', StudentTechniqueController.updateStudentTechnique)

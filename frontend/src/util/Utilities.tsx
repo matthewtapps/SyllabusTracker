@@ -1,21 +1,8 @@
-import { Technique, Hierarchy, Gi, Collection, CollectionWithoutTechniquesOrId, CollectionTechnique, Role } from "common";
+import { Technique, Hierarchy, Gi, Collection, CollectionTechnique, Role, NewTechnique, UpdateTechnique, NewCollection, UpdateCollection } from "common";
 import { User as Auth0User } from '@auth0/auth0-react'
 
 
 const API_SERVER_URL = process.env.REACT_APP_API_SERVER_URL
-
-interface TechniqueDTO {
-    title: string;
-    videoSrc: string | null;
-    description: string;
-    globalNotes: string | null;
-    gi: Gi;
-    hierarchy: Hierarchy;
-    type: {title: string, description: string};
-    position: {title: string, description: string};
-    openGuard: {title: string, description: string} | null;
-    techniqueId: string
-}
 
 export const decodeAndAddRole = (userToken: Auth0User) =>  {
     if (!Object.values(Role).includes(userToken[`https://syllabustracker.matthewtapps.com/roles`][0])) {
@@ -31,7 +18,7 @@ export const decodeAndAddRole = (userToken: Auth0User) =>  {
     return user
 }
 
-export const transformTechniqueForBackend = (technique: any): Technique | null => {
+export const transformTechniqueForPost = (technique: any): NewTechnique | null => {
     if (!Object.values(Gi).includes(technique.gi)) {
         alert('Invalid Gi value');
         return null;
@@ -42,7 +29,7 @@ export const transformTechniqueForBackend = (technique: any): Technique | null =
         return null;
     }
 
-    const transformedTechnique: TechniqueDTO = {
+    const transformedTechnique: NewTechnique = {
         title: technique.title,
         videoSrc: technique.videoSrc,
         description: technique.description,
@@ -57,8 +44,7 @@ export const transformTechniqueForBackend = (technique: any): Technique | null =
             title: technique.position,
             description: technique.positionDescription
         },
-        openGuard: null,
-        techniqueId: ""
+        openGuard: null
     };
 
     if (technique.openGuard && technique.openGuardDescription) {
@@ -71,7 +57,47 @@ export const transformTechniqueForBackend = (technique: any): Technique | null =
     return transformedTechnique;
 };
 
-export const postTechnique = async (techniqueId: string | null, technique: Technique, accessToken: string | null): Promise<Technique | null> => {
+export const transformTechniqueForPut = (technique: any): UpdateTechnique | null => {
+    if (!Object.values(Gi).includes(technique.gi)) {
+        alert('Invalid Gi value');
+        return null;
+    }
+  
+    if (!Object.values(Hierarchy).includes(technique.hierarchy)) {
+      alert('Invalid Hierarchy value');
+        return null;
+    }
+
+    const transformedTechnique: UpdateTechnique = {
+        techniqueId: technique.techniqueId,
+        title: technique.title,
+        videoSrc: technique.videoSrc,
+        description: technique.description,
+        globalNotes: technique.globalNotes,
+        gi: technique.gi as Gi,
+        hierarchy: technique.hierarchy as Hierarchy,
+        type: {
+            title: technique.type,
+            description: technique.typeDescription
+        },
+        position: {
+            title: technique.position,
+            description: technique.positionDescription
+        },
+        openGuard: null
+    };
+
+    if (technique.openGuard && technique.openGuardDescription) {
+        transformedTechnique.openGuard = {
+            title: technique.openGuard,
+            description: technique.openGuardDescription
+        };
+    }
+
+    return transformedTechnique;
+};
+
+export const postTechnique = async (technique: NewTechnique, accessToken: string | null): Promise<Technique | null> => {
     try {
         const response = await fetch(`${API_SERVER_URL}technique`, {
             method: 'POST',
@@ -79,7 +105,7 @@ export const postTechnique = async (techniqueId: string | null, technique: Techn
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({ technique, techniqueId }),
+            body: JSON.stringify({ technique }),
         });
   
         if (!response.ok) {
@@ -97,13 +123,39 @@ export const postTechnique = async (techniqueId: string | null, technique: Techn
         }
 };
 
+export const updateTechnique = async (technique: UpdateTechnique, accessToken: string | null): Promise<Technique | null> => {
+    try {
+        const response = await fetch(`${API_SERVER_URL}technique`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ technique }),
+        });
+  
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
+        }
+  
+        const responseData = await response.json();
+        console.log('Success:', responseData);
+        
+        return responseData
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Error updating technique: ${error}`);
+            return null
+        }
+};
+
 export const postCollectionTechniques = async (
     collectionId: string, 
     collectionTechniques: { index: number, technique: Technique }[],
     accessToken: string | null
     ) => {
     try {
-        const response = await fetch(`${API_SERVER_URL}addToCollection`, {
+        const response = await fetch(`${API_SERVER_URL}collectionTechnique`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -124,7 +176,7 @@ export const postCollectionTechniques = async (
         }
 };
 
-export const transformCollectionForBackend = (collection: any): CollectionWithoutTechniquesOrId | null => {
+export const transformCollectionForPost = (collection: any): NewCollection | null => {
     if (!collection.title) {
         alert('Invalid title value')
         return null;
@@ -145,7 +197,7 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
         return null;
     }
  
-    const transformedCollection: CollectionWithoutTechniquesOrId = {
+    const transformedCollection: NewCollection = {
         title: collection.title,
         description: collection.description,
         globalNotes: collection.globalNotes || null,
@@ -175,20 +227,98 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
     return transformedCollection;
 };
 
-  export const postCollection = async (
-    collectionId: string | null, 
-    collection: CollectionWithoutTechniquesOrId,
+export const transformCollectionForPut = (collection: any): UpdateCollection | null => {
+    if (!collection.title) {
+        alert('Invalid title value')
+        return null;
+    }
+
+    if (!collection.description) {
+        alert('Invalid description value')
+        return null;
+    }
+
+    if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
+        alert('Invalid Gi value');
+        return null;
+    }
+  
+    if (collection.hierarchy && !Object.values(Hierarchy).includes(collection.hierarchy)) {
+      alert('Invalid Hierarchy value');
+        return null;
+    }
+ 
+    const transformedCollection: UpdateCollection = {
+        collectionId: collection.collectionId,
+        title: collection.title,
+        description: collection.description,
+        globalNotes: collection.globalNotes || null,
+        gi: collection.gi as Gi || null,
+        hierarchy: collection.hierarchy as Hierarchy || null, 
+        type: {
+            title: collection.type,
+            description: collection.typeDescription
+        } || null,
+        position: {
+            title: collection.position,
+            description: collection.positionDescription
+        } || null,
+        openGuard: {
+            title: collection.openGuard,
+            description: collection.openGuardDescription
+        } || null,
+    };
+
+    if (collection.openGuard && collection.openGuardDescription) {
+        transformedCollection.openGuard = {
+            title: collection.openGuard,
+            description: collection.openGuardDescription
+        };
+    }
+
+    return transformedCollection;
+};
+
+export const postCollection = async (
+    collection: NewCollection,
     accessToken: string | null
     ): Promise<Collection | null> => {
     if (!accessToken) {console.log(`Invalid access token on post Collection: ${accessToken}`); return null}
     try {
-        const response = await fetch(`${API_SERVER_URL}newCollection`, {
+        const response = await fetch(`${API_SERVER_URL}collection`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({collectionId: collectionId, collection: collection}),
+            body: JSON.stringify({collection: collection}),
+        });
+  
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
+        }
+  
+        const responseData = await response.json();
+        return responseData
+        } catch (error) {
+            console.error('Error:', error);
+            return null
+        }
+};
+
+export const updateCollection = async (
+    collection: UpdateCollection,
+    accessToken: string | null
+    ): Promise<Collection | null> => {
+    if (!accessToken) {console.log(`Invalid access token on update Collection: ${accessToken}`); return null}
+    try {
+        const response = await fetch(`${API_SERVER_URL}collection`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({collection: collection}),
         });
   
         if (!response.ok) {
@@ -206,8 +336,8 @@ export const transformCollectionForBackend = (collection: any): CollectionWithou
 export const deleteCollection = async (collectionId: string, accessToken: string | null): Promise<number | null> => {
     if (!accessToken) {console.log(`Invalid access token on delete Collection: ${accessToken}`); return null}
     try {
-        const response = await fetch(`${API_SERVER_URL}deleteCollection`, {
-            method: 'POST',
+        const response = await fetch(`${API_SERVER_URL}collection`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
@@ -231,8 +361,8 @@ export const deleteCollection = async (collectionId: string, accessToken: string
 export const deleteTechnique = async (techniqueId: string, accessToken: string | null): Promise<number | null> => {
     if (!accessToken) {console.log(`Invalid access token on delete Technique: ${accessToken}`); return null}
     try {
-        const response = await fetch(`${API_SERVER_URL}deleteTechnique`, {
-            method: 'POST',
+        const response = await fetch(`${API_SERVER_URL}technique`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,

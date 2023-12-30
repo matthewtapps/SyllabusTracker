@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import CollectionList from '../../../components/Lists/CollectionList'
 import CollectionFilter, { useHandleCollectionFilterChange } from '../../../components/Lists/CollectionFilter'
-import { transformTechniqueForBackend, postTechnique, deleteCollection, fetchCollectionTechniques, fetchCollections, fetchTechniques } from '../../../util/Utilities'
+import { deleteCollection, fetchCollectionTechniques, fetchCollections, fetchTechniques, transformTechniqueForPut, transformCollectionForPost, transformCollectionForPut, updateCollection, deleteTechnique, updateTechnique } from '../../../util/Utilities'
 import { Technique } from 'common'
 import Dialog from '@mui/material/Dialog'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange} from '../../../components/Lists/TechniqueFilter'
@@ -18,7 +18,7 @@ import TechniqueList from '../../../components/Lists/TechniqueList'
 import MuiButton, { ButtonProps } from '@mui/material/Button'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import { postCollectionTechniques, transformCollectionForBackend, postCollection } from '../../../util/Utilities'
+import { postCollectionTechniques, postCollection } from '../../../util/Utilities'
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
 import { EditCollectionDialog } from '../../../components/Dialogs/EditCollectionDialog'
 import { NewCollectionDialog } from '../../../components/Dialogs/NewCollectionDialog'
@@ -270,16 +270,16 @@ function CoachCollections(): JSX.Element {
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
         console.log(fieldValues)
-        const validTechnique = transformTechniqueForBackend(fieldValues);
+        const validTechnique = transformTechniqueForPut(fieldValues);
         console.log(validTechnique)
         if (!validTechnique) {
             alert('Not a valid technique posted')
             return
         };
         
-        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique, accessToken);        
+        const updatedTechnique = await updateTechnique(validTechnique, accessToken);        
 
-        if (postedTechnique) {
+        if (updatedTechnique) {
             setCollectionTechniques((prevTechniques) => {
                 const updatedTechniques = [...prevTechniques as CollectionTechnique[]];
                 const indexToUpdate = updatedTechniques.findIndex(collectionTechnique => collectionTechnique.technique.techniqueId === editingTechniqueId);
@@ -288,7 +288,7 @@ function CoachCollections(): JSX.Element {
                     updatedTechniques[indexToUpdate] = { 
                         ...updatedTechniques[indexToUpdate],
                         technique : {
-                            ...validTechnique, 
+                            ...validTechnique,
                             techniqueId: editingTechniqueId,
                             position: {
                                 title: validTechnique.position.title,
@@ -298,6 +298,8 @@ function CoachCollections(): JSX.Element {
                                 title: validTechnique.type.title,
                                 description: validTechnique.type.description
                             },
+                            created: updatedTechniques[indexToUpdate].technique.created,
+                            lastUpdated: new Date(),
                         }
                     }
                 }
@@ -329,10 +331,8 @@ function CoachCollections(): JSX.Element {
     }
 
     const handleTechniqueDeleteClick = (techniqueId: string) => {
-        // TODO: Call the backend API to delete the technique
-        // Handle the UI update after deletion (e.g., remove the technique from the list)
+        // TODO because this is slightly confusing and I don't want people deleting stuff by accident
     }
-    
 
     const handleCollectionTechniqueEditClick = (collection: Collection) => {
         
@@ -440,23 +440,27 @@ function CoachCollections(): JSX.Element {
         event.preventDefault();
         
         const formData = new FormData(event.currentTarget)
-        const fieldValues = Object.fromEntries(formData.entries())
-        const validCollection = transformCollectionForBackend(fieldValues);
+        const fieldValues = Object.fromEntries(formData.entries());
+        const fieldValuesWithId = {
+            ...fieldValues,
+            collectionId: editingCollectionId
+        }
+        const validCollection = transformCollectionForPut(fieldValuesWithId);
         if (!validCollection) {
-            alert('Not a valid technique posted')
+            alert('Not a valid collection posted')
             return
         };
         
-        const postedCollection = await postCollection(editingCollectionId, validCollection, accessToken);
+        const updatedCollection = await updateCollection(validCollection, accessToken);
 
-        if (postedCollection) {
+        if (updatedCollection) {
             setCollectionsList((prevCollections) => {
                 const updatedCollections = [...prevCollections];
-                const indexToUpdate = updatedCollections.findIndex(collection => collection.collectionId === postedCollection.collectionId);
+                const indexToUpdate = updatedCollections.findIndex(collection => collection.collectionId === updatedCollection.collectionId);
                 
                 if (indexToUpdate !== -1) {
                     updatedCollections[indexToUpdate] = { 
-                        ...postedCollection, 
+                        ...updatedCollection, 
                     };
                 }
                 return updatedCollections;
@@ -559,13 +563,13 @@ function CoachCollections(): JSX.Element {
         
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
-        const validCollection = transformCollectionForBackend(fieldValues);
+        const validCollection = transformCollectionForPost(fieldValues);
         if (!validCollection) {
             alert('Not a valid technique posted')
             return
         };
         
-        const postedCollection = await postCollection(null, validCollection, accessToken)
+        const postedCollection = await postCollection(validCollection, accessToken)
 
         if (postedCollection) {
             setCollectionsList((prevCollections) => {
@@ -576,7 +580,18 @@ function CoachCollections(): JSX.Element {
     
             setShowFab(true);
             setNewCollectionDialogOpen(false);
+            handleCollectionTechniqueEditClick(postedCollection);
+            handleOpenAddTechniqueDialogue();
+            setExpandedCollectionId(postedCollection.collectionId)
         }
+    }
+
+    const [expandedCollectionId, setExpandedCollectionId] = React.useState("");
+
+    const handleAccordionChange = (collectionId: string) => {
+        setExpandedCollectionId(prevExpandedCollectionId => 
+            prevExpandedCollectionId === collectionId ? "" : collectionId
+        );
     }
 
     return (
@@ -603,6 +618,8 @@ function CoachCollections(): JSX.Element {
                     editableTechniques
                     onTechniqueEditClick={handleTechniqueEditClick}
                     editingTechniquesCollection={editingTechniquesCollection}
+                    expandedCollectionId={expandedCollectionId}
+                    onAccordionChange={handleAccordionChange}
 
                     collectionTechniques={collectionTechniques}
                     onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}

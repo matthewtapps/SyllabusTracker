@@ -88,6 +88,8 @@ interface CollectionsListProps {
         techniqueOpenGuardOptions: string[],
         techniqueGiOptions: string[]
     } | null;
+    expandedCollectionId: string;
+    onAccordionChange: (collectionId: string) => void;
 
     editableCollection: boolean;
     editingTechniquesCollection: Collection | null;
@@ -137,7 +139,8 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                     });
                 }
             return (
-                <Accordion disableGutters elevation={props.elevation} key={collection.collectionId}>
+                <Accordion disableGutters elevation={props.elevation} key={collection.collectionId} expanded={props.expandedCollectionId === collection.collectionId}
+                onChange={() => props.onAccordionChange(collection.collectionId)}>
                     <AccordionSummary expandIcon={<ExpandMore/>} aria-controls="panel1a-content">
                         <Box display="flex" flexDirection="column" flexGrow={1}>
                             <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">

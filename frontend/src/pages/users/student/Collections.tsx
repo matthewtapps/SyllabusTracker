@@ -59,6 +59,13 @@ function StudentCollections(): JSX.Element {
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
     const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collectionsList)
 
+    const [expandedCollectionId, setExpandedCollectionId] = React.useState("");
+    const handleAccordionChange = (collectionId: string) => {
+        setExpandedCollectionId(prevExpandedCollectionId => 
+            prevExpandedCollectionId === collectionId ? "" : collectionId
+        );
+    }
+
     return (
         <div>
             <Card>
@@ -76,7 +83,7 @@ function StudentCollections(): JSX.Element {
                     <Typography>{placeholderContent}</Typography>
                 </CardContent>
             ) : (
-                <CollectionList filteredCollections={filteredCollections}/>
+                <CollectionList filteredCollections={filteredCollections} expandedCollectionId={expandedCollectionId} onAccordionChange={handleAccordionChange}/>
             )}
             </Card>
         </div>

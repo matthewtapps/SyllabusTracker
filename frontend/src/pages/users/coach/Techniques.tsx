@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import TechniqueList from '../../../components/Lists/TechniqueList'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/Lists/TechniqueFilter'
-import { transformTechniqueForBackend, postTechnique, deleteTechnique, fetchTechniques } from '../../../util/Utilities'
+import { postTechnique, deleteTechnique, fetchTechniques, transformTechniqueForPost, transformTechniqueForPut, updateTechnique } from '../../../util/Utilities'
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
 import { NewTechniqueDialog } from '../../../components/Dialogs/NewTechniqueDialog'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -121,23 +121,27 @@ function CoachTechniques(): JSX.Element {
         event.preventDefault();
         
         const formData = new FormData(event.currentTarget)
-        const fieldValues = Object.fromEntries(formData.entries())
-        const validTechnique = transformTechniqueForBackend(fieldValues);
+        const fieldValues = Object.fromEntries(formData.entries());
+        const fieldValuesWithId = {
+            ...fieldValues,
+            techniqueId: editingTechniqueId
+        }
+        const validTechnique = transformTechniqueForPut(fieldValuesWithId);
         if (!validTechnique) {
             alert('Not a valid technique posted')
             return
         };
         
-        const postedTechnique = await postTechnique(editingTechniqueId, validTechnique, accessToken);        
+        const updatedTechnique = await updateTechnique(validTechnique, accessToken);        
 
-        if (postedTechnique) {
+        if (updatedTechnique) {
             setTechniquesList((prevTechniques) => {
                 const updatedTechniques = [...prevTechniques];
                 const indexToUpdate = updatedTechniques.findIndex(technique => technique.techniqueId === editingTechniqueId);
                 
                 if ((indexToUpdate !== -1) && (editingTechniqueId)) {
                     updatedTechniques[indexToUpdate] = { 
-                        ...postedTechnique
+                        ...updatedTechnique
                     };
                 }
 
@@ -183,13 +187,13 @@ function CoachTechniques(): JSX.Element {
         
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
-        const validTechnique = transformTechniqueForBackend(fieldValues);
+        const validTechnique = transformTechniqueForPost(fieldValues);
         if (!validTechnique) {
             alert('Not a valid technique posted')
             return
         };
         
-        const postedTechnique = await postTechnique(null, validTechnique, accessToken);        
+        const postedTechnique = await postTechnique(validTechnique, accessToken);        
 
         if (postedTechnique) {
             setTechniquesList((prevTechniques) => {

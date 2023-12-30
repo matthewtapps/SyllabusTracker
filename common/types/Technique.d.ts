@@ -11,6 +11,8 @@ export interface Technique {
     type: DTO;
     position: DTO;
     openGuard: DTO | null;
+    lastUpdated: Date;
+    created: Date;
 }
 interface DTO {
     title: string;

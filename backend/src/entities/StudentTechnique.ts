@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Technique } from "./Technique";
 import { StudentTechnique as StudentTechniqueInterface } from "common";
 import { TechniqueStatus } from "common";
@@ -24,9 +24,9 @@ export class StudentTechnique implements StudentTechniqueInterface {
     @Column()
     coachNotes: string;
 
-    @Column()
+    @CreateDateColumn()
     lastUpdated: Date;
 
-    @Column()
+    @UpdateDateColumn()
     created: Date;
 }

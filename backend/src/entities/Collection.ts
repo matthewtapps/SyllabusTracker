@@ -1,5 +1,5 @@
 import { Gi, Hierarchy, Collection as CollectionInterface} from "common";
-import { Entity, PrimaryGeneratedColumn, Column, Generated, OneToMany, ManyToOne, JoinTable} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Generated, OneToMany, ManyToOne, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import { CollectionTechnique } from "./CollectionTechnique";
 import { Position } from "./Position";
 import { TechniqueType } from "./TechniqueType";
@@ -37,4 +37,10 @@ export class Collection implements CollectionInterface {
     
     @ManyToOne(type => OpenGuard, openGuard => openGuard.title, {nullable: true})
     openGuard?: OpenGuard;
+
+    @CreateDateColumn()
+    lastUpdated: Date;
+
+    @UpdateDateColumn()
+    created: Date;
 }

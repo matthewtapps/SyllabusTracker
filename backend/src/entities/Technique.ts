@@ -1,5 +1,5 @@
 import { Hierarchy, Technique as TechniqueInterface, Gi } from "common";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Generated, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { TechniqueType } from "./TechniqueType";
 import { Position } from "./Position";
 import { OpenGuard } from "./OpenGuard";
@@ -39,5 +39,11 @@ export class Technique implements TechniqueInterface {
     openGuard: OpenGuard;
 
     @OneToMany(() => CollectionTechnique, ct => ct.technique, {nullable: true})
-    collectionTechniques: CollectionTechnique[]
+    collectionTechniques: CollectionTechnique[];
+
+    @CreateDateColumn()
+    lastUpdated: Date;
+
+    @UpdateDateColumn()
+    created: Date;
 }

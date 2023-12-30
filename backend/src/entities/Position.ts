@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Generated } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Generated, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Position {
@@ -11,4 +11,10 @@ export class Position {
 
     @Column()
     description: string;
+
+    @CreateDateColumn()
+    lastUpdated: Date;
+
+    @UpdateDateColumn()
+    created: Date;
 }

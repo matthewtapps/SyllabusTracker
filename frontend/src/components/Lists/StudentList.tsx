@@ -7,7 +7,6 @@ import CardContent from '@mui/material/CardContent';
 import { styled } from '@mui/material/styles';
 import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutlined';
 import IconButton from '@mui/material/IconButton';
-import { stripAuth0FromUserId } from '../../util/Utilities';
 
 
 interface StudentListProps {
@@ -21,8 +20,6 @@ const Card = styled(MuiCard)({
         borderRadius: "2",
     }
 });
-
-
 
 function StudentList(props: StudentListProps): JSX.Element {
     const handleSelectStudent = (student: User) => {

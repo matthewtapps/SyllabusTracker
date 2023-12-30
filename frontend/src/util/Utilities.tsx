@@ -226,7 +226,7 @@ export const deleteCollection = async (collectionId: string, accessToken: string
             console.error('Error:', error);
             return null
         }
-}
+};
 
 export const deleteTechnique = async (techniqueId: string, accessToken: string | null): Promise<number | null> => {
     if (!accessToken) {console.log(`Invalid access token on delete Technique: ${accessToken}`); return null}
@@ -251,7 +251,7 @@ export const deleteTechnique = async (techniqueId: string, accessToken: string |
             console.error('Error:', error);
             return null
         }
-}
+};
 
 export const fetchCollections = async (accessToken: string | null) => {
     if (!accessToken) {console.log(`Invalid access token on fetch Collections: ${accessToken}`); return null}
@@ -266,7 +266,7 @@ export const fetchCollections = async (accessToken: string | null) => {
 
         return collections
     } catch (error) { console.log(`Error on fetch collections: ${error}`)}
-}
+};
 
 export const fetchCollectionTechniques = async (accessToken: string | null) => {
     if (!accessToken) {console.log(`Invalid access token on fetch Collections: ${accessToken}`); return null}
@@ -281,7 +281,7 @@ export const fetchCollectionTechniques = async (accessToken: string | null) => {
 
         return collectionTechniques
     } catch (error) { console.log(`Error on fetch collection techniques: ${error}`) }
-}
+};
 
 export const fetchTechniques = async (accessToken: string | null) => {
     if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
@@ -295,7 +295,7 @@ export const fetchTechniques = async (accessToken: string | null) => {
         
         return techniques
     } catch (error) { console.log(`Error on fetch techniques: ${error}`)}
-}
+};
 
 export const fetchStudents = async (accessToken: string | null) => {
     if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
@@ -309,8 +309,85 @@ export const fetchStudents = async (accessToken: string | null) => {
 
         return students
     } catch (error) { console.log(`Error on fetch students: ${error}`)}
-}
+};
 
 export const stripAuth0FromUserId = (id: string): string => {
     return id.replace("auth0|", "")
-}
+};
+
+export const addStudentTechniques = async (studentId: string, techniques: Technique[], accessToken: string | null): Promise<void> => {
+    if (!accessToken) {
+        console.error(`Invalid access token on add Student Techniques: ${accessToken}`);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_SERVER_URL}student-techniques`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ studentId, techniques }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
+        }
+
+        console.log('Student Techniques added successfully');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+export const updateStudentTechnique = async (studentId: string, techniqueId: string, updatedData: any, accessToken: string | null): Promise<void> => {
+    if (!accessToken) {
+        console.error(`Invalid access token on update Student Technique: ${accessToken}`);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_SERVER_URL}student-technique/${studentId}/${techniqueId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(updatedData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
+        }
+
+        console.log('Student Technique updated successfully');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+export const getStudentTechniques = async (studentId: string, accessToken: string | null): Promise<any> => {
+    if (!accessToken) {
+        console.error(`Invalid access token on fetch Student Techniques: ${accessToken}`);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_SERVER_URL}student-technique/${studentId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
+        }
+
+        const studentTechniques = await response.json();
+        return studentTechniques;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
+    }
+};

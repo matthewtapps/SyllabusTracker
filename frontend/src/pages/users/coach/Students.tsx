@@ -6,6 +6,8 @@ import { fetchStudents } from '../../../util/Utilities';
 import StudentList from '../../../components/Lists/StudentList';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import { useNavigate } from 'react-router-dom';
+import { useStudent } from '../../../components/Contexts/SelectedStudentContext';
 
 
 const Card = styled(MuiCard)({
@@ -21,8 +23,16 @@ const Card = styled(MuiCard)({
 const CoachStudents: React.FC = () => {
     const { getAccessTokenSilently } = useAuth0();
 
-    const [students, setStudents] = React.useState<User[] | null>(null)
+    const [students, setStudents] = React.useState<User[] | null>(null);
 
+    const navigate = useNavigate();
+    const { setSelectedStudent } = useStudent();
+
+    const handleNavigateToSelectedStudentHome = (student: User) => {
+        setSelectedStudent(student)
+        navigate('/student') 
+    };
+    
     React.useEffect(() => {
         const getAccessToken = async () => {
             try {
@@ -43,7 +53,7 @@ const CoachStudents: React.FC = () => {
         <div>
             {students ? 
             students.length > 0 ?
-            <Card><StudentList students={students}/></Card>
+            <Card><StudentList students={students} onSelectStudent={handleNavigateToSelectedStudentHome}/></Card>
             : <Card><CardContent><Typography>Empty student data received (this probably shouldn't happen)</Typography></CardContent></Card>
             : <Card><CardContent><Typography>Loading...</Typography></CardContent></Card>}
         </div>

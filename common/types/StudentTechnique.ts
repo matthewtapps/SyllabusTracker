@@ -7,4 +7,6 @@ export interface StudentTechnique {
     status: TechniqueStatus;
     studentNotes: string;
     coachNotes: string;
+    lastUpdated: Date;
+    created: Date;
 };

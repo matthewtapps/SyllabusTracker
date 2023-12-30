@@ -310,3 +310,7 @@ export const fetchStudents = async (accessToken: string | null) => {
         return students
     } catch (error) { console.log(`Error on fetch students: ${error}`)}
 }
+
+export const stripAuth0FromUserId = (id: string): string => {
+    return id.replace("auth0|", "")
+}

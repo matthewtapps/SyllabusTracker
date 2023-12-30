@@ -11,6 +11,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from './components/Authentication/AuthenticationGuard';
 import { ProfilePage } from './pages/navigation/ProfilePage';
 import StudentsPage from './pages/navigation/StudentsPage';
+import { StudentProvider } from './components/Contexts/SelectedStudentContext';
+import SelectedStudentDashboardPage from './pages/navigation/SelectedStudentDashboardPage';
+import SelectedStudentTechniquesPage from './pages/navigation/SelectedStudentTechniquesPage';
 
 
 function App() {
@@ -27,6 +30,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <StudentProvider>
         <Routes>
           <Route path="/" 
             element={<AuthenticationGuard component={DashboardPage}/>}
@@ -44,8 +48,15 @@ function App() {
           />
           <Route path="/students"
             element={<AuthenticationGuard component={StudentsPage}/>}
-            />
+          />
+          <Route path="/student"
+            element={<AuthenticationGuard component={SelectedStudentDashboardPage}/>}
+          />
+          <Route path="/student/techniques"
+            element={<AuthenticationGuard component={SelectedStudentTechniquesPage}/>}
+          />
         </Routes>
+      </StudentProvider>
     </ThemeProvider>
   );
 }

@@ -13,6 +13,8 @@ export interface Technique {
     position: DTO; // Technqiue Position relational database object
     openGuard: DTO | null; // Technique OpenGuard relational database object
                               // May be null if position is not an open guard
+    lastUpdated: Date;
+    created: Date;
 }
 
 interface DTO {

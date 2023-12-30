@@ -6,4 +6,6 @@ export interface CollectionSet {
     title: string;
     description: string;
     techniques: Technique[] | null;
+    lastUpdated: Date;
+    created: Date;
 }

@@ -136,22 +136,22 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
         <Accordion disableGutters>
             <AccordionSummary expandIcon={<ExpandMore/>}>
                 <Box display="flex" flexDirection="column" maxWidth="95%">
-                <TextField
-                    fullWidth
-                    label="Filter Techniques"
-                    value={filters.title}
-                    onChange={e => {
-                        const newFilters = { ...filters, title: e.target.value };
-                        setFilters(newFilters);
-                        props.onTechniqueFiltersChange(newFilters);
-                    }}
-                    onClick={e => e.stopPropagation()}
-                    variant="outlined"
-                    size="small"
-                />
-                {props.matchTechniqueFilters && (
-                    <Button variant="contained" fullWidth size="small" sx={{marginTop: "5px"}} onClick={handleMatchFiltersClick}>Match to Collection Filters</Button>
-                )}
+                    <TextField
+                        fullWidth
+                        label="Filter Techniques"
+                        value={filters.title}
+                        onChange={e => {
+                            const newFilters = { ...filters, title: e.target.value };
+                            setFilters(newFilters);
+                            props.onTechniqueFiltersChange(newFilters);
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        variant="outlined"
+                        size="small"
+                    />
+                    {props.matchTechniqueFilters && (
+                        <Button variant="contained" fullWidth size="small" sx={{marginTop: "5px"}} onClick={e => {e.stopPropagation(); handleMatchFiltersClick()}}>Match Collection Filters</Button>
+                    )}
                 </Box>
             </AccordionSummary>
             <AccordionDetails>

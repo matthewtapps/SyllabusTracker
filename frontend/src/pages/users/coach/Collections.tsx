@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import CollectionList from '../../../components/Lists/CollectionList'
 import CollectionFilter, { useHandleCollectionFilterChange } from '../../../components/Lists/CollectionFilter'
-import { deleteCollection, fetchCollectionTechniques, fetchCollections, fetchTechniques, transformTechniqueForPut, transformCollectionForPost, transformCollectionForPut, updateCollection, updateTechnique } from '../../../util/Utilities'
+import { deleteCollection, fetchCollectionTechniques, fetchCollections, fetchTechniques, transformTechniqueForPut, transformCollectionForPost, transformCollectionForPut, updateCollection, updateTechnique, transformTechniqueForPost, postTechnique } from '../../../util/Utilities'
 import { Technique } from 'common'
 import Dialog from '@mui/material/Dialog'
 import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange} from '../../../components/Lists/TechniqueFilter'
@@ -23,6 +23,7 @@ import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDi
 import { EditCollectionDialog } from '../../../components/Dialogs/EditCollectionDialog'
 import { NewCollectionDialog } from '../../../components/Dialogs/NewCollectionDialog'
 import { useAuth0 } from '@auth0/auth0-react'
+import { NewTechniqueDialog } from '../../../components/Dialogs/NewTechniqueDialog'
 
 
 interface TechniqueDTO {
@@ -88,7 +89,7 @@ function CoachCollections(): JSX.Element {
                     const techniques = await fetchTechniques(token);
                     if (techniques) {
                         setTechniques(techniques);
-                        setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
+                        setTechniqueSuggestions(generateTechniqueSuggestions(techniques, collections));
                         if (collections && techniques) {
                             setCollectionSuggestions(generateCollectionSuggestions(collections, techniques));
                         }
@@ -193,7 +194,7 @@ function CoachCollections(): JSX.Element {
         giOptions: []
     })
 
-    const generateTechniqueSuggestions = (techniqueList: Technique[]): {
+    const generateTechniqueSuggestions = (techniqueList: Technique[], collectionList: Collection[]): {
         titleOptions: string[],
         positionOptions: string[],
         hierarchyOptions: string[],
@@ -221,6 +222,11 @@ function CoachCollections(): JSX.Element {
             if (!generatedSuggestions.positionOptions.includes(technique.position?.title)) {generatedSuggestions.positionOptions.push(technique.position.title)}
             if (!generatedSuggestions.typeOptions.includes(technique.type?.title)) {generatedSuggestions.typeOptions.push(technique.type.title)}
             if (technique.openGuard && (!generatedSuggestions.openGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.openGuardOptions.push(technique.openGuard?.title)}
+        })
+        collectionList.forEach(collection => {
+            if (collection.position && !generatedSuggestions.positionOptions.includes(collection.position?.title)) {generatedSuggestions.positionOptions.push(collection.position.title)}
+            if (collection.type && !generatedSuggestions.typeOptions.includes(collection.type?.title)) {generatedSuggestions.typeOptions.push(collection.type.title)}
+            if (collection.openGuard && (!generatedSuggestions.openGuardOptions.includes(collection.openGuard?.title))) {generatedSuggestions.openGuardOptions.push(collection.openGuard?.title)}
         })
         return generatedSuggestions
     }
@@ -277,7 +283,7 @@ function CoachCollections(): JSX.Element {
             return
         };
         
-        const updatedTechnique = await updateTechnique(validTechnique, accessToken);        
+        const updatedTechnique = await updateTechnique(validTechnique, accessToken);
 
         if (updatedTechnique) {
             setCollectionTechniques((prevTechniques) => {
@@ -322,6 +328,7 @@ function CoachCollections(): JSX.Element {
     
             setEditingTechniqueDialogOpen(false);
             setShowFab(true);
+            setTechniqueSuggestions(generateTechniqueSuggestions([...techniques, updatedTechnique], collectionsList))
         }
     }
     
@@ -468,6 +475,7 @@ function CoachCollections(): JSX.Element {
     
             setEditingCollectionDialogOpen(false)
             setShowFab(true);
+            setTechniqueSuggestions(generateTechniqueSuggestions(techniques, [...collectionsList, updatedCollection]))
         }
     }
     
@@ -583,6 +591,7 @@ function CoachCollections(): JSX.Element {
             handleCollectionTechniqueEditClick(postedCollection);
             handleOpenAddTechniqueDialogue();
             setExpandedCollectionId(postedCollection.collectionId)
+            setTechniqueSuggestions(generateTechniqueSuggestions(techniques, [...collectionsList, postedCollection]))
         }
     }
 
@@ -593,6 +602,48 @@ function CoachCollections(): JSX.Element {
             prevExpandedCollectionId === collectionId ? "" : collectionId
         );
     }
+
+    const [newTechniqueDialogOpen, setNewTechniqueDialogOpen] = React.useState(false)
+
+    const handleNewTechniqueClick = () => {
+        setNewTechniqueDialogOpen(true)
+        setEditedTechnique(emptyTechniqueDTO)
+        setEditingTechniqueId(null)
+    }
+
+    const handleNewTechniqueCancel = () => {
+        setNewTechniqueDialogOpen(false);
+    }
+
+    const handleNewTechniqueSaveClick = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        
+        const formData = new FormData(event.currentTarget)
+        const fieldValues = Object.fromEntries(formData.entries())
+        const validTechnique = transformTechniqueForPost(fieldValues);
+        if (!validTechnique) {
+            alert('Not a valid technique posted')
+            return
+        };
+        
+        const postedTechnique = await postTechnique(validTechnique, accessToken);        
+
+        if (postedTechnique) {
+            setTechniques((prevTechniques) => {
+                const updatedTechniques = [...prevTechniques];
+                updatedTechniques.unshift(postedTechnique)
+                return updatedTechniques
+            });
+    
+            setNewTechniqueDialogOpen(false)
+            setTechniqueSuggestions(generateTechniqueSuggestions([...techniques, postedTechnique], collectionsList))
+        }
+    }
+
+    React.useEffect(() => {
+        const updatedSuggestions = generateTechniqueSuggestions(techniques, collectionsList);
+        setTechniqueSuggestions(updatedSuggestions);
+    }, [collectionsList, techniques]);
 
     return (
         <div>
@@ -634,6 +685,7 @@ function CoachCollections(): JSX.Element {
                 </Box>
             )}
             </Card>
+
             {showFab && (
                 <Fab // Should only exist on coach version of techniques
                 color="primary" 
@@ -652,11 +704,16 @@ function CoachCollections(): JSX.Element {
                             onTechniqueFiltersChange={handleTechniqueFilterChange} 
                             options={techniqueOptions}
                             matchTechniqueFilters={editingTechniquesCollection && (handleTechniqueFilterMatchClick(editingTechniquesCollection))}/>
-                    </Card> 
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                        <Button disabled={(selectedTechniques.length === 0)} onClick={(event) => { event.stopPropagation(); handleSaveAddTechniqueDialogue(); handleCloseAddTechniqueDialogue(); }}>Add</Button>
-                        <Button onClick={(event) => { event.stopPropagation(); handleCloseAddTechniqueDialogue(); }}>Cancel</Button>
-                    </Box>  
+                    </Card>
+                    <Box display="flex" flexDirection="column">
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                            <Button disabled={(selectedTechniques.length === 0)} onClick={(event) => { event.stopPropagation(); handleSaveAddTechniqueDialogue(); handleCloseAddTechniqueDialogue(); }}>Add</Button>
+                            <Button onClick={(event) => { event.stopPropagation(); handleCloseAddTechniqueDialogue(); }}>Cancel</Button>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                            <Button onClick={handleNewTechniqueClick}>Create New Technique</Button>
+                        </Box>
+                    </Box>
                 </DialogTitle>
 
                 <DialogContent dividers={true} sx={{padding: "0px"}}> 
@@ -704,6 +761,15 @@ function CoachCollections(): JSX.Element {
                 onCancel={handleNewCollectionCancel}
                 techniqueList={techniques}
                 collectionOptions={collectionSuggestions}
+            />
+
+            <NewTechniqueDialog
+                dialogOpen={newTechniqueDialogOpen}
+                onClose={handleNewTechniqueCancel}
+                onCancel={handleNewTechniqueCancel}
+                onSave={handleNewTechniqueSaveClick}
+                techniqueList={techniques}
+                techniqueOptions={techniqueSuggestions}
             />
         </div>
     );

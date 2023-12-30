@@ -12,6 +12,8 @@ import Typography from '@mui/material/Typography';
 import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import MuiCard from '@mui/material/Card';
+import Card from '@mui/material/Card';
+import { CardContent } from '@mui/material';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -105,32 +107,21 @@ interface TechniquesListProps {
     editingTechniqueId?: string | null;
     editingTechnique?: TechniqueDTO | null;
     onEditClick?: (technique: Technique) => void;
-    onSubmitClick?: (event: React.FormEvent<HTMLFormElement>) => void;
-    onCancelClick?: () => void;
-    onDeleteClick?: (techniqueId: string) => void;
-    editingTechniqueOptions: {
-        techniqueTitleOptions: string[],
-        techniquePositionOptions: string[],
-        techniqueHierarchyOptions: string[],
-        techniqueTypeOptions: string[],
-        techniqueOpenGuardOptions: string[],
-        techniqueGiOptions: string[]
-    } | null;
-}  
+}
 
 TechniqueList.defaultProps = {
     checkbox: false,
     elevation: 3,
     ordered: false,
     editable: false,
-    editingTechniqueOptions: null
 }
 
 function TechniqueList(props: TechniquesListProps): JSX.Element {
 
     return (
-        <form noValidate onSubmit={props.onSubmitClick}>
-            {props.filteredTechniques.map((technique, index) => {
+        <div>
+            {props.filteredTechniques.length > 0 ? (
+            props.filteredTechniques.map((technique, index) => {
                 let currentOrder = props.ordered ? index + 1 : null;
             return (
                 <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
@@ -276,8 +267,15 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                         </SubCard>
                     </AccordionDetails>
                 </Accordion>
-            )})}
-        </form>
+            )})
+            ) : (
+                <Card style={{backgroundColor: `#3c3836`}} elevation={0}>
+                    <CardContent>
+                        <Typography variant='body1'>No techniques available</Typography>
+                    </CardContent>
+                </Card>
+            ) }
+        </div>
     )
 }
 

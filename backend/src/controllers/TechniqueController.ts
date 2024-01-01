@@ -44,39 +44,39 @@ export class TechniqueController {
         }
     }
 
-    static async getAllTechniqueTitles(req: Request, res: Response) {
+    static async getAllTechniqueTitlesWithDescriptions(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniqueTitles = await techniqueService.getAllTechniqueTitles();
+            const techniqueTitles = await techniqueService.getAllTechniqueTitlesWithDescriptions();
             res.json(techniqueTitles);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
     }    
-    static async getAllTechniqueTypes(req: Request, res: Response) {
+    static async getAllTypes(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniqueTypes = await techniqueService.getAllTechniqueTypes();
+            const techniqueTypes = await techniqueService.getAllTypes();
             res.json(techniqueTypes);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
     }
 
-    static async getAllTechniquePositions(req: Request, res: Response) {
+    static async getAllPositions(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniquePositions = await techniqueService.getAllTechniquePositions();
+            const techniquePositions = await techniqueService.getAllPositions();
             res.json(techniquePositions);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
     }
 
-    static async getAllTechniqueOpenGuards(req: Request, res: Response) {
+    static async getAllOpenGuards(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniqueOpenGuards = await techniqueService.getAllTechniqueOpenGuards();
+            const techniqueOpenGuards = await techniqueService.getAllOpenGuards();
             res.json(techniqueOpenGuards);
         } catch (error) {
             res.status(400).json({ error: error.message })

@@ -24,6 +24,9 @@ import { EditCollectionDialog } from '../../../components/Dialogs/EditCollection
 import { NewCollectionDialog } from '../../../components/Dialogs/NewCollectionDialog'
 import { useAuth0 } from '@auth0/auth0-react'
 import { NewTechniqueDialog } from '../../../components/Dialogs/NewTechniqueDialog'
+import { useDispatch, useSelector } from 'react-redux'
+import { setAccessToken } from '../../../slices/auth'
+import { RootState } from '../../../store/store'
 
 
 interface TechniqueDTO {
@@ -72,34 +75,14 @@ const Button = styled((props: ButtonProps) => (
 
 function CoachCollections(): JSX.Element {
     const { getAccessTokenSilently } = useAuth0();
-    const [accessToken, setAccessToken] = React.useState<string | null>(null);
+    const dispatch = useDispatch();
 
     React.useEffect(() => {
         const getAccessToken = async () => {
             try {
                 const token = await getAccessTokenSilently();
-                setAccessToken(token);
+                dispatch(setAccessToken(token))
 
-                // Now that we have the token, we can fetch data
-                const collections = await fetchCollections(token);
-                if (collections) {
-                    setCollectionsList(collections);
-                    setLoading(false);
-
-                    const techniques = await fetchTechniques(token);
-                    if (techniques) {
-                        setTechniques(techniques);
-                        setTechniqueSuggestions(generateTechniqueSuggestions(techniques, collections));
-                        if (collections && techniques) {
-                            setCollectionSuggestions(generateCollectionSuggestions(collections, techniques));
-                        }
-                    }
-                }
-
-                const collectionTechniques = await fetchCollectionTechniques(token);
-                if (collectionTechniques) {
-                    setCollectionTechniques(collectionTechniques);
-                }
             } catch (error) {
                 console.log(error);
                 setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
@@ -108,7 +91,41 @@ function CoachCollections(): JSX.Element {
         };
 
         getAccessToken();
-    }, [getAccessTokenSilently]);
+    }, [getAccessTokenSilently, dispatch]);
+
+    const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+    React.useEffect(() => {
+        const fetchData = async () => {
+            if (!accessToken) return;
+
+            try {
+                const collections = await fetchCollections(accessToken)
+                if (collections) {
+                    setCollectionsList(collections);
+                    setLoading(false);
+            
+                    const techniques = await fetchTechniques(accessToken);
+                    if (techniques) {
+                        setTechniques(techniques);
+                        setTechniqueSuggestions(generateTechniqueSuggestions(techniques, collections));
+                        if (collections && techniques) {
+                            setCollectionSuggestions(generateCollectionSuggestions(collections, techniques));
+                        }
+                    }
+                }
+                const collectionTechniques = await fetchCollectionTechniques(accessToken);
+                if (collectionTechniques) {
+                    setCollectionTechniques(collectionTechniques);
+                }
+            } catch (error) {
+                console.error('Error fetching data', error);
+                setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`);
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, [accessToken]);
 
     // Whether content is loading or not state
     const [loading, setLoading] = React.useState(true);
@@ -591,7 +608,6 @@ function CoachCollections(): JSX.Element {
             handleCollectionTechniqueEditClick(postedCollection);
             handleOpenAddTechniqueDialogue();
             setExpandedCollectionId(postedCollection.collectionId)
-            setTechniqueSuggestions(generateTechniqueSuggestions(techniques, [...collectionsList, postedCollection]))
         }
     }
 
@@ -636,7 +652,6 @@ function CoachCollections(): JSX.Element {
             });
     
             setNewTechniqueDialogOpen(false)
-            setTechniqueSuggestions(generateTechniqueSuggestions([...techniques, postedTechnique], collectionsList))
         }
     }
 

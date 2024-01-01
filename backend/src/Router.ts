@@ -10,10 +10,10 @@ router.post('/technique', TechniqueController.createTechnique);
 router.put('/technique', TechniqueController.updateTechnique);
 router.get('/technique', TechniqueController.getAllTechniques);
 router.delete('/technique', TechniqueController.deleteTechnique);
-router.get('/technique/types', TechniqueController.getAllTechniqueTypes);
-router.get('/technique/titles', TechniqueController.getAllTechniqueTitles)
-router.get('/technique/positions', TechniqueController.getAllTechniquePositions);
-router.get('/technique/openguards', TechniqueController.getAllTechniqueOpenGuards);
+router.get('/type', TechniqueController.getAllTypes);
+router.get('/technique/titles', TechniqueController.getAllTechniqueTitlesWithDescriptions)
+router.get('/position', TechniqueController.getAllPositions);
+router.get('/openguard', TechniqueController.getAllOpenGuards);
 router.post('/collection', CollectionController.createCollection);
 router.put('/collection', CollectionController.updateCollection);
 router.get('/collection', CollectionController.getAllCollections);

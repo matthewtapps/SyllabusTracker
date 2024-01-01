@@ -120,9 +120,9 @@ export class TechniqueService {
             .execute();}
     }
 
-    async getAllTechniqueTitles(): Promise<Technique[]> {
+    async getAllTechniqueTitlesWithDescriptions(): Promise<Technique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
-        const techniques = techniqueRepo.find({ select: ["title"]})
+        const techniques = techniqueRepo.find({ select: ["title", "description"]})
 
         return techniques
     };
@@ -136,18 +136,18 @@ export class TechniqueService {
         return techniques
     };
 
-    async getAllTechniqueTypes(): Promise<TechniqueType[]> {
+    async getAllTypes(): Promise<TechniqueType[]> {
         const typeRepo = AppDataSource.getRepository(TechniqueType);
-        return typeRepo.find({ select: ["title"]})
+        return typeRepo.find({ select: ["title", "description"]})
     };
 
-    async getAllTechniquePositions(): Promise<Position[]> {
-        const typeRepo = AppDataSource.getRepository(Position);
-        return typeRepo.find({ select: ["title"]})
+    async getAllPositions(): Promise<Position[]> {
+        const positionRepo = AppDataSource.getRepository(Position);
+        return positionRepo.find({ select: ["title", "description"]})
     };
 
-    async getAllTechniqueOpenGuards(): Promise<OpenGuard[]> {
-        const typeRepo = AppDataSource.getRepository(OpenGuard);
-        return typeRepo.find({ select: ["title"]})
+    async getAllOpenGuards(): Promise<OpenGuard[]> {
+        const openGuardRepo = AppDataSource.getRepository(OpenGuard);
+        return openGuardRepo.find({ select: ["title", "description"]})
     };
 };

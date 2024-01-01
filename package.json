@@ -1,5 +1,0 @@
-{
-    "name": "syllabustracker",
-    "private": true,
-    "workspaces": ["common"]
-  }

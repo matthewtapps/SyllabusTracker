@@ -1,5 +1,5 @@
 import React from 'react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { Technique } from 'common';
 import MuiCard from '@mui/material/Card';
 import MuiAccordion from '@mui/material/Accordion';

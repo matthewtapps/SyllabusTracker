@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { TechniqueListWithFilters } from '../../../components/Lists/TechniquesListWithFilters'
+import { StudentTechniqueListWithFilters } from '../../../components/Lists/StudentTechniquesListWithFilters'
 import { setAccessToken } from '../../../slices/auth'
 import { AppDispatch } from '../../../store/store'
 
@@ -25,7 +25,7 @@ function StudentTechniques(): JSX.Element {
     }, [getAccessTokenSilently, dispatch]);
 
     return (
-        <TechniqueListWithFilters/>
+        <StudentTechniqueListWithFilters/>
     );
 };
 

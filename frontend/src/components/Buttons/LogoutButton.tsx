@@ -16,7 +16,7 @@ export const LogoutButton = () => {
 
   return (
     <Button className="button__logout" onClick={handleLogout} variant='outlined'>
-      Log Out
+      LogOut
     </Button>
   );
 };

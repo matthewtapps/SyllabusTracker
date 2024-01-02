@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCollectionSuggestionsAsync } from '../../slices/suggestions';
+import { fetchTechniqueSuggestionsAsync } from '../../slices/suggestions';
 import { AppDispatch, RootState } from '../../store/store';
 import { FastTextField as TextField } from '../Fields/FastTextField';
 import { SelectField } from '../Fields/SelectField';
@@ -52,7 +52,7 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
     const { descriptions } = useSelector((state: RootState) => state.descriptions)
 
     React.useEffect(() => {
-        dispatch(fetchCollectionSuggestionsAsync())
+        dispatch(fetchTechniqueSuggestionsAsync())
     }, [dispatch]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

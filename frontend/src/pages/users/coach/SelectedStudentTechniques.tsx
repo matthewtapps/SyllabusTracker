@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { TechniqueListWithFilters } from '../../../components/Lists/TechniquesListWithFilters'
 import { setAccessToken } from '../../../slices/auth'
 import { AppDispatch } from '../../../store/store'
+import { StudentTechniqueListWithFilters } from '../../../components/Lists/StudentTechniquesListWithFilters'
 
 
 function SelectedStudentTechniques(): JSX.Element {
@@ -25,7 +26,9 @@ function SelectedStudentTechniques(): JSX.Element {
     }, [getAccessTokenSilently, dispatch]);
 
     return (
-        <TechniqueListWithFilters/>
+        <StudentTechniqueListWithFilters
+        editable
+        />
     );
 };
 

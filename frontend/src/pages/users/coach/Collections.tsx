@@ -205,11 +205,8 @@ function CoachCollections(): JSX.Element {
 
     const handleDragDropDeleteClick = (deletedTechnique: { index: number, technique: Technique }) => {
         let newDragDropTechniques = dragDropTechniques.filter(item => item.technique !== deletedTechnique.technique)
-
         setDragDropTechniques(newDragDropTechniques)
     };
-
-    
 
     const handleCollectionEditClick = (collection: Collection) => {
         setEditingCollectionId(collection.collectionId);

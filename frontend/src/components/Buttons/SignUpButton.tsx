@@ -18,8 +18,8 @@ export const SignupButton = () => {
   };
 
   return (
-    <Button className="button__sign-up" onClick={handleSignUp} variant='outlined'>
-      Sign Up
+    <Button className="button__sign-up" onClick={handleSignUp} variant='outlined' size="small">
+      SignUp
     </Button>
   );
 };

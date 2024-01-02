@@ -22,7 +22,7 @@ const NavBar = (props: NavBarProps) => {
 
     return (
         <React.Fragment>
-            <AppBar position="static">
+            <AppBar position="fixed" elevation={2}>
                 <Toolbar>
                     <IconButton
                         size="large"

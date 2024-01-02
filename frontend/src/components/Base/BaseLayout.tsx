@@ -1,5 +1,6 @@
 import React from 'react';
 import NavBar from './NavBar';
+import { Box } from '@mui/material';
 
 interface BaseLayoutProps {
     children: React.ReactNode;
@@ -11,7 +12,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = (props) => {
       <div>
         <NavBar 
         text={props.text} />
-        <div>{props.children}</div>
+        <Box sx={{paddingTop: "60px"}}>{props.children}</Box>
       </div>
     );
   }

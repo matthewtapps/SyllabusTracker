@@ -141,6 +141,16 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
         setNewTechniqueDialogOpen(false)
     }
 
+    const handleAddTechniques = (selectedTechniques: { index: number, technique: Technique }[]) => {
+        setCleanedTechniques(prevCleanedTechniques => {
+            return prevCleanedTechniques.filter(technique =>
+                !selectedTechniques.some(st => st.technique.techniqueId === technique.techniqueId)
+            )
+        })
+        setSelectedTechniques([])
+        props.onSave(selectedTechniques)
+    }
+
     return (
         <>
             <Dialog open={props.dialogOpen} onClose={props.onCancel} scroll="paper">
@@ -153,7 +163,7 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
                     </Card>
                     <Box display="flex" flexDirection="column">
                         <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                            <Button disabled={(selectedTechniques.length === 0)} onClick={(event) => { event.stopPropagation(); props.onSave(selectedTechniques); props.onClose(); }}>Add</Button>
+                            <Button disabled={(selectedTechniques.length === 0)} onClick={(event) => { event.stopPropagation(); handleAddTechniques(selectedTechniques); props.onClose(); }}>Add</Button>
                             <Button onClick={(event) => { event.stopPropagation(); props.onClose(); }}>Cancel</Button>
                         </Box>
                         <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>

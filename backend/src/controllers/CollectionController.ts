@@ -37,7 +37,7 @@ export class CollectionController {
         const collectionService = new CollectionService()
         try {
             await collectionService.deleteCollection(req.body)
-            res.status(200)
+            res.status(200).json({ message: 'Collection deleted successfully' });
         } catch (error) {
             res.status(400).json({error: error.message})
         }

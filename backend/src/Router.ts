@@ -19,7 +19,7 @@ router.put('/collection', CollectionController.updateCollection);
 router.get('/collection', CollectionController.getAllCollections);
 router.delete('/collection', CollectionController.deleteCollection);
 router.get('/collection/titles', CollectionController.getAllCollectionTitles);
-router.post('/collectionTechnique', CollectionController.setCollectionTechniques);
+router.post('/collectiontechnique', CollectionController.setCollectionTechniques);
 router.get('/collectiontechnique', CollectionController.getCollectionTechniques);
 router.get('/students', StudentController.fetchStudents);
 router.post('/student-techniques', StudentTechniqueController.addStudentTechniques)

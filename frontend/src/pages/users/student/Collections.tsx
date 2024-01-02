@@ -6,10 +6,11 @@ import { Collection } from 'common'
 import { styled } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
-import CollectionList from '../../../components/Lists/CollectionList'
-import CollectionFilter, { useDetermineCollectionFilterOptions, useHandleCollectionFilterChange } from '../../../components/Lists/CollectionFilter'
+import CollectionList from '../../../components/Lists/Base Lists/CollectionList'
+import CollectionFilter, { useHandleCollectionFilterChange } from '../../../components/Lists/List Filters/CollectionFilter'
 import { useAuth0 } from '@auth0/auth0-react'
 import { fetchCollections } from '../../../util/Utilities'
+import { CollectionListWithFilters } from '../../../components/Lists/CollectionListWithFilters'
 
 const Card = styled(MuiCard)({
     '&.MuiCard-root': {
@@ -52,9 +53,6 @@ function StudentCollections(): JSX.Element {
         getAccessToken();
     }, [getAccessTokenSilently]);
 
-    // Generate options for the filters based on the full techniques list
-    const options = useDetermineCollectionFilterOptions(collectionsList)
-
     // Generated list of filtered techniques which is held at this level, and function for handling filter
     // changes which is passed to the onFiltersChange prop on TechniqueFilter
     const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collectionsList)
@@ -68,24 +66,10 @@ function StudentCollections(): JSX.Element {
 
     return (
         <div>
-            <Card>
-                <CollectionFilter 
-                onCollectionFiltersChange={handleCollectionFilterChange} 
-                options={options}/>
-            </Card>
-            <Card>
-            {loading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-                    <CircularProgress />
-                </Box>
-            ) : filteredCollections.length === 0 ? (
-                <CardContent>
-                    <Typography>{placeholderContent}</Typography>
-                </CardContent>
-            ) : (
-                <CollectionList filteredCollections={filteredCollections} expandedCollectionId={expandedCollectionId} onAccordionChange={handleAccordionChange}/>
-            )}
-            </Card>
+            <CollectionListWithFilters
+            onAccordionChange={handleAccordionChange}
+            expandedCollectionId={expandedCollectionId}
+            />
         </div>
     );
 };

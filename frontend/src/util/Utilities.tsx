@@ -4,11 +4,11 @@ import { User as Auth0User } from '@auth0/auth0-react'
 
 const API_SERVER_URL = process.env.REACT_APP_API_SERVER_URL
 
-export const decodeAndAddRole = (userToken: Auth0User) =>  {
+export const decodeAndAddRole = (userToken: Auth0User) => {
     if (!Object.values(Role).includes(userToken[`https://syllabustracker.matthewtapps.com/roles`][0])) {
         alert('Invalid user role attached to id token')
         return undefined
-    }   
+    }
 
     const user = {
         ...userToken,
@@ -18,15 +18,13 @@ export const decodeAndAddRole = (userToken: Auth0User) =>  {
     return user
 }
 
-export const transformTechniqueForPost = (technique: any): NewTechnique | null => {
+export const transformTechniqueForPost = (technique: any): NewTechnique => {
     if (!Object.values(Gi).includes(technique.gi)) {
-        alert('Invalid Gi value');
-        return null;
+        throw new Error(`Invalid Gi value`)
     }
-  
+
     if (!Object.values(Hierarchy).includes(technique.hierarchy)) {
-      alert('Invalid Hierarchy value');
-        return null;
+        throw new Error(`Invalid Hierarchy value`)
     }
 
     const transformedTechnique: NewTechnique = {
@@ -57,15 +55,13 @@ export const transformTechniqueForPost = (technique: any): NewTechnique | null =
     return transformedTechnique;
 };
 
-export const transformTechniqueForPut = (technique: any): UpdateTechnique | null => {
+export const transformTechniqueForPut = (technique: any): UpdateTechnique => {
     if (!Object.values(Gi).includes(technique.gi)) {
-        alert('Invalid Gi value');
-        return null;
+        throw new Error(`Invalid Gi value`)
     }
-  
+
     if (!Object.values(Hierarchy).includes(technique.hierarchy)) {
-      alert('Invalid Hierarchy value');
-        return null;
+        throw new Error(`Invalid Hierarchy value`)
     }
 
     const transformedTechnique: UpdateTechnique = {
@@ -102,25 +98,15 @@ export const postTechnique = async (technique: NewTechnique, accessToken: string
         const response = await fetch(`${API_SERVER_URL}technique`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify({ technique }),
         });
-  
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-  
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
         const responseData = await response.json();
-        console.log('Success:', responseData);
-        
         return responseData
-        } catch (error) {
-            console.error('Error:', error);
-            alert(`Error posting technique: ${error}`);
-            return null
-        }
+    } catch (error) { throw new Error(`Error posting technique: ${error}`) }
 };
 
 export const updateTechnique = async (technique: UpdateTechnique, accessToken: string | null): Promise<Technique | null> => {
@@ -128,81 +114,61 @@ export const updateTechnique = async (technique: UpdateTechnique, accessToken: s
         const response = await fetch(`${API_SERVER_URL}technique`, {
             method: 'PUT',
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify({ technique }),
         });
-  
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-  
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
         const responseData = await response.json();
-        console.log('Success:', responseData);
-        
         return responseData
-        } catch (error) {
-            console.error('Error:', error);
-            alert(`Error updating technique: ${error}`);
-            return null
-        }
+    } catch (error) { throw new Error(`Error updating technique: ${error}`) }
 };
 
 export const postCollectionTechniques = async (
-    collectionId: string, 
+    collectionId: string,
     collectionTechniques: { index: number, technique: Technique }[],
     accessToken: string | null
-    ) => {
+): Promise<CollectionTechnique[]> => {
     try {
-        const response = await fetch(`${API_SERVER_URL}collectionTechnique`, {
+        const response = await fetch(`${API_SERVER_URL}collectiontechnique`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({collectionId: collectionId, techniques: collectionTechniques}),
+            body: JSON.stringify({ collectionId: collectionId, techniques: collectionTechniques }),
         });
-  
         if (!response.ok) {
             throw new Error(`Failed with status ${response.status}`);
         }
-
-        const responseData = await response.json();
-        console.log('Success:', responseData);
-        } catch (error) {
-            console.error('Error:', error);
-            alert(`Error posting collection: ${error}`);
-        }
+        return await response.json();
+    } catch (error) { throw new Error(`Error posting collection techniques: ${error}`) }
 };
 
-export const transformCollectionForPost = (collection: any): NewCollection | null => {
+export const transformCollectionForPost = (collection: any): NewCollection => {
     if (!collection.title) {
-        alert('Invalid title value')
-        return null;
+        throw new Error(`Collection title missing`)
     }
 
     if (!collection.description) {
-        alert('Invalid description value')
-        return null;
+        throw new Error(`Collection description missing`)
     }
 
     if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
-        alert('Invalid Gi value');
-        return null;
+        throw new Error(`Gi value is invalid`)
     }
-  
+
     if (collection.hierarchy && !Object.values(Hierarchy).includes(collection.hierarchy)) {
-      alert('Invalid Hierarchy value');
-        return null;
+        throw new Error(`Hierarchy value is invalid`)
     }
- 
+
     const transformedCollection: NewCollection = {
         title: collection.title,
         description: collection.description,
         globalNotes: collection.globalNotes || null,
         gi: collection.gi as Gi || null,
-        hierarchy: collection.hierarchy as Hierarchy || null, 
+        hierarchy: collection.hierarchy as Hierarchy || null,
         type: {
             title: collection.type,
             description: collection.typeDescription
@@ -227,34 +193,30 @@ export const transformCollectionForPost = (collection: any): NewCollection | nul
     return transformedCollection;
 };
 
-export const transformCollectionForPut = (collection: any): UpdateCollection | null => {
+export const transformCollectionForPut = (collection: any): UpdateCollection => {
     if (!collection.title) {
-        alert('Invalid title value')
-        return null;
+        throw new Error(`Collection title missing`)
     }
 
     if (!collection.description) {
-        alert('Invalid description value')
-        return null;
+        throw new Error(`Collection description missing`)
     }
 
     if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
-        alert('Invalid Gi value');
-        return null;
+        throw new Error(`Gi value is invalid`)
     }
-  
+
     if (collection.hierarchy && !Object.values(Hierarchy).includes(collection.hierarchy)) {
-      alert('Invalid Hierarchy value');
-        return null;
+        throw new Error(`Hierarchy value is invalid`)
     }
- 
+
     const transformedCollection: UpdateCollection = {
         collectionId: collection.collectionId,
         title: collection.title,
         description: collection.description,
         globalNotes: collection.globalNotes || null,
         gi: collection.gi as Gi || null,
-        hierarchy: collection.hierarchy as Hierarchy || null, 
+        hierarchy: collection.hierarchy as Hierarchy || null,
         type: {
             title: collection.type,
             description: collection.typeDescription
@@ -282,8 +244,8 @@ export const transformCollectionForPut = (collection: any): UpdateCollection | n
 export const postCollection = async (
     collection: NewCollection,
     accessToken: string | null
-    ): Promise<Collection | null> => {
-    if (!accessToken) {console.log(`Invalid access token on post Collection: ${accessToken}`); return null}
+): Promise<Collection | null> => {
+    if (!accessToken) { console.log(`Invalid access token on post Collection: ${accessToken}`); return null }
     try {
         const response = await fetch(`${API_SERVER_URL}collection`, {
             method: 'POST',
@@ -291,29 +253,24 @@ export const postCollection = async (
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({collection: collection}),
+            body: JSON.stringify({ collection: collection }),
         });
 
-        console.log(collection)
-  
         if (!response.ok) {
             throw new Error(`Failed with status ${response.status}`);
         }
-  
+
         const responseData = await response.json();
-        
+
         return responseData
-        } catch (error) {
-            console.error('Error:', error);
-            return null
-        }
+    } catch (error) { throw new Error(`Error posting collection: ${error}`) }
 };
 
 export const updateCollection = async (
     collection: UpdateCollection,
     accessToken: string | null
-    ): Promise<Collection | null> => {
-    if (!accessToken) {console.log(`Invalid access token on update Collection: ${accessToken}`); return null}
+): Promise<Collection> => {
+    if (!accessToken) { throw new Error(`Invalid access token on update Collection`) }
     try {
         const response = await fetch(`${API_SERVER_URL}collection`, {
             method: 'PUT',
@@ -321,23 +278,16 @@ export const updateCollection = async (
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({collection: collection}),
+            body: JSON.stringify({ collection: collection }),
         });
-  
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-  
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
         const responseData = await response.json();
         return responseData
-        } catch (error) {
-            console.error('Error:', error);
-            return null
-        }
+    } catch (error) { throw new Error(`Error updating collection: ${error}`) }
 };
 
-export const deleteCollection = async (collectionId: string, accessToken: string | null): Promise<number | null> => {
-    if (!accessToken) {console.log(`Invalid access token on delete Collection: ${accessToken}`); return null}
+export const deleteCollection = async (collectionId: string, accessToken: string | null): Promise<number> => {
+    if (!accessToken) { throw new Error(`Invalid access token on update Collection`) }
     try {
         const response = await fetch(`${API_SERVER_URL}collection`, {
             method: 'DELETE',
@@ -345,24 +295,15 @@ export const deleteCollection = async (collectionId: string, accessToken: string
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({collectionId: collectionId}),
+            body: JSON.stringify({ collectionId: collectionId }),
         });
-
-    if (!response.ok) {
-        throw new Error(`Failed with status ${response.status}`);
-    }
-
-    const responseData = await response.json();
-        console.log('Success:', responseData);
-        return response.status
-        } catch (error) {
-            console.error('Error:', error);
-            return null
-        }
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+        return await response.json();
+    } catch (error) { throw new Error(`Error deleting collection: ${error}`) }
 };
 
-export const deleteTechnique = async (techniqueId: string, accessToken: string | null): Promise<number | null> => {
-    if (!accessToken) {console.log(`Invalid access token on delete Technique: ${accessToken}`); return null}
+export const deleteTechnique = async (techniqueId: string, accessToken: string | null): Promise<number> => {
+    if (!accessToken) { throw new Error(`Invalid access token on delete technique`) }
     try {
         const response = await fetch(`${API_SERVER_URL}technique`, {
             method: 'DELETE',
@@ -370,78 +311,69 @@ export const deleteTechnique = async (techniqueId: string, accessToken: string |
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({techniqueId: techniqueId}),
+            body: JSON.stringify({ techniqueId: techniqueId }),
         });
 
-    if (!response.ok) {
-        throw new Error(`Failed with status ${response.status}`);
-    }
-
-    const responseData = await response.json();
-        console.log('Success:', responseData);
-        return response.status
-        } catch (error) {
-            console.error('Error:', error);
-            return null
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
         }
+        return await response.json();
+    } catch (error) { throw new Error(`Error deleting technique: ${error}`) }
 };
 
-export const fetchCollections = async (accessToken: string | null) => {
-    if (!accessToken) {console.log(`Invalid access token on fetch Collections: ${accessToken}`); return null}
+export const fetchCollections = async (accessToken: string | null): Promise<Collection[]> => {
+    if (!accessToken) throw new Error(`Access token invalid on fetch collections`)
 
     try {
         const [collectionResponse] = await Promise.all([
-            fetch(`${API_SERVER_URL}collection`, { headers: { 'Authorization': `Bearer ${accessToken}` }})
+            fetch(`${API_SERVER_URL}collection`, { headers: { 'Authorization': `Bearer ${accessToken}` } })
         ]);
 
         const collections: Collection[] = await (collectionResponse.json())
-        collections.sort((a, b) => a.title.localeCompare(b.title));
 
         return collections
-    } catch (error) { console.log(`Error on fetch collections: ${error}`)}
+    } catch (error) { throw new Error(`Error on fetch collections: ${error}`) }
 };
 
-export const fetchCollectionTechniques = async (accessToken: string | null) => {
-    if (!accessToken) {console.log(`Invalid access token on fetch Collections: ${accessToken}`); return null}
-
+export const fetchCollectionTechniques = async (accessToken: string | null): Promise<CollectionTechnique[]> => {
+    if (!accessToken) throw new Error(`Access token error on fetch collection techniques`)
 
     try {
         const [collectionTechniqueResponse] = await Promise.all([
-            fetch(`${API_SERVER_URL}collectiontechnique`, { headers: { 'Authorization': `Bearer ${accessToken}` }})
+            fetch(`${API_SERVER_URL}collectiontechnique`, { headers: { 'Authorization': `Bearer ${accessToken}` } })
         ]);
 
         const collectionTechniques: CollectionTechnique[] = await (collectionTechniqueResponse.json())
 
         return collectionTechniques
-    } catch (error) { console.log(`Error on fetch collection techniques: ${error}`) }
+    } catch (error) { throw new Error(`Error on fetch collection techniques: ${error}`) }
 };
 
-export const fetchTechniques = async (accessToken: string | null) => {
-    if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
+export const fetchTechniques = async (accessToken: string | null): Promise<Technique[]> => {
+    if (!accessToken) throw new Error(`Access token error on fetch techniques`)
 
     try {
         const techniqueResponse = await fetch(`${API_SERVER_URL}technique`,
-            { headers: { 'Authorization': `Bearer ${accessToken}` },
-        
-    })
+            {
+                headers: { 'Authorization': `Bearer ${accessToken}` },
+            })
         const techniques = (await techniqueResponse.json())
-        
+
         return techniques
-    } catch (error) { console.log(`Error on fetch techniques: ${error}`)}
+    } catch (error) { throw new Error(`Failed to fetch techniques: ${error}`) }
 };
 
 export const fetchStudents = async (accessToken: string | null) => {
-    if (!accessToken) {console.log(`Invalid access token on fetch Techniques: ${accessToken}`); return null}
-
+    if (!accessToken) { throw new Error(`Invalid access token on fetch Techniques: ${accessToken}`); }
     try {
         const studentsResponse = await fetch(`${API_SERVER_URL}students`,
-        { headers: { 'Authorization': `Bearer ${accessToken}` }
-
-    })
+            {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            })
         const students = (await studentsResponse.json())
 
         return students
-    } catch (error) { console.log(`Error on fetch students: ${error}`)}
+    } catch (error) { throw new Error(`Error on fetch students: ${error}`) }
 };
 
 export const stripAuth0FromUserId = (id: string): string => {
@@ -449,11 +381,7 @@ export const stripAuth0FromUserId = (id: string): string => {
 };
 
 export const addStudentTechniques = async (studentId: string, techniques: Technique[], accessToken: string | null): Promise<void> => {
-    if (!accessToken) {
-        console.error(`Invalid access token on add Student Techniques: ${accessToken}`);
-        return;
-    }
-
+    if (!accessToken) { throw new Error(`Invalid access token on add Student Techniques: ${accessToken}`); }
     try {
         const response = await fetch(`${API_SERVER_URL}student-techniques`, {
             method: 'POST',
@@ -463,23 +391,12 @@ export const addStudentTechniques = async (studentId: string, techniques: Techni
             },
             body: JSON.stringify({ studentId, techniques }),
         });
-
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-
-        console.log('Student Techniques added successfully');
-    } catch (error) {
-        console.error('Error:', error);
-    }
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+    } catch (error) { throw new Error(`Error:, ${error}`); }
 };
 
 export const updateStudentTechnique = async (studentId: string, techniqueId: string, updatedData: any, accessToken: string | null): Promise<void> => {
-    if (!accessToken) {
-        console.error(`Invalid access token on update Student Technique: ${accessToken}`);
-        return;
-    }
-
+    if (!accessToken) { throw new Error(`Invalid access token on update Student Technique: ${accessToken}`); }
     try {
         const response = await fetch(`${API_SERVER_URL}student-technique/${studentId}/${techniqueId}`, {
             method: 'PUT',
@@ -489,23 +406,12 @@ export const updateStudentTechnique = async (studentId: string, techniqueId: str
             },
             body: JSON.stringify(updatedData),
         });
-
-        if (!response.ok) {
-            throw new Error(`Failed with status ${response.status}`);
-        }
-
-        console.log('Student Technique updated successfully');
-    } catch (error) {
-        console.error('Error:', error);
-    }
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+    } catch (error) { throw new Error(`Error:, ${error}`); }
 };
 
 export const getStudentTechniques = async (studentId: string, accessToken: string | null): Promise<any> => {
-    if (!accessToken) {
-        console.error(`Invalid access token on fetch Student Techniques: ${accessToken}`);
-        return;
-    }
-
+    if (!accessToken) { throw new Error(`Invalid access token on fetch Student Technique: ${accessToken}`); }
     try {
         const response = await fetch(`${API_SERVER_URL}student-technique/${studentId}`, {
             headers: {
@@ -519,8 +425,47 @@ export const getStudentTechniques = async (studentId: string, accessToken: strin
 
         const studentTechniques = await response.json();
         return studentTechniques;
-    } catch (error) {
-        console.error('Error:', error);
-        return null;
-    }
+    } catch (error) { throw new Error(`Error:, ${error}`); }
+};
+
+export const getPositions = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
+    if (!accessToken) { throw new Error(`Invalid access token on fetch positions: ${accessToken}`); }
+    try {
+        const response = await fetch(`${API_SERVER_URL}position`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+        const positions = await response.json();
+        return positions;
+    } catch (error) { throw new Error(`Error: ${error}`) }
+};
+
+export const getTypes = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
+    if (!accessToken) { throw new Error(`Invalid access token on fetch types: ${accessToken}`); }
+    try {
+        const response = await fetch(`${API_SERVER_URL}type`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+        const positions = await response.json();
+        return positions;
+    } catch (error) { throw new Error(`Error: ${error}`) }
+};
+
+export const getOpenGuards = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
+    if (!accessToken) { throw new Error(`Invalid access token on fetch open guards: ${accessToken}`); }
+    try {
+        const response = await fetch(`${API_SERVER_URL}openguard`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+        });
+        if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+        const positions = await response.json();
+        return positions;
+    } catch (error) { throw new Error(`Error: ${error}`) }
 };

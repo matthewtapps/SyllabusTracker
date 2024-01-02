@@ -38,7 +38,19 @@ export class CollectionService {
             collectionTechniques.push(newCollectionTechnique)
         };
 
-        return await collectionTechniqueRepo.save(collectionTechniques);
+        await collectionTechniqueRepo.save(collectionTechniques);
+
+        const returnObject = await collectionTechniqueRepo.createQueryBuilder("collectionTechnique")
+            .leftJoinAndSelect("collectionTechnique.technique", "technique")
+            .leftJoinAndSelect("technique.type", "type")
+            .leftJoinAndSelect("technique.position", "position")
+            .leftJoinAndSelect("technique.openGuard", "openGuard")
+            .leftJoinAndSelect("collectionTechnique.collection", "collection")
+            .where("collectionTechnique.collection = :collectionId", { collectionId: data.collectionId })
+            .orderBy("collectionTechnique.order", "ASC")
+            .getMany();
+
+        return returnObject
     }
 
     async createCollection(data: {collection: NewCollection}): Promise<Collection> {

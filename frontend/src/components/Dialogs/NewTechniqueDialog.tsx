@@ -1,16 +1,18 @@
-import React from 'react';
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import MuiCard from '@mui/material/Card'
+import { CardContent, styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
+import MuiCard from '@mui/material/Card';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCollectionSuggestionsAsync } from '../../slices/suggestions';
+import { AppDispatch, RootState } from '../../store/store';
 import { FastTextField as TextField } from '../Fields/FastTextField';
-import { CardContent, styled } from '@mui/material';
-import { Technique } from 'common';
-import { TitleTextField } from '../Fields/TitleTextField';
-import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { SelectField } from '../Fields/SelectField';
+import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
+import { TitleTextField } from '../Fields/TitleTextField';
 
 
 const Card = styled(MuiCard)({
@@ -31,23 +33,6 @@ interface NewTechniqueDialogProps {
     onClose: () => void;
     onCancel: () => void;
     onSave: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
-    techniqueOptions: {
-        titleOptions: string[];
-        giOptions: string[];
-        hierarchyOptions: string[];
-        typeOptions: string[];
-        positionOptions: string[];
-        openGuardOptions: string[];
-    } | null;
-    techniqueList: Technique[];
-};
-
-interface DescriptionMap {
-    [key: string]: string | undefined;
-};
-
-interface Descriptions {
-    [key: string]: DescriptionMap
 };
 
 export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
@@ -62,35 +47,13 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
 
     const isPositionOpenGuard = localPositionState.toLowerCase() === 'open guard';
 
-    const generateDescriptionObjects = (techniques: Technique[]) => {
-        let descriptions: Descriptions = {
-            position: {},
-            type: {},
-            openGuard: {},
-        };
-
-        techniques.forEach(technique => {
-            if (technique.position && technique.position.title) {
-                descriptions.position[technique.position.title] = technique.position.description;
-            }
-    
-            if (technique.type && technique.type.title) {
-                descriptions.type[technique.type.title] = technique.type.description;
-            }
-    
-            if (technique.openGuard && technique.openGuard.title) {
-                descriptions.openGuard[technique.openGuard.title] = technique.openGuard.description;
-            }
-        });
-
-        return descriptions
-    };
-    
-    const [descriptions, setDescriptions] = React.useState(generateDescriptionObjects(props.techniqueList));
+    const dispatch = useDispatch<AppDispatch>();
+    const { techniqueSuggestions } = useSelector((state: RootState) => state.suggestions);
+    const { descriptions } = useSelector((state: RootState) => state.descriptions)
 
     React.useEffect(() => {
-        setDescriptions(generateDescriptionObjects(props.techniqueList))
-    }, [props.techniqueList]) 
+        dispatch(fetchCollectionSuggestionsAsync())
+    }, [dispatch]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -116,7 +79,7 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                     <Card>
                         <CardContent>
                             <TitleTextField wasSubmitted={wasSubmitted} size="small" fullWidth required
-                            name="title" label="Technique Title" options={props.techniqueOptions?.titleOptions}/>
+                            name="title" label="Technique Title" options={techniqueSuggestions.titleOptions}/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth required
                             multiline rows={4} name="description" label="Technique Description"/>
@@ -125,19 +88,19 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                             multiline rows={4} name="globalNotes" label="Global Notes"/>
                             
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="position" 
-                            label="Position" descriptionLabel="Position Description" options={props.techniqueOptions?.positionOptions} descriptions={descriptions} 
+                            label="Position" descriptionLabel="Position Description" options={techniqueSuggestions.positionOptions} descriptions={descriptions} 
                             onPositionBlur={handlePositionBlur} />
 
-                            <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" options={props.techniqueOptions?.hierarchyOptions} required/>
+                            <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" options={techniqueSuggestions.hierarchyOptions} required/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type" 
-                            label="Type" descriptionLabel="Type Description" options={props.techniqueOptions?.typeOptions} descriptions={descriptions} />
+                            label="Type" descriptionLabel="Type Description" options={techniqueSuggestions.typeOptions} descriptions={descriptions} />
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth name="openGuard"
-                            label="Open Guard" descriptionLabel="Open Guard Description" options={props.techniqueOptions?.openGuardOptions} 
+                            label="Open Guard" descriptionLabel="Open Guard Description" options={techniqueSuggestions.openGuardOptions} 
                             descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard}/>
 
-                            <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" options={props.techniqueOptions?.giOptions} required/>
+                            <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" options={techniqueSuggestions.giOptions} required/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth name="videoSrc" label="Video Link"/>
                         </CardContent>

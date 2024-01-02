@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import { useAuth0, User } from '@auth0/auth0-react';
 import React from 'react';
 import { fetchStudents } from '../../../util/Utilities';
-import StudentList from '../../../components/Lists/StudentList';
+import StudentList from '../../../components/Lists/Base Lists/StudentList';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';

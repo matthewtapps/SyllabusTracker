@@ -28,7 +28,7 @@ export class TechniqueController {
         const techniqueService = new TechniqueService()
         try {
             await techniqueService.deleteTechnique(req.body)
-            res.status(200)
+            res.status(200).json({ message: 'Technique deleted successfully' });
         } catch (error) {
             res.status(400).json({error: error.message})
         }

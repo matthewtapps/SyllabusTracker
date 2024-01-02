@@ -48,7 +48,6 @@ function DragDropTechniquesList(props: DragDropTechniquesListProps): JSX.Element
         const reorderedTechniques = Array.from(props.selectedTechniques);
         const [reorderedItem] = reorderedTechniques.splice(result.source.index, 1);
         reorderedTechniques.splice(result.destination.index, 0, reorderedItem);
-        console.log(reorderedTechniques)
         props.onReorder(reorderedTechniques);
     };
 

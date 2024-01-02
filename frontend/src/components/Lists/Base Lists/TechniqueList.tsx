@@ -14,6 +14,11 @@ import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import MuiCard from '@mui/material/Card';
 import Card from '@mui/material/Card';
 import { CardContent } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAuth0 } from '@auth0/auth0-react';
+import { setAccessToken } from '../../../slices/auth';
+import { AppDispatch, RootState } from '../../../store/store';
+import { fetchTechniquesAsync } from '../../../slices/techniques';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -97,7 +102,7 @@ const SubCard = styled(MuiCard)({
 })
 
 interface TechniquesListProps {
-    filteredTechniques: Technique[];
+    filteredTechniques?: Technique[];
     checkbox?: boolean;
     ordered?: boolean;
     elevation: number;
@@ -107,6 +112,8 @@ interface TechniquesListProps {
     editingTechniqueId?: string | null;
     editingTechnique?: TechniqueDTO | null;
     onEditClick?: (technique: Technique) => void;
+    expandedTechniqueId?: string;
+    onAccordionChange?: (techniqueId: string) => void;
 }
 
 TechniqueList.defaultProps = {
@@ -117,14 +124,41 @@ TechniqueList.defaultProps = {
 }
 
 function TechniqueList(props: TechniquesListProps): JSX.Element {
+    const { getAccessTokenSilently } = useAuth0();
+    const dispatch = useDispatch<AppDispatch>();
+
+    React.useEffect(() => {
+        const getAccessToken = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+                dispatch(setAccessToken(token))
+
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        getAccessToken();
+    }, [getAccessTokenSilently, dispatch]);
+
+    const { techniques, loading } = useSelector((state: RootState) => state.techniques);
+
+    React.useEffect(() => {
+        if (techniques.length === 0 && !loading) {
+            dispatch(fetchTechniquesAsync());
+        }
+    }, [dispatch, techniques.length, loading]);
+
+    const techniquesToDisplay = props.filteredTechniques || techniques
 
     return (
         <div>
-            {props.filteredTechniques.length > 0 ? (
-            props.filteredTechniques.map((technique, index) => {
+            {techniquesToDisplay.length > 0 ? (
+            techniquesToDisplay.map((technique, index) => {
                 let currentOrder = props.ordered ? index + 1 : null;
             return (
-                <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
+                <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId} 
+                expanded={props.expandedTechniqueId ? props.expandedTechniqueId === technique.techniqueId : undefined}>
                     <AccordionSummary
                         expandIcon={<ExpandMore/>}
                         aria-controls="panel1a-content"

@@ -8,10 +8,12 @@ import MuiButton, { ButtonProps } from '@mui/material/Button';
 import theme from '../../theme/Theme';
 import { FastTextField } from '../Fields/FastTextField';
 import { CardContent, styled } from '@mui/material';
-import { Technique } from 'common';
 import { TitleTextField } from '../Fields/TitleTextField';
 import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { SelectField } from '../Fields/SelectField';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCollectionSuggestionsAsync } from '../../slices/suggestions';
+import { AppDispatch, RootState } from '../../store/store';
 
 
 const TextField = styled(FastTextField)({
@@ -54,24 +56,8 @@ interface EditTechniqueDialogProps {
     onSave: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     editingTechnique: TechniqueDTO;
     editingTechniqueId: string;
-    editingTechniqueOptions: {
-        titleOptions: string[],
-        positionOptions: string[],
-        hierarchyOptions: string[],
-        typeOptions: string[],
-        openGuardOptions: string[],
-        giOptions: string[]
-    } | null;
-    techniqueList: Technique[];
 }
 
-interface DescriptionMap {
-    [key: string]: string | undefined;
-};
-
-interface Descriptions {
-    [key: string]: DescriptionMap
-};
 
 export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
     const [wasSubmitted, setWasSubmitted] = React.useState(false);
@@ -84,31 +70,13 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
 
     const isPositionOpenGuard = localPositionState.toLowerCase() === 'open guard';
 
-    const generateDescriptionObjects = (techniques: Technique[]) => {
-        let descriptions: Descriptions = {
-            position: {},
-            type: {},
-            openGuard: {},
-        }
+    const dispatch = useDispatch<AppDispatch>();
+    const { techniqueSuggestions } = useSelector((state: RootState) => state.suggestions);
+    const { descriptions } = useSelector((state: RootState) => state.descriptions)
 
-        techniques.forEach(technique => {
-            if (technique.position && technique.position.title) {
-                descriptions.position[technique.position.title] = technique.position.description;
-            }
-    
-            if (technique.type && technique.type.title) {
-                descriptions.type[technique.type.title] = technique.type.description;
-            }
-    
-            if (technique.openGuard && technique.openGuard.title) {
-                descriptions.openGuard[technique.openGuard.title] = technique.openGuard.description;
-            }
-        });
-
-        return descriptions
-    }
-    
-    const descriptions = generateDescriptionObjects(props.techniqueList)
+    React.useEffect(() => {
+        dispatch(fetchCollectionSuggestionsAsync())
+    }, [dispatch]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -137,7 +105,7 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
                     <Card>
                         <CardContent>
                             <TitleTextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingTechnique?.title || ''}
-                            name="title" label="Technique Title" options={props.editingTechniqueOptions?.titleOptions}/>
+                            name="title" label="Technique Title" options={techniqueSuggestions.titleOptions}/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingTechnique?.description || ''}
                             multiline rows={4} name="description" label="Technique Description"/>
@@ -146,23 +114,23 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
                             multiline rows={4} name="globalNotes" label="Global Notes"/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="position"
-                            label="Position" descriptionLabel="Position Description" options={props.editingTechniqueOptions?.positionOptions} 
+                            label="Position" descriptionLabel="Position Description" options={techniqueSuggestions.positionOptions} 
                             descriptions={descriptions} onPositionBlur={handlePositionBlur} defaultValue={props.editingTechnique?.position || ''} 
                             descriptionDefaultValue={props.editingTechnique?.positionDescription || ''}/>
 
                             <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" defaultValue={props.editingTechnique?.hierarchy || ''}
-                            options={props.editingTechniqueOptions?.hierarchyOptions} required/>
+                            options={techniqueSuggestions.hierarchyOptions} required/>
                                     
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type" 
                             defaultValue={props.editingTechnique?.type || ''} descriptionDefaultValue={props.editingTechnique?.typeDescription || ''}
-                            label="Type" descriptionLabel="Type Description" options={props.editingTechniqueOptions?.typeOptions} descriptions={descriptions} />
+                            label="Type" descriptionLabel="Type Description" options={techniqueSuggestions.typeOptions} descriptions={descriptions} />
 
                             <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" defaultValue={props.editingTechnique?.gi || ''}
-                            options={props.editingTechniqueOptions?.giOptions} required/>
+                            options={techniqueSuggestions.giOptions} required/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth name="openGuard" 
                             defaultValue={props.editingTechnique?.openGuard || ''} descriptionDefaultValue={props.editingTechnique?.openGuardDescription || ''}
-                            label="Open Guard" descriptionLabel="Open Guard Description" options={props.editingTechniqueOptions?.openGuardOptions} 
+                            label="Open Guard" descriptionLabel="Open Guard Description" options={techniqueSuggestions.openGuardOptions} 
                             descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard}/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth label="Video Source"

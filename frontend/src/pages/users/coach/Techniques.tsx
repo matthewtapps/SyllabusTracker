@@ -1,19 +1,16 @@
 import React from 'react'
-import Typography from '@mui/material/Typography'
-import MuiCard from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import { Technique } from 'common'
-import { styled } from '@mui/material/styles'
-import CircularProgress from '@mui/material/CircularProgress'
-import Box from '@mui/material/Box'
-import TechniqueList from '../../../components/Lists/TechniqueList'
-import TechniqueFilter, { useDetermineTechniqueFilterOptions, useHandleTechniqueFilterChange } from '../../../components/Lists/TechniqueFilter'
-import { postTechnique, deleteTechnique, fetchTechniques, transformTechniqueForPost, transformTechniqueForPut, updateTechnique } from '../../../util/Utilities'
+import { transformTechniqueForPost, transformTechniqueForPut } from '../../../util/Utilities'
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
 import { NewTechniqueDialog } from '../../../components/Dialogs/NewTechniqueDialog'
 import { useAuth0 } from '@auth0/auth0-react'
+import { TechniqueListWithFilters } from '../../../components/Lists/TechniquesListWithFilters'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../../../store/store'
+import { deleteTechniqueAsync, postTechniqueAsync, updateTechniqueAsync } from '../../../slices/techniques'
+import { setAccessToken } from '../../../slices/auth'
 
 
 interface TechniqueDTO {
@@ -46,52 +43,28 @@ const emptyTechniqueDTO: TechniqueDTO = {
     openGuardDescription: undefined,
 }
 
-const Card = styled(MuiCard)({
-    '&.MuiCard-root': {
-        marginLeft: "10px",
-        marginTop: "10px",
-        marginRight: "10px",
-        borderRadius: "2",
-        boxShadow: "3"
-    }
-});
-
 function CoachTechniques(): JSX.Element {
     const { getAccessTokenSilently } = useAuth0();
-    const [accessToken, setAccessToken] = React.useState<string | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
 
     React.useEffect(() => {
         const getAccessToken = async () => {
             try {
                 const token = await getAccessTokenSilently();
-                setAccessToken(token);
-
-                const techniques = await fetchTechniques(token);
-                if (techniques) {
-                    setTechniquesList(techniques);
-                    setTechniqueSuggestions(generateTechniqueSuggestions(techniques));
-                    setLoading(false);                    
-                }
+                dispatch(setAccessToken(token))
 
             } catch (error) {
-                setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-                setLoading(false)
+                console.log(error);
             }
         };
 
         getAccessToken();
-    }, [getAccessTokenSilently]);
+    }, [getAccessTokenSilently, dispatch]);
 
-    // Whether content is loading or not state
-    const [loading, setLoading] = React.useState(true);
-    const [placeholderContent, setPlaceholderContent] = React.useState('No technique data available')
     const [showFab, setShowFab] = React.useState(true)
 
-    // List of techniques state
-    const [techniquesList, setTechniquesList] = React.useState<Technique[]>([])
-
     // Technique editing states and functions
-    const [editingTechniqueId, setEditingTechniqueId] = React.useState<string | null>(null);
+    const [editingTechniqueId, setEditingTechniqueId] = React.useState<string>("");
     const [editedTechnique, setEditedTechnique] = React.useState<TechniqueDTO>(emptyTechniqueDTO);
     const [editingTechniqueDialogOpen, setEditingTechniqueDialogOpen] = React.useState(false)
 
@@ -127,58 +100,27 @@ function CoachTechniques(): JSX.Element {
             techniqueId: editingTechniqueId
         }
         const validTechnique = transformTechniqueForPut(fieldValuesWithId);
-        if (!validTechnique) {
-            alert('Not a valid technique posted')
-            return
-        };
-        
-        const updatedTechnique = await updateTechnique(validTechnique, accessToken);        
 
-        if (updatedTechnique) {
-            setTechniquesList((prevTechniques) => {
-                const updatedTechniques = [...prevTechniques];
-                const indexToUpdate = updatedTechniques.findIndex(technique => technique.techniqueId === editingTechniqueId);
-                
-                if ((indexToUpdate !== -1) && (editingTechniqueId)) {
-                    updatedTechniques[indexToUpdate] = { 
-                        ...updatedTechnique
-                    };
-                }
-
-                return updatedTechniques;
-            });
+        dispatch(updateTechniqueAsync(validTechnique))
     
-            setEditingTechniqueDialogOpen(false)
-        }
+        setEditingTechniqueDialogOpen(false)
     }
     
     const handleCancelClick = () => {
         setEditingTechniqueDialogOpen(false)
         setNewTechniqueDialogOpen(false)
-    } // Doesn't care which dialog is getting cancelled
+    }
 
     const handleDeleteClick = (techniqueId: string) => {
-        const status = deleteTechnique(techniqueId, accessToken)
-        
-        if (status !== null) {setTechniquesList((techniques) => {
-            let newTechniques = [
-                ...techniques.filter(technique => {
-                    return technique.techniqueId !== editingTechniqueId
-                })
-            ]
-
-            return newTechniques
-        });
-
+        dispatch(deleteTechniqueAsync(techniqueId))
         setEditingTechniqueDialogOpen(false)
         setShowFab(true);
-        }
     }
 
     const handleNewTechniqueClick = () => {
         setNewTechniqueDialogOpen(true)
         setEditedTechnique(emptyTechniqueDTO)
-        setEditingTechniqueId(null)
+        setEditingTechniqueId("")
         setShowFab(false)
     }
 
@@ -188,105 +130,18 @@ function CoachTechniques(): JSX.Element {
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
         const validTechnique = transformTechniqueForPost(fieldValues);
-        if (!validTechnique) {
-            alert('Not a valid technique posted')
-            return
-        };
-        
-        const postedTechnique = await postTechnique(validTechnique, accessToken);        
 
-        if (postedTechnique) {
-            setTechniquesList((prevTechniques) => {
-                const updatedTechniques = [...prevTechniques];
-                updatedTechniques.unshift(postedTechnique)
-                return updatedTechniques
-            });
-    
-            setNewTechniqueDialogOpen(false)
-            setShowFab(true);
-        }
-    }
-
-    // Generate options for the filters based on the full techniques list
-    const options = useDetermineTechniqueFilterOptions(techniquesList)
-    
-    // Generated list of filtered techniques which is held at this level, and function for handling filter
-    // changes which is passed to the onFiltersChange prop on TechniqueFilter
-    const { filteredTechniques, handleTechniqueFilterChange: handleFilterChange } = useHandleTechniqueFilterChange(techniquesList)
-
-    // Autocomplete suggestions when editing techniques
-    const [techniqueSuggestions, setTechniqueSuggestions] = React.useState<{
-        titleOptions: string[],
-        positionOptions: string[],
-        hierarchyOptions: string[],
-        typeOptions: string[],
-        openGuardOptions: string[],
-        giOptions: string[]
-    }>({
-        titleOptions: [],
-        positionOptions: [],
-        hierarchyOptions: [],
-        typeOptions: [],
-        openGuardOptions: [],
-        giOptions: []
-    })
-
-    const generateTechniqueSuggestions = (techniqueList: Technique[]): {
-        titleOptions: string[],
-        positionOptions: string[],
-        hierarchyOptions: string[],
-        typeOptions: string[],
-        openGuardOptions: string[],
-        giOptions: string[]
-    } => {
-        let generatedSuggestions: {
-            titleOptions: string[],
-            positionOptions: string[],
-            hierarchyOptions: string[],
-            typeOptions: string[],
-            openGuardOptions: string[],
-            giOptions: string[]
-        } = { 
-            titleOptions: [],
-            positionOptions: [],
-            hierarchyOptions: ["Top", "Bottom"],
-            typeOptions: [],
-            openGuardOptions: [],
-            giOptions: ["Yes Gi", "No Gi", "Both"]
-        }
-        techniqueList.forEach(technique => {
-            if (!generatedSuggestions.titleOptions.includes(technique.title)) {generatedSuggestions.titleOptions.push(technique.title)}
-            if (!generatedSuggestions.positionOptions.includes(technique.position?.title)) {generatedSuggestions.positionOptions.push(technique.position.title)}
-            if (!generatedSuggestions.typeOptions.includes(technique.type?.title)) {generatedSuggestions.typeOptions.push(technique.type.title)}
-            if (technique.openGuard && (!generatedSuggestions.openGuardOptions.includes(technique.openGuard?.title))) {generatedSuggestions.openGuardOptions.push(technique.openGuard?.title)}
-        })
-        return generatedSuggestions
+        dispatch(postTechniqueAsync(validTechnique))
+        setNewTechniqueDialogOpen(false)
+        setShowFab(true);
     }
 
     return (
         <div>
-            <Card>
-                <TechniqueFilter 
-                onTechniqueFiltersChange={handleFilterChange} 
-                options={options}/>
-            </Card>
-            <Card>
-            {loading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-                    <CircularProgress />
-                </Box>
-            ) : filteredTechniques.length === 0 ? (
-                <CardContent>
-                    <Typography>{placeholderContent}</Typography>
-                </CardContent>
-            ) : (
-                <TechniqueList
-                filteredTechniques={filteredTechniques}
-                editable
-                onEditClick={handleEditClick}
-                />
-            )}
-            </Card>
+            <TechniqueListWithFilters
+            onTechniqueEditClick={handleEditClick}
+            editable
+            />
             <Fab // Should only exist on coach version of techniques
             color="primary" 
             aria-label="add" 
@@ -303,17 +158,13 @@ function CoachTechniques(): JSX.Element {
                 onDelete={handleDeleteClick}
                 onSave={handleEditSaveClick}
                 editingTechnique={editedTechnique}
-                editingTechniqueId={editingTechniqueId || ""}
-                editingTechniqueOptions={techniqueSuggestions}
-                techniqueList={techniquesList}
+                editingTechniqueId={editingTechniqueId}
             />
             <NewTechniqueDialog
                 dialogOpen={newTechniqueDialogOpen}
                 onClose={handleCancelClick}
                 onCancel={handleCancelClick}
                 onSave={handleNewTechniqueSaveClick}
-                techniqueList={techniquesList}
-                techniqueOptions={techniqueSuggestions}
             />
         </div>
     );

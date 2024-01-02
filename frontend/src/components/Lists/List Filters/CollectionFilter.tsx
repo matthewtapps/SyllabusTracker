@@ -38,70 +38,42 @@ export interface CollectionFilters {
     gi: string | null;
 }
 
-export const useDetermineCollectionFilterOptions = (collections: Collection[]) => {
-    // Autocomplete options for filters
-    const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
-    const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
-    const [positionOptions, setPositionOptions] = React.useState<string[]>([]);
-    const [openGuardOptions, setOpenGuardOptions] = React.useState<string[]>([]);
-    const [giOptions] = React.useState<string[]>(['Yes Gi', 'No Gi', 'Both']);
-
-    // Object of the above to pass to filter component
-    const options = {
-        giOptions: giOptions,
-        hierarchyOptions: hierarchyOptions,
-        typeOptions: typeOptions,
-        positionOptions: positionOptions,
-        openGuardOptions: openGuardOptions
-    }
-
-    React.useEffect(() => {
-        const types: string[] = []
-        const positions: string[] = []
-        const openGuards: string[] = []
-
-        collections.forEach(collection => {
-            if (collection.type && !types.includes(collection.type.title)) {
-                types.push(collection.type.title);
-            }
-            if (collection.position && !positions.includes(collection.position.title)) {
-                positions.push(collection.position.title);
-            }
-            if (collection.openGuard && !openGuards.includes(collection.openGuard.title)) {
-                openGuards.push(collection.openGuard.title);
-            }
-        });
-        
-        setTypeOptions(types)
-        setPositionOptions(positions)
-        setOpenGuardOptions(openGuards)
-    }, [collections]);
-
-    return options
-}
-
 export const useHandleCollectionFilterChange = (collectionsList: Collection[]) => {
     const [filteredCollections, setFilteredCollections] = React.useState<Collection[]>([]);
+    const [currentFilters, setCurrentFilters] = React.useState<CollectionFilters>({
+        title: '',
+        hierarchy: null,
+        type: null,
+        position: null,
+        openGuard: null,
+        gi: null,
+    });
 
-    const handleCollectionFilterChange = React.useCallback((newFilters: CollectionFilters) => {
-        const giFilterMatch = (filterValue: string, collectionValue: string) => {
-            return collectionValue === 'Both' || collectionValue.includes(filterValue);
+    const giFilterMatch = (filterValue: string, collectionValue: string) => {
+        return collectionValue === 'Both' || collectionValue.includes(filterValue);
+    };
+
+    React.useEffect(() => {
+        const filterCollections = (filters: CollectionFilters) => {
+            return collectionsList.filter(collection => {
+                return (!filters.title || collection.title.toLowerCase().includes(filters.title.toLowerCase())) &&
+                       (!filters.hierarchy || (collection.hierarchy && collection.hierarchy.includes(filters.hierarchy))) &&
+                       (!filters.type || (collection.type && collection.type.title.includes(filters.type))) &&
+                       (!filters.position || (collection.position && collection.position.title.includes(filters.position))) &&
+                       (!filters.openGuard || (collection.openGuard && collection.openGuard.title.includes(filters.openGuard))) &&
+                       (!filters.gi || (collection.gi && giFilterMatch(filters.gi, collection.gi)));
+            });
         };
-        const updatedFilteredCollections = collectionsList.filter(collection => {
-            return (!newFilters.title || collection.title.toLowerCase().includes(newFilters.title.toLowerCase())) &&
-                   ( !newFilters.hierarchy || (collection.hierarchy && collection.hierarchy.includes(newFilters.hierarchy))) &&
-                   (!newFilters.type || (collection.type && collection.type.title.includes(newFilters.type))) &&
-                   (!newFilters.position || (collection.position && collection.position.title.includes(newFilters.position))) &&
-                   (!newFilters.openGuard || (collection.openGuard && collection.openGuard.title.includes(newFilters.openGuard))) &&
-                   (!newFilters.gi || (collection.gi && giFilterMatch(newFilters.gi, collection.gi)));
-        });
-    
-        setFilteredCollections(updatedFilteredCollections);
 
-    },[collectionsList]);
+        setFilteredCollections(filterCollections(currentFilters));
+    }, [collectionsList, currentFilters]);
 
-    return { filteredCollections: filteredCollections, handleCollectionFilterChange };
-}
+    const handleCollectionFilterChange = (newFilters: CollectionFilters) => {
+        setCurrentFilters(newFilters);
+    };
+
+    return { filteredCollections, handleCollectionFilterChange };
+};
 
 function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options }: CollectionFilterProps): JSX.Element {
     const [filters, setFilters] = React.useState<CollectionFilters>({

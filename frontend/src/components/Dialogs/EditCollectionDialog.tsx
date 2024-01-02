@@ -1,17 +1,23 @@
-import React from 'react';
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import MuiCard from '@mui/material/Card'
+import { useAuth0 } from '@auth0/auth0-react';
+import { CardContent, styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
+import MuiCard from '@mui/material/Card';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { Collection } from 'common';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAccessToken } from '../../slices/auth';
+import { fetchDescriptionsAsync } from '../../slices/descriptions';
+import { fetchCollectionSuggestionsAsync } from '../../slices/suggestions';
+import { AppDispatch, RootState } from '../../store/store';
 import theme from '../../theme/Theme';
 import { FastTextField } from '../Fields/FastTextField';
-import { CardContent, styled } from '@mui/material';
-import { Collection, Technique } from 'common';
-import { TitleTextField } from '../Fields/TitleTextField';
-import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { SelectField } from '../Fields/SelectField';
+import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
+import { TitleTextField } from '../Fields/TitleTextField';
 
 
 const TextField = styled(FastTextField)({
@@ -39,26 +45,30 @@ interface EditCollectionDialogProps {
     onSave: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     editingCollection: Collection | null;
     editingCollectionId: string;
-    editingCollectionOptions: {
-        titleOptions: string[];
-        giOptions: string[];
-        hierarchyOptions: string[];
-        typeOptions: string[];
-        positionOptions: string[];
-        openGuardOptions: string[];
-    } | null;
-    techniqueList: Technique[];
 }
 
-interface DescriptionMap {
-    [key: string]: string | undefined;
-};
-
-interface Descriptions {
-    [key: string]: DescriptionMap
-};
-
 export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { getAccessTokenSilently } = useAuth0();
+    React.useEffect(() => {
+        const getAccessToken = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+                dispatch(setAccessToken(token))
+
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        getAccessToken();
+        dispatch(fetchCollectionSuggestionsAsync())
+        dispatch(fetchDescriptionsAsync())
+    }, [getAccessTokenSilently, dispatch]);
+
+    const { collectionSuggestions } = useSelector((state: RootState) => state.suggestions);
+    const { descriptions } = useSelector((state: RootState) => state.descriptions)
+    
     const [wasSubmitted, setWasSubmitted] = React.useState(false);
     const [localPositionState, setLocalPositionState] = React.useState(props.editingCollection?.position?.title || '')
 
@@ -68,32 +78,6 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
     };
 
     const isPositionOpenGuard = localPositionState.toLowerCase() === 'open guard';
-
-    const generateDescriptionObjects = (techniques: Technique[]) => {
-        let descriptions: Descriptions = {
-            position: {},
-            type: {},
-            openGuard: {},
-        }
-
-        techniques.forEach(technique => {
-            if (technique.position && technique.position.title) {
-                descriptions.position[technique.position.title] = technique.position.description;
-            }
-    
-            if (technique.type && technique.type.title) {
-                descriptions.type[technique.type.title] = technique.type.description;
-            }
-    
-            if (technique.openGuard && technique.openGuard.title) {
-                descriptions.openGuard[technique.openGuard.title] = technique.openGuard.description;
-            }
-        });
-
-        return descriptions
-    }
-    
-    const descriptions = generateDescriptionObjects(props.techniqueList)
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -122,7 +106,7 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                     <Card>
                         <CardContent>
                             <TitleTextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingCollection?.title || ''}
-                            name="title" label="Collection Title" options={props.editingCollectionOptions?.titleOptions}/>
+                            name="title" label="Collection Title" options={collectionSuggestions.titleOptions}/>
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingCollection?.description}
                             multiline rows={4} name="description" label="Collection Description"/>
@@ -131,23 +115,23 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                             multiline rows={4} name="globalNotes" label="Global Notes"/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="position"
-                            label="Position" descriptionLabel="Position Description" options={props.editingCollectionOptions?.positionOptions} 
+                            label="Position" descriptionLabel="Position Description" options={collectionSuggestions.positionOptions} 
                             descriptions={descriptions} onPositionBlur={handlePositionBlur} defaultValue={props.editingCollection?.position?.title || ''} 
                             descriptionDefaultValue={props.editingCollection?.position?.description || ''}/>
 
                             <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" defaultValue={props.editingCollection?.hierarchy || ''}
-                            options={props.editingCollectionOptions?.hierarchyOptions} required/>
+                            options={collectionSuggestions.hierarchyOptions} required/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type" 
                             defaultValue={props.editingCollection?.type?.title || ''} descriptionDefaultValue={props.editingCollection?.type?.description || ''}
-                            label="Type" descriptionLabel="Type Description" options={props.editingCollectionOptions?.typeOptions} descriptions={descriptions} />
+                            label="Type" descriptionLabel="Type Description" options={collectionSuggestions.typeOptions} descriptions={descriptions} />
 
                             <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" defaultValue={props.editingCollection?.gi || ''}
-                            options={props.editingCollectionOptions?.giOptions} required/>
+                            options={collectionSuggestions.giOptions} required/>
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth name="openGuard" 
                             defaultValue={props.editingCollection?.openGuard?.title || ''} descriptionDefaultValue={props.editingCollection?.openGuard?.description || ''}
-                            label="Open Guard" descriptionLabel="Open Guard Description" options={props.editingCollectionOptions?.openGuardOptions} 
+                            label="Open Guard" descriptionLabel="Open Guard Description" options={collectionSuggestions.openGuardOptions} 
                             descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard}/>
                         </CardContent>
                     </Card>

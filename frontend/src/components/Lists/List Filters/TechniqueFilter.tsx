@@ -10,7 +10,6 @@ import { Technique } from 'common';
 import { FormControl, InputLabel, Select, MenuItem, Button, Box } from '@mui/material';
 
 
-
 const Accordion = styled(MuiAccordion)({
     backgroundColor: `#3c3836`,
     boxShadow: 'none',
@@ -47,67 +46,39 @@ export interface TechniqueFilters {
     gi: string | null;
 }
 
-export const useDetermineTechniqueFilterOptions = (techniques: Technique[]) => {
-    // Autocomplete options for filters
-    const [hierarchyOptions] = React.useState<string[]>(['Top', 'Bottom']);
-    const [typeOptions, setTypeOptions] = React.useState<string[]>([]);
-    const [positionOptions, setPositionOptions] = React.useState<string[]>([]);
-    const [openGuardOptions, setOpenGuardOptions] = React.useState<string[]>([]);
-    const [giOptions] = React.useState<string[]>(['Yes Gi', 'No Gi', 'Both']);
-
-    // Object of the above to pass to filter component
-    const options = {
-        giOptions: giOptions,
-        hierarchyOptions: hierarchyOptions,
-        typeOptions: typeOptions,
-        positionOptions: positionOptions,
-        openGuardOptions: openGuardOptions
-    }
-
-    React.useEffect(() => {
-        const types: string[] = []
-        const positions: string[] = []
-        const openGuards: string[] = []
-
-        techniques.forEach(technique => {
-            if (!types.includes(technique.type.title)) {
-                types.push(technique.type.title);
-            }
-            if (!positions.includes(technique.position.title)) {
-                positions.push(technique.position.title);
-            }
-            if (technique.openGuard && !openGuards.includes(technique.openGuard.title)) {
-                openGuards.push(technique.openGuard.title);
-            }
-        });
-        
-        setTypeOptions(types)
-        setPositionOptions(positions)
-        setOpenGuardOptions(openGuards)
-    }, [techniques]);
-
-    return options
-}
-
 export const useHandleTechniqueFilterChange = (techniquesList: Technique[]) => {
     const [filteredTechniques, setFilteredTechniques] = React.useState<Technique[]>([]);
+    const [currentFilters, setCurrentFilters] = React.useState<TechniqueFilters>({
+        title: '',
+        hierarchy: null,
+        type: null,
+        position: null,
+        openGuard: null,
+        gi: null,
+    });
 
-    const handleTechniqueFilterChange = React.useCallback((newFilters: TechniqueFilters) => {
-        const giFilterMatch = (filterValue: string, techniqueValue: string) => {
-            return techniqueValue === 'Both' || techniqueValue.includes(filterValue);
+    const giFilterMatch = (filterValue: string, techniqueValue: string) => {
+        return techniqueValue === 'Both' || techniqueValue.includes(filterValue);
+    };
+
+    React.useEffect(() => {
+        const filterTechniques = (filters: TechniqueFilters) => {
+            return techniquesList.filter(technique => {
+                return (!filters.title || technique.title.toLowerCase().includes(filters.title.toLowerCase())) &&
+                       (!filters.hierarchy || technique.hierarchy.includes(filters.hierarchy)) &&
+                       (!filters.type || technique.type.title.includes(filters.type)) &&
+                       (!filters.position || technique.position.title.includes(filters.position)) &&
+                       (!filters.openGuard || (technique.openGuard && technique.openGuard.title.includes(filters.openGuard))) &&
+                       (!filters.gi || giFilterMatch(filters.gi, technique.gi));
+            });
         };
-        const updatedFilteredTechniques = techniquesList.filter(technique => {
-            return (!newFilters.title || technique.title.toLowerCase().includes(newFilters.title.toLowerCase())) &&
-                   (!newFilters.hierarchy || technique.hierarchy.includes(newFilters.hierarchy)) &&
-                   (!newFilters.type || technique.type.title.includes(newFilters.type)) &&
-                   (!newFilters.position || technique.position.title.includes(newFilters.position)) &&
-                   (!newFilters.openGuard || (technique.openGuard && technique.openGuard.title.includes(newFilters.openGuard))) &&
-                   (!newFilters.gi || giFilterMatch(newFilters.gi, technique.gi));
-        });
-    
-        setFilteredTechniques(updatedFilteredTechniques);
 
-    },[techniquesList]);
+        setFilteredTechniques(filterTechniques(currentFilters));
+    }, [techniquesList, currentFilters]);
+
+    const handleTechniqueFilterChange = (newFilters: TechniqueFilters) => {
+        setCurrentFilters(newFilters);
+    };
 
     return { filteredTechniques, handleTechniqueFilterChange };
 }

@@ -18,9 +18,9 @@ export class CollectionSet implements CollectionSetInterface {
     @OneToMany(() => CollectionTechnique, ct => ct.collection, {nullable: true})
     techniques: Technique[];
 
-    @CreateDateColumn()
+    @UpdateDateColumn()
     lastUpdated: Date;
 
-    @UpdateDateColumn()
+    @CreateDateColumn()
     created: Date;
 }

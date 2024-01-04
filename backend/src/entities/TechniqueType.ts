@@ -12,9 +12,9 @@ export class TechniqueType {
     @Column()
     description: string;
 
-    @CreateDateColumn()
+    @UpdateDateColumn()
     lastUpdated: Date;
 
-    @UpdateDateColumn()
+    @CreateDateColumn()
     created: Date;
 }

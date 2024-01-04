@@ -41,9 +41,9 @@ export class Technique implements TechniqueInterface {
     @OneToMany(() => CollectionTechnique, ct => ct.technique, {nullable: true})
     collectionTechniques: CollectionTechnique[];
 
-    @CreateDateColumn()
+    @UpdateDateColumn()
     lastUpdated: Date;
 
-    @UpdateDateColumn()
+    @CreateDateColumn()
     created: Date;
 }

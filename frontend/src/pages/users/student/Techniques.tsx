@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { StudentTechniqueListWithFilters } from '../../../components/Lists/StudentTechniquesListWithFilters'
+import { StudentTechniqueListWithFilters } from '../../../components/Lists/StudentTechniqueListWithFilters'
 import { setAccessToken } from '../../../slices/auth'
 import { AppDispatch } from '../../../store/store'
 

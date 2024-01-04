@@ -1,7 +1,7 @@
+import { TechniqueStatus } from 'common';
 import { AppDataSource } from '../data-source';
 import { StudentTechnique } from "../entities/StudentTechnique";
 import { Technique } from "../entities/Technique";
-import { TechniqueStatus } from 'common';
 
 export class StudentTechniqueService {
     async addStudentTechniques(techniques: Technique[], studentId: string): Promise<StudentTechnique[]> {
@@ -40,11 +40,50 @@ export class StudentTechniqueService {
             lastUpdated: new Date()
         });
 
-        return studentTechniqueRepository.findOne({where: {studentTechniqueId: studentTechnique.studentTechniqueId}});
+        return studentTechniqueRepository.findOne({ where: { studentTechniqueId: studentTechnique.studentTechniqueId } });
     }
 
-    async getStudentTechniques(userId: string): Promise<StudentTechnique[]> {
+    async fetchStudentTechniques(userId: string): Promise<{ status: number, res: StudentTechnique[] | { message: string } }> {
         const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
-        return studentTechniqueRepository.find({ where: { userId } });
+        const responseData = await studentTechniqueRepository.find({
+            where: { userId },
+            relations: ["technique", "technique.position", "technique.type", "technique.openGuard"]
+        });
+
+        if (responseData.length === 0) {
+            return { status: 204, res: { message: 'No techniques found for given student Id' } };
+        }
+
+        return { status: 200, res: responseData };
+    }
+
+    async fetchAllStudentTechniques(): Promise<StudentTechnique[]> {
+        const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
+        const responseData = await studentTechniqueRepository.find({
+            relations: ["technique", "technique.postion", "technique.type", "technique.openGuard"]
+        })
+        return responseData
+    }
+
+    async deleteStudentTechnique(data: { studentTechniqueId: string }) {
+        const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
+
+        console.log("Deleting student technique with ID:", data.studentTechniqueId);
+
+        try {
+            const studentTechnique = await studentTechniqueRepository.findOneBy({ studentTechniqueId: data.studentTechniqueId });
+
+            if (!studentTechnique) {
+                console.log("Failed to find studentTechnique when deleting");
+            } else {
+                await studentTechniqueRepository.createQueryBuilder()
+                    .delete()
+                    .from(StudentTechnique)
+                    .where("studentTechniqueId = :studentTechniqueId", { studentTechniqueId: data.studentTechniqueId })
+                    .execute();
+            }
+        } catch (error) {
+            console.error("Error deleting student technique:", error);
+        }
     }
 };

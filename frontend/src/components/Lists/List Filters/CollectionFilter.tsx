@@ -7,7 +7,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collection } from 'common';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Box, Checkbox, Typography } from '@mui/material';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -27,6 +27,8 @@ interface CollectionFilterProps {
         positionOptions: string[],
         openGuardOptions: string[]
     };
+    onAssignedFilterCheck?: () => void;
+    showAssignedCollections: boolean;
 }
 
 export interface CollectionFilters {
@@ -57,11 +59,11 @@ export const useHandleCollectionFilterChange = (collectionsList: Collection[]) =
         const filterCollections = (filters: CollectionFilters) => {
             return collectionsList.filter(collection => {
                 return (!filters.title || collection.title.toLowerCase().includes(filters.title.toLowerCase())) &&
-                       (!filters.hierarchy || (collection.hierarchy && collection.hierarchy.includes(filters.hierarchy))) &&
-                       (!filters.type || (collection.type && collection.type.title.includes(filters.type))) &&
-                       (!filters.position || (collection.position && collection.position.title.includes(filters.position))) &&
-                       (!filters.openGuard || (collection.openGuard && collection.openGuard.title.includes(filters.openGuard))) &&
-                       (!filters.gi || (collection.gi && giFilterMatch(filters.gi, collection.gi)));
+                    (!filters.hierarchy || (collection.hierarchy && collection.hierarchy.includes(filters.hierarchy))) &&
+                    (!filters.type || (collection.type && collection.type.title.includes(filters.type))) &&
+                    (!filters.position || (collection.position && collection.position.title.includes(filters.position))) &&
+                    (!filters.openGuard || (collection.openGuard && collection.openGuard.title.includes(filters.openGuard))) &&
+                    (!filters.gi || (collection.gi && giFilterMatch(filters.gi, collection.gi)));
             });
         };
 
@@ -75,7 +77,11 @@ export const useHandleCollectionFilterChange = (collectionsList: Collection[]) =
     return { filteredCollections, handleCollectionFilterChange };
 };
 
-function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options }: CollectionFilterProps): JSX.Element {
+CollectionFilter.defaultProps = {
+    showAssignedCollections: false,
+}
+
+function CollectionFilter(props: CollectionFilterProps): JSX.Element {
     const [filters, setFilters] = React.useState<CollectionFilters>({
         title: '',
         hierarchy: null as null | string,
@@ -85,27 +91,37 @@ function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options 
         gi: null as null | string,
     });
 
+    const onFiltersChange = props.onCollectionFiltersChange
+
     React.useEffect(() => {
         onFiltersChange(filters);
     }, [onFiltersChange, filters]);
 
     return (
         <Accordion disableGutters>
-            <AccordionSummary expandIcon={<ExpandMore/>}>
-                <TextField
-                    fullWidth
-                    sx={{maxWidth: "95%"}}
-                    label="Filter Collections"
-                    value={filters.title}
-                    onChange={e => {
-                        const newFilters = { ...filters, title: e.target.value };
-                        setFilters(newFilters);
-                        onFiltersChange(newFilters);
-                    }}
-                    onClick={e => e.stopPropagation()}
-                    variant="outlined"
-                    size="small"
-                />
+            <AccordionSummary expandIcon={<ExpandMore />}>
+                <Box display="flex" flexDirection="column">
+                    <TextField
+                        fullWidth
+                        sx={{ maxWidth: "95%" }}
+                        label="Filter Collections"
+                        value={filters.title}
+                        onChange={e => {
+                            const newFilters = { ...filters, title: e.target.value };
+                            setFilters(newFilters);
+                            onFiltersChange(newFilters);
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        variant="outlined"
+                        size="small"
+                    />
+                    {props.onAssignedFilterCheck && (
+                        <Box display="flex" flexDirection="row" alignItems="center" justifyItems="flex-start">
+                            <Checkbox checked={props.showAssignedCollections} onClick={event => { event.stopPropagation(); props.onAssignedFilterCheck?.() }} />
+                            <Typography variant="body1">Show Assigned Only</Typography>
+                        </Box>
+                    )}
+                </Box>
             </AccordionSummary>
             <AccordionDetails>
                 <FormControl fullWidth size="small" sx={{ marginTop: "10px" }}>
@@ -121,8 +137,8 @@ function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options 
                             onFiltersChange(newFilters);
                         }}
                     >
-                    <MenuItem value=""><em>None</em></MenuItem>
-                        {options.giOptions.map(option => (
+                        <MenuItem value=""><em>None</em></MenuItem>
+                        {props.options.giOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
@@ -140,20 +156,20 @@ function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options 
                             onFiltersChange(newFilters);
                         }}
                     >
-                    <MenuItem value=""><em>None</em></MenuItem>
-                        {options.hierarchyOptions.map(option => (
+                        <MenuItem value=""><em>None</em></MenuItem>
+                        {props.options.hierarchyOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
                 <Autocomplete
-                    options={options.typeOptions}
+                    options={props.options.typeOptions}
                     value={filters.type}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, type: newValue || null };
                         setFilters(newFilters);
                         onFiltersChange(newFilters);
-                    }}                          
+                    }}
                     isOptionEqualToValue={(option, value) => option === value}
                     renderInput={(params) => (
                         <TextField
@@ -161,19 +177,19 @@ function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options 
                             fullWidth
                             label="Type"
                             variant="outlined"
-                            sx={{marginTop: "10px"}}
+                            sx={{ marginTop: "10px" }}
                             size="small"
                         />
                     )}
                 />
                 <Autocomplete
-                    options={options.positionOptions}
+                    options={props.options.positionOptions}
                     value={filters.position}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, position: newValue || null };
                         setFilters(newFilters);
                         onFiltersChange(newFilters);
-                    }}                          
+                    }}
                     isOptionEqualToValue={(option, value) => option === value}
                     renderInput={(params) => (
                         <TextField
@@ -181,32 +197,32 @@ function CollectionFilter({ onCollectionFiltersChange: onFiltersChange, options 
                             fullWidth
                             label="Position"
                             variant="outlined"
-                            sx={{marginTop: "10px"}}
+                            sx={{ marginTop: "10px" }}
                             size="small"
                         />
                     )}
                 />
-                { options.openGuardOptions && (
-                <Autocomplete
-                    options={options.openGuardOptions}
-                    value={filters.openGuard}
-                    onInputChange={(event, newValue) => {
-                        const newFilters = { ...filters, openGuard: newValue || null };
-                        setFilters(newFilters);
-                        onFiltersChange(newFilters);
-                    }}                          
-                    isOptionEqualToValue={(option, value) => option === value}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            fullWidth
-                            label="Open Guard"
-                            variant="outlined"
-                            sx={{marginTop: "10px"}}
-                            size="small"
-                        />
-                    )}
-                />
+                {props.options.openGuardOptions && (
+                    <Autocomplete
+                        options={props.options.openGuardOptions}
+                        value={filters.openGuard}
+                        onInputChange={(event, newValue) => {
+                            const newFilters = { ...filters, openGuard: newValue || null };
+                            setFilters(newFilters);
+                            onFiltersChange(newFilters);
+                        }}
+                        isOptionEqualToValue={(option, value) => option === value}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                fullWidth
+                                label="Open Guard"
+                                variant="outlined"
+                                sx={{ marginTop: "10px" }}
+                                size="small"
+                            />
+                        )}
+                    />
                 )}
             </AccordionDetails>
         </Accordion>

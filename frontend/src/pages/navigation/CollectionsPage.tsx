@@ -1,15 +1,14 @@
+import { useAuth0 } from '@auth0/auth0-react';
+import { Role } from 'common';
 import React from 'react';
-import { Role } from 'common'
-import StudentCollections from '../users/student/Collections';
-import CoachCollections from '../users/coach/Collections';
-import { useAuth0 } from '@auth0/auth0-react'
 import BaseLayout from '../../components/Base/BaseLayout';
 import { decodeAndAddRole } from '../../util/Utilities';
+import CoachCollections from '../users/coach/Collections';
+import StudentCollections from '../users/student/Collections';
 
 
 const CollectionsPage: React.FC = () => {
-
-    let { user } = useAuth0();
+        let { user } = useAuth0();
 
     if (user) {user = decodeAndAddRole(user)}
 

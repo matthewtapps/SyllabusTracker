@@ -22,8 +22,10 @@ router.get('/collection/titles', CollectionController.getAllCollectionTitles);
 router.post('/collectiontechnique', CollectionController.setCollectionTechniques);
 router.get('/collectiontechnique', CollectionController.getCollectionTechniques);
 router.get('/students', StudentController.fetchStudents);
-router.post('/student-techniques', StudentTechniqueController.addStudentTechniques)
-router.put('/student-technique/:userId/:techniqueId', StudentTechniqueController.updateStudentTechnique)
-router.get('/student-technique/:userId', StudentTechniqueController.getStudentTechniques)
+router.post('/studenttechnique', StudentTechniqueController.addStudentTechniques)
+router.put('/studenttechnique/:userId/:techniqueId', StudentTechniqueController.updateStudentTechnique)
+router.get('/studenttechnique/:userId', StudentTechniqueController.fetchStudentTechniques)
+router.get('/studenttechnique', StudentTechniqueController.fetchAllStudentTechniques)
+router.delete('/studenttechnique', StudentTechniqueController.deleteStudentTechnique)
 
 export default router;

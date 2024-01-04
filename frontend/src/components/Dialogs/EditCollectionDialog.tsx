@@ -84,6 +84,7 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
         setWasSubmitted(true)
         if (event.currentTarget.checkValidity()) {
             await props.onSave(event);
+            setWasSubmitted(false)
         } else {
             console.log("Form is invalid");
         }

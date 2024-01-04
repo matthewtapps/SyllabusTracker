@@ -1,17 +1,19 @@
 import React from 'react';
-import BaseLayout from '../../components/Base/BaseLayout';
-import { useStudent } from '../../components/Contexts/SelectedStudentContext';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import BaseLayout from '../../components/Base/BaseLayout';
+import { RootState } from '../../store/store';
 import SelectedStudentTechniques from '../users/coach/SelectedStudentTechniques';
 
 
 const SelectedStudentTechniquesPage: React.FC = () => {
-    const { selectedStudent } = useStudent();
     const navigate = useNavigate();
+    
+    const { selectedStudent } = useSelector((state: RootState) => state.student)
 
     React.useEffect(() => {
-        if (selectedStudent === null) {
-            navigate('/');
+        if (!selectedStudent) {
+            navigate('/')
         }
     }, [selectedStudent, navigate]);
 

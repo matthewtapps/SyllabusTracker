@@ -9,6 +9,7 @@ import { fetchTechniquesAsync } from "../../slices/techniques";
 import { AppDispatch, RootState } from "../../store/store";
 import TechniqueList from "./Base Lists/TechniqueList";
 import TechniqueFilter, { useHandleTechniqueFilterChange } from "./List Filters/TechniqueFilter";
+import { fetchTechniqueSuggestionsAsync } from "../../slices/suggestions";
 
 
 const Card = styled(MuiCard)({
@@ -59,7 +60,10 @@ export function TechniqueListWithFilters(props: TechniqueListWithFiltersProps): 
         if (techniques.length === 0 && !loading) {
             dispatch(fetchTechniquesAsync());
         }
-    }, [dispatch, techniques.length, loading]);
+        if (techniqueSuggestions.positionOptions.length === 0) {
+            dispatch(fetchTechniqueSuggestionsAsync())
+        }
+    }, [dispatch, techniques.length, loading, techniqueSuggestions.positionOptions.length]);
 
     const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange(techniques)
 

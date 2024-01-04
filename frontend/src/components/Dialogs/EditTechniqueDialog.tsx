@@ -12,7 +12,7 @@ import { TitleTextField } from '../Fields/TitleTextField';
 import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { SelectField } from '../Fields/SelectField';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCollectionSuggestionsAsync } from '../../slices/suggestions';
+import { fetchCollectionSuggestionsAsync, fetchTechniqueSuggestionsAsync } from '../../slices/suggestions';
 import { AppDispatch, RootState } from '../../store/store';
 
 
@@ -75,7 +75,7 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
     const { descriptions } = useSelector((state: RootState) => state.descriptions)
 
     React.useEffect(() => {
-        dispatch(fetchCollectionSuggestionsAsync())
+        dispatch(fetchTechniqueSuggestionsAsync())
     }, [dispatch]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -83,6 +83,7 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
         setWasSubmitted(true)
         if (event.currentTarget.checkValidity()) {
             await props.onSave(event);
+            setWasSubmitted(false)
         } else {
             console.log("Form is invalid");
         }

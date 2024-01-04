@@ -24,9 +24,9 @@ export class StudentTechnique implements StudentTechniqueInterface {
     @Column()
     coachNotes: string;
 
-    @CreateDateColumn()
+    @UpdateDateColumn()
     lastUpdated: Date;
 
-    @UpdateDateColumn()
+    @CreateDateColumn()
     created: Date;
 }

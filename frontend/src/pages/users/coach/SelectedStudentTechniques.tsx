@@ -1,33 +1,23 @@
-import { useAuth0 } from '@auth0/auth0-react'
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { TechniqueListWithFilters } from '../../../components/Lists/TechniquesListWithFilters'
-import { setAccessToken } from '../../../slices/auth'
-import { AppDispatch } from '../../../store/store'
-import { StudentTechniqueListWithFilters } from '../../../components/Lists/StudentTechniquesListWithFilters'
+import { useSelector } from 'react-redux'
+import { StudentTechniqueListWithFilters } from '../../../components/Lists/StudentTechniqueListWithFilters'
+import { RootState } from '../../../store/store'
+import { useNavigate } from 'react-router-dom'
 
 
 function SelectedStudentTechniques(): JSX.Element {
-    const { getAccessTokenSilently } = useAuth0();
-    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const { selectedStudent } = useSelector((state: RootState) => state.student)
 
     React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
+        if (!selectedStudent) {
+            navigate('/')
+        }
+    }, [selectedStudent, navigate]);
 
     return (
         <StudentTechniqueListWithFilters
-        editable
+            editable
         />
     );
 };

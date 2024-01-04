@@ -1,13 +1,13 @@
-import React from 'react';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Checkbox, Typography } from '@mui/material';
+import MuiAccordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { styled } from '@mui/material/styles'
-import MuiAccordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { styled } from '@mui/material/styles';
 import { Technique } from 'common';
-import { FormControl, InputLabel, Select, MenuItem, Button, Box } from '@mui/material';
+import React from 'react';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -34,7 +34,9 @@ interface TechniqueFilterProps {
         position: string | null,
         openGuard: string | null,
         gi: string | null;
-    } | null
+    } | null;
+    showAssignedTechniques: boolean;
+    onAssignedFiltersCheck?: () => void;
 }
 
 export interface TechniqueFilters {
@@ -44,6 +46,10 @@ export interface TechniqueFilters {
     position: string | null;
     openGuard: string | null;
     gi: string | null;
+}
+
+TechniqueFilter.defaultProps = {
+    showAssignedTechniques: false
 }
 
 export const useHandleTechniqueFilterChange = (techniquesList: Technique[]) => {
@@ -65,11 +71,11 @@ export const useHandleTechniqueFilterChange = (techniquesList: Technique[]) => {
         const filterTechniques = (filters: TechniqueFilters) => {
             return techniquesList.filter(technique => {
                 return (!filters.title || technique.title.toLowerCase().includes(filters.title.toLowerCase())) &&
-                       (!filters.hierarchy || technique.hierarchy.includes(filters.hierarchy)) &&
-                       (!filters.type || technique.type.title.includes(filters.type)) &&
-                       (!filters.position || technique.position.title.includes(filters.position)) &&
-                       (!filters.openGuard || (technique.openGuard && technique.openGuard.title.includes(filters.openGuard))) &&
-                       (!filters.gi || giFilterMatch(filters.gi, technique.gi));
+                    (!filters.hierarchy || technique.hierarchy.includes(filters.hierarchy)) &&
+                    (!filters.type || technique.type.title.includes(filters.type)) &&
+                    (!filters.position || technique.position.title.includes(filters.position)) &&
+                    (!filters.openGuard || (technique.openGuard && technique.openGuard.title.includes(filters.openGuard))) &&
+                    (!filters.gi || giFilterMatch(filters.gi, technique.gi));
             });
         };
 
@@ -105,8 +111,14 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
 
     return (
         <Accordion disableGutters>
-            <AccordionSummary expandIcon={<ExpandMore/>}>
-                <Box display="flex" flexDirection="column" maxWidth="95%">
+            <AccordionSummary expandIcon={<ExpandMore />}>
+                <Box display="flex" flexDirection="column">
+                    {props.onAssignedFiltersCheck && (
+                        <Box display="flex" flexDirection="row" alignItems="center" justifyItems="flex-start">
+                            <Checkbox checked={props.showAssignedTechniques} onClick={event => { event.stopPropagation(); props.onAssignedFiltersCheck?.() }} />
+                            <Typography variant="body1">Show Assigned Only</Typography>
+                        </Box>
+                    )}
                     <TextField
                         fullWidth
                         label="Filter Techniques"
@@ -121,12 +133,12 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                         size="small"
                     />
                     {props.matchTechniqueFilters && (
-                        <Button variant="contained" fullWidth size="small" sx={{marginTop: "5px"}} onClick={e => {e.stopPropagation(); handleMatchFiltersClick()}}>Match Collection Filters</Button>
+                        <Button variant="contained" fullWidth size="small" sx={{ marginTop: "5px" }} onClick={e => { e.stopPropagation(); handleMatchFiltersClick() }}>Match Collection Filters</Button>
                     )}
                 </Box>
             </AccordionSummary>
             <AccordionDetails>
-                
+
                 <FormControl fullWidth size="small" sx={{ marginTop: "10px" }}>
                     <InputLabel id="gi-select-label">Yes Gi or No Gi</InputLabel>
                     <Select
@@ -140,7 +152,7 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                             props.onTechniqueFiltersChange(newFilters);
                         }}
                     >
-                    <MenuItem value=""><em>None</em></MenuItem>
+                        <MenuItem value=""><em>None</em></MenuItem>
                         {props.options.giOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
@@ -159,7 +171,7 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                             props.onTechniqueFiltersChange(newFilters);
                         }}
                     >
-                    <MenuItem value=""><em>None</em></MenuItem>
+                        <MenuItem value=""><em>None</em></MenuItem>
                         {props.options.hierarchyOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
@@ -172,14 +184,14 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                         const newFilters = { ...filters, type: newValue || null };
                         setFilters(newFilters);
                         props.onTechniqueFiltersChange(newFilters);
-                    }}                          isOptionEqualToValue={(option, value) => option === value}
+                    }} isOptionEqualToValue={(option, value) => option === value}
                     renderInput={(params) => (
                         <TextField
                             {...params}
                             fullWidth
                             label="Type"
                             variant="outlined"
-                            sx={{marginTop: "10px"}}
+                            sx={{ marginTop: "10px" }}
                             size="small"
                         />
                     )}
@@ -191,38 +203,38 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                         const newFilters = { ...filters, position: newValue || null };
                         setFilters(newFilters);
                         props.onTechniqueFiltersChange(newFilters);
-                    }}                          isOptionEqualToValue={(option, value) => option === value}
+                    }} isOptionEqualToValue={(option, value) => option === value}
                     renderInput={(params) => (
                         <TextField
                             {...params}
                             fullWidth
                             label="Position"
                             variant="outlined"
-                            sx={{marginTop: "10px"}}
+                            sx={{ marginTop: "10px" }}
                             size="small"
                         />
                     )}
                 />
-                { props.options.openGuardOptions && (
-                <Autocomplete
-                    options={props.options.openGuardOptions}
-                    value={filters.openGuard}
-                    onInputChange={(event, newValue) => {
-                        const newFilters = { ...filters, openGuard: newValue || null };
-                        setFilters(newFilters);
-                        props.onTechniqueFiltersChange(newFilters);
-                    }}                          isOptionEqualToValue={(option, value) => option === value}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            fullWidth
-                            label="Open Guard"
-                            variant="outlined"
-                            sx={{marginTop: "10px"}}
-                            size="small"
-                        />
-                    )}
-                />
+                {props.options.openGuardOptions && (
+                    <Autocomplete
+                        options={props.options.openGuardOptions}
+                        value={filters.openGuard}
+                        onInputChange={(event, newValue) => {
+                            const newFilters = { ...filters, openGuard: newValue || null };
+                            setFilters(newFilters);
+                            props.onTechniqueFiltersChange(newFilters);
+                        }} isOptionEqualToValue={(option, value) => option === value}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                fullWidth
+                                label="Open Guard"
+                                variant="outlined"
+                                sx={{ marginTop: "10px" }}
+                                size="small"
+                            />
+                        )}
+                    />
                 )}
             </AccordionDetails>
         </Accordion>

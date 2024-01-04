@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Collection, Technique } from 'common';
 import { RootState } from '../store/store';
-import { getOpenGuards, getPositions, getTypes } from '../util/Utilities';
+import { fetchOpenGuards, fetchPositions, fetchTypes } from '../util/Utilities';
 
 
 interface DescriptionMap {
@@ -37,9 +37,9 @@ export const fetchDescriptionsAsync = createAsyncThunk(
             throw new Error('No access token available');
         }
 
-        const positions = await getPositions(token);
-        const types = await getTypes(token);
-        const openguards = await getOpenGuards(token);
+        const positions = await fetchPositions(token);
+        const types = await fetchTypes(token);
+        const openguards = await fetchOpenGuards(token);
 
         let descriptions: Descriptions = {
             position: {},

@@ -29,10 +29,9 @@ const ArrowForwardIosIcon = styled(MuiArrowForwardIosIcon)({
 });
 
 const SelectedStudentDashboard: React.FC = () => {
-
     const navigate = useNavigate();
     const navigateToSelectedStudentTechniques = () => { navigate('/student/techniques') }
-    const navigateToCollections = () => { navigate('/collections') }
+    const navigateToSelectedStudentCollections = () => { navigate('/student/collections') }
 
     return (
         <div>
@@ -53,7 +52,7 @@ const SelectedStudentDashboard: React.FC = () => {
                     </Card>
                 </Grid>
                 <Grid item xs={6}>
-                    <Card onClick={navigateToCollections}>
+                    <Card onClick={navigateToSelectedStudentCollections}>
                         <CardActionArea>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Typography variant='h6' className="DashboardCard-heading">Collections</Typography>

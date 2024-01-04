@@ -3,10 +3,10 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import BaseLayout from '../../components/Base/BaseLayout';
 import { RootState } from '../../store/store';
-import SelectedStudentDashboard from '../users/coach/SelectedStudentDashboard';
+import SelectedStudentCollections from '../users/coach/SelectedStudentCollections';
 
 
-const SelectedStudentDashboardPage: React.FC = () => {
+const SelectedStudentCollectionsPage: React.FC = () => {
     const navigate = useNavigate();
     
     const { selectedStudent } = useSelector((state: RootState) => state.student)
@@ -18,12 +18,12 @@ const SelectedStudentDashboardPage: React.FC = () => {
     }, [selectedStudent, navigate]);
 
     return (
-        <BaseLayout text={selectedStudent?.name || "Student selection error"}>
+        <BaseLayout text={`${selectedStudent?.name} Collections`}>
             <div className="home-container">
-                <SelectedStudentDashboard/>
+                <SelectedStudentCollections/>
             </div>
         </BaseLayout>
     );
 };
 
-export default SelectedStudentDashboardPage;
+export default SelectedStudentCollectionsPage;

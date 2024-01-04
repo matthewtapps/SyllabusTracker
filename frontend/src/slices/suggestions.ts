@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { fetchCollections, fetchTechniques, getOpenGuards, getPositions, getTypes } from '../util/Utilities';
+import { fetchCollections, fetchTechniques, fetchOpenGuards, fetchPositions, fetchTypes } from '../util/Utilities';
 import { RootState } from '../store/store';
 import { Technique, Collection } from 'common';
 
@@ -45,9 +45,9 @@ export const fetchTechniqueSuggestionsAsync = createAsyncThunk(
             throw new Error('No access token available')
         }
 
-        const positions = await getPositions(token)
-        const types = await getTypes(token)
-        const openguards = await getOpenGuards(token)
+        const positions = await fetchPositions(token)
+        const types = await fetchTypes(token)
+        const openguards = await fetchOpenGuards(token)
         const techniques = await fetchTechniques(token)
 
         let suggestions: SuggestionsObject = {
@@ -84,9 +84,9 @@ export const fetchCollectionSuggestionsAsync = createAsyncThunk(
         if (!token) {
             throw new Error('No access token available')
         }
-        const positions = await getPositions(token)
-        const types = await getTypes(token)
-        const openguards = await getOpenGuards(token)
+        const positions = await fetchPositions(token)
+        const types = await fetchTypes(token)
+        const openguards = await fetchOpenGuards(token)
         const collections = await fetchCollections(token)
 
         let suggestions: SuggestionsObject = {

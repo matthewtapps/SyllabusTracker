@@ -1,4 +1,4 @@
-import { Technique, Hierarchy, Gi, Collection, CollectionTechnique, Role, NewTechnique, UpdateTechnique, NewCollection, UpdateCollection } from "common";
+import { Technique, Hierarchy, Gi, Collection, CollectionTechnique, Role, NewTechnique, UpdateTechnique, NewCollection, UpdateCollection, StudentTechnique } from "common";
 import { User as Auth0User } from '@auth0/auth0-react'
 
 
@@ -380,10 +380,10 @@ export const stripAuth0FromUserId = (id: string): string => {
     return id.replace("auth0|", "")
 };
 
-export const addStudentTechniques = async (studentId: string, techniques: Technique[], accessToken: string | null): Promise<void> => {
+export const postStudentTechniques = async (studentId: string, techniques: Technique[], accessToken: string | null): Promise<StudentTechnique[]> => {
     if (!accessToken) { throw new Error(`Invalid access token on add Student Techniques: ${accessToken}`); }
     try {
-        const response = await fetch(`${API_SERVER_URL}student-techniques`, {
+        const response = await fetch(`${API_SERVER_URL}studenttechnique`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -391,29 +391,32 @@ export const addStudentTechniques = async (studentId: string, techniques: Techni
             },
             body: JSON.stringify({ studentId, techniques }),
         });
+
         if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+        return await response.json()
     } catch (error) { throw new Error(`Error:, ${error}`); }
 };
 
-export const updateStudentTechnique = async (studentId: string, techniqueId: string, updatedData: any, accessToken: string | null): Promise<void> => {
+export const updateStudentTechnique = async (studentId: string, techniqueId: string, updatedData: Partial<StudentTechnique>, accessToken: string | null): Promise<StudentTechnique> => {
     if (!accessToken) { throw new Error(`Invalid access token on update Student Technique: ${accessToken}`); }
     try {
-        const response = await fetch(`${API_SERVER_URL}student-technique/${studentId}/${techniqueId}`, {
+        const response = await fetch(`${API_SERVER_URL}studenttechnique/${studentId}/${techniqueId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify(updatedData),
+            body: JSON.stringify({studentId, techniqueId, updatedData}),
         });
         if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
+        return await response.json()
     } catch (error) { throw new Error(`Error:, ${error}`); }
 };
 
-export const getStudentTechniques = async (studentId: string, accessToken: string | null): Promise<any> => {
+export const fetchStudentTechniques = async (studentId: string, accessToken: string | null): Promise<StudentTechnique[]> => {
     if (!accessToken) { throw new Error(`Invalid access token on fetch Student Technique: ${accessToken}`); }
     try {
-        const response = await fetch(`${API_SERVER_URL}student-technique/${studentId}`, {
+        const response = await fetch(`${API_SERVER_URL}studenttechnique/${studentId}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
             },
@@ -428,7 +431,26 @@ export const getStudentTechniques = async (studentId: string, accessToken: strin
     } catch (error) { throw new Error(`Error:, ${error}`); }
 };
 
-export const getPositions = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
+export const deleteStudentTechnique = async (studentTechniqueId: string, accessToken: string | null): Promise<number> => {
+    if (!accessToken) { throw new Error(`Invalid access token on delete technique`) }
+    try {
+        const response = await fetch(`${API_SERVER_URL}studenttechnique`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ studentTechniqueId: studentTechniqueId }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed with status ${response.status}`);
+        }
+        return response.status;
+    } catch (error) { throw new Error(`Error deleting student technique: ${error}`) }
+};
+
+export const fetchPositions = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
     if (!accessToken) { throw new Error(`Invalid access token on fetch positions: ${accessToken}`); }
     try {
         const response = await fetch(`${API_SERVER_URL}position`, {
@@ -442,7 +464,7 @@ export const getPositions = async (accessToken: string | null): Promise<{ title:
     } catch (error) { throw new Error(`Error: ${error}`) }
 };
 
-export const getTypes = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
+export const fetchTypes = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
     if (!accessToken) { throw new Error(`Invalid access token on fetch types: ${accessToken}`); }
     try {
         const response = await fetch(`${API_SERVER_URL}type`, {
@@ -456,7 +478,7 @@ export const getTypes = async (accessToken: string | null): Promise<{ title: str
     } catch (error) { throw new Error(`Error: ${error}`) }
 };
 
-export const getOpenGuards = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
+export const fetchOpenGuards = async (accessToken: string | null): Promise<{ title: string, description: string }[]> => {
     if (!accessToken) { throw new Error(`Invalid access token on fetch open guards: ${accessToken}`); }
     try {
         const response = await fetch(`${API_SERVER_URL}openguard`, {

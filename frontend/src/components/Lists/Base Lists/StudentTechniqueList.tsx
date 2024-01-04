@@ -1,26 +1,23 @@
-import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import Edit from '@mui/icons-material/Edit'
-import { styled } from '@mui/material/styles'
-import { Technique } from 'common';
 import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
-import Typography from '@mui/material/Typography';
+import { default as Card, default as MuiCard } from '@mui/material/Card';
 import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
-import MuiCard from '@mui/material/Card';
-import Card from '@mui/material/Card';
-import { CardContent } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import { Technique, TechniqueStatus } from 'common';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useAuth0 } from '@auth0/auth0-react';
 import { setAccessToken } from '../../../slices/auth';
-import { AppDispatch, RootState } from '../../../store/store';
+import { deleteStudentTechniqueAsync, fetchStudentTechniquesAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
 import { fetchTechniquesAsync } from '../../../slices/techniques';
-import CircleTwoToneIcon from '@mui/icons-material/CircleTwoTone';
-import { CircleIcon } from '../../Icons/CircleIcon';
+import { AppDispatch, RootState } from '../../../store/store';
+import { CircleIcon, Option } from '../../Buttons/CircleIcon';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -108,17 +105,13 @@ interface TechniquesListProps {
     ordered?: boolean;
     elevation: number;
     editable?: boolean;
-    checkedTechniques?: { index: number, technique: Technique }[];
-    onTechniqueCheck?: (techniqueId: string) => void;
     editingTechniqueId?: string | null;
     editingTechnique?: TechniqueDTO | null;
-    onEditClick?: (technique: Technique) => void;
     expandedTechniqueId?: string;
     onAccordionChange?: (techniqueId: string) => void;
 }
 
 StudentTechniqueList.defaultProps = {
-    checkbox: false,
     elevation: 3,
     ordered: false,
     editable: false,
@@ -127,6 +120,17 @@ StudentTechniqueList.defaultProps = {
 function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
     const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
+
+    const iconColor = (techniqueStatus: TechniqueStatus | undefined): string => {
+        if (techniqueStatus === TechniqueStatus.Started) {
+            return "#d79921";
+        } else if (techniqueStatus === TechniqueStatus.Passed) {
+            return "#689d6a";
+        } else {
+            return "#665c54";
+        }
+
+    }
 
     React.useEffect(() => {
         const getAccessToken = async () => {
@@ -143,14 +147,62 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
     }, [getAccessTokenSilently, dispatch]);
 
     const { techniques, loading } = useSelector((state: RootState) => state.techniques);
+    const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
 
     React.useEffect(() => {
         if (techniques.length === 0 && !loading) {
             dispatch(fetchTechniquesAsync());
         }
-    }, [dispatch, techniques.length, loading]);
+        if (selectedStudentTechniques.length === 0) {
+            dispatch(fetchStudentTechniquesAsync())
+        }
+    }, [dispatch, techniques, loading, selectedStudentTechniques]);
 
     const techniquesToDisplay = props.filteredTechniques || techniques
+
+    const handleIndicatorFill = (technique: Technique) => {
+        const matchingTechnique = selectedStudentTechniques.find(st =>
+            st.technique.techniqueId === technique.techniqueId
+        )
+        return iconColor(matchingTechnique?.status)
+    }
+
+    const menuActions = {
+        [Option.Assign]: async (technique: Technique) => {
+            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
+            if (!matchedTechnique) {
+                await dispatch(postStudentTechniquesAsync([technique])).unwrap();
+            }
+            await dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.NotYetStarted } })).unwrap();
+        },
+        [Option.Started]: async (technique: Technique) => {
+            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
+            if (!matchedTechnique) {
+                await dispatch(postStudentTechniquesAsync([technique])).unwrap();
+            }
+            await dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Started } })).unwrap();
+        },
+        [Option.Passed]: async (technique: Technique) => {
+            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
+            if (!matchedTechnique) {
+                await dispatch(postStudentTechniquesAsync([technique])).unwrap();
+            }
+            await dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Passed } })).unwrap();
+        },
+        [Option.Unassign]: (technique: Technique) => {
+            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
+            if (matchedTechnique) {
+                dispatch(deleteStudentTechniqueAsync(matchedTechnique.studentTechniqueId));
+            }
+        }
+    };
+    
+    const handleAction = (technique: Technique) => async (option: Option) => {
+        const action = menuActions[option];
+        if (action) {
+            await action(technique);
+        }
+    };
 
     return (
         <div>
@@ -175,9 +227,10 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                             </Box>
                                             {props.editable && !(props.editingTechniqueId === technique.techniqueId) && !(props.editingTechniqueId) && (
                                                 <CircleIcon
-                                                fill="#665c54"
-                                                border="#bdae93"
-                                                onClick={(event) => { event.stopPropagation(); props.onEditClick?.(technique); }} />
+                                                    fill={handleIndicatorFill(technique)}
+                                                    onClick={(event) => event.stopPropagation()}
+                                                    onMenuItemClick={handleAction(technique)}
+                                                />
                                             )}
                                         </Box>
                                     </Box>

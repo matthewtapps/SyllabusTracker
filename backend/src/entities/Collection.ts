@@ -38,9 +38,9 @@ export class Collection implements CollectionInterface {
     @ManyToOne(type => OpenGuard, openGuard => openGuard.title, {nullable: true})
     openGuard?: OpenGuard;
 
-    @CreateDateColumn()
+    @UpdateDateColumn()
     lastUpdated: Date;
 
-    @UpdateDateColumn()
+    @CreateDateColumn()
     created: Date;
 }

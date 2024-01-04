@@ -4,6 +4,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BaseLayout from '../../components/Base/BaseLayout';
 import { setAccessToken, shouldRefreshToken } from '../../slices/auth';
+import { fetchDescriptionsIfOld } from '../../slices/descriptions';
 import { fetchTechniqueSuggestionsIfOld } from '../../slices/suggestions';
 import { fetchTechniquesIfOld } from '../../slices/techniques';
 import { AppDispatch, RootState } from '../../store/store';
@@ -15,7 +16,7 @@ import StudentTechniques from '../users/student/Techniques';
 const TechniquesPage: React.FC = () => {
     const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
-    const state = useSelector((state: RootState) => state);
+    const state = useSelector((state: RootState) => state.auth);
 
     React.useEffect(() => {
         const getAccessToken = async () => {
@@ -36,6 +37,7 @@ const TechniquesPage: React.FC = () => {
     React.useEffect(() => {
         dispatch(fetchTechniquesIfOld());
         dispatch(fetchTechniqueSuggestionsIfOld());
+        dispatch(fetchDescriptionsIfOld());
     }, [dispatch]);
 
     let { user } = useAuth0();

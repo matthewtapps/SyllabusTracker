@@ -16,7 +16,7 @@ const SelectedStudentTechniquesPage: React.FC = () => {
 
     const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
-    const state = useSelector((state: RootState) => state);
+    const state = useSelector((state: RootState) => state.auth);
 
     React.useEffect(() => {
         const getAccessToken = async () => {

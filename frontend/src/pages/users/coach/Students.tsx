@@ -1,16 +1,15 @@
+import { User } from '@auth0/auth0-react';
 import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
-import { useAuth0, User } from '@auth0/auth0-react';
-import React from 'react';
-import StudentList from '../../../components/Lists/Base Lists/StudentList';
 import CardContent from '@mui/material/CardContent';
+import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAccessToken } from '../../../slices/auth';
-import { AppDispatch, RootState } from '../../../store/store';
-import { fetchStudentsAsync, selectStudent } from '../../../slices/student';
+import { useNavigate } from 'react-router-dom';
 import Pageloader from '../../../components/Base/PageLoader';
+import StudentList from '../../../components/Lists/Base Lists/StudentList';
+import { fetchStudentsAsync, selectStudent } from '../../../slices/student';
+import { AppDispatch, RootState } from '../../../store/store';
 
 
 const Card = styled(MuiCard)({
@@ -24,27 +23,12 @@ const Card = styled(MuiCard)({
 });
 
 const CoachStudents: React.FC = () => {
-    const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const handleNavigateToSelectedStudentHome = (student: User) => {
         dispatch(selectStudent(student))
         navigate('/student')
     }
-
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
 
     const { students, loading } = useSelector((state: RootState) => state.student)
 

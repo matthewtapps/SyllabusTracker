@@ -1,4 +1,3 @@
-import { useAuth0 } from '@auth0/auth0-react'
 import AddIcon from '@mui/icons-material/Add'
 import Fab from '@mui/material/Fab'
 import { Collection, CollectionTechnique, Technique } from 'common'
@@ -9,8 +8,7 @@ import { EditCollectionDialog } from '../../../components/Dialogs/EditCollection
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
 import { NewCollectionDialog } from '../../../components/Dialogs/NewCollectionDialog'
 import { CollectionListWithFilters } from '../../../components/Lists/CollectionListWithFilters'
-import { setAccessToken } from '../../../slices/auth'
-import { fetchCollectionTechniquesAsync, postCollectionTechniquesAsync } from '../../../slices/collectionTechniques'
+import { postCollectionTechniquesAsync } from '../../../slices/collectionTechniques'
 import { deleteCollectionAsync, postCollectionAsync, updateCollectionAsync } from '../../../slices/collections'
 import { updateTechniqueAsync } from '../../../slices/techniques'
 import { AppDispatch, RootState } from '../../../store/store'
@@ -47,32 +45,10 @@ const emptyTechniqueDTO: TechniqueDTO = {
     openGuardDescription: undefined,
 }
 
-
 function CoachCollections(): JSX.Element {
-    const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
 
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
-
     const { collectionTechniques } = useSelector((state: RootState) => state.collectionTechniques)
-
-    React.useEffect(() => {
-        if (collectionTechniques.length < 1) {
-            dispatch(fetchCollectionTechniquesAsync());
-        }
-    }, [dispatch, collectionTechniques.length]);
 
     // Technique editing states for in-place technique editing
     const [editingTechniqueId, setEditingTechniqueId] = React.useState<string>("");
@@ -103,7 +79,7 @@ function CoachCollections(): JSX.Element {
         setAddTechniqueToCollectionDialogueOpen(false)
     }
 
-    const handleSaveAddTechniqueDialogue = (selectedTechniques: {index: number, technique: Technique}[]) => {
+    const handleSaveAddTechniqueDialogue = (selectedTechniques: { index: number, technique: Technique }[]) => {
         let updatedCollectionTechniques = dragDropTechniques
         let length = updatedCollectionTechniques?.length
 
@@ -188,10 +164,10 @@ function CoachCollections(): JSX.Element {
 
     const handleDragDropSaveClick = async (collectionId: string) => {
         dispatch(postCollectionTechniquesAsync({
-            collectionId: collectionId, 
+            collectionId: collectionId,
             collectionTechniques: dragDropTechniques
         }))
-        
+
         setEditingTechniquesCollection(null);
         setDragDropTechniques([]);
         setShowNewCollectionFab(true)
@@ -283,62 +259,62 @@ function CoachCollections(): JSX.Element {
     return (
         <div>
             <CollectionListWithFilters
-            editable
-            onAccordionChange={handleAccordionChange}
-            expandedCollectionId={expandedCollectionId}
-            editingTechniquesCollection={editingTechniquesCollection}
-            onTechniqueEditClick={handleTechniqueEditClick}
-            onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
-            onCollectionEditClick={handleCollectionEditClick}
-            dragDropTechniques={dragDropTechniques}
-            onReorderDragDropTechniques={handleReorderDragDropTechniques}
-            onDragDropSaveClick={handleDragDropSaveClick}
-            onDragDropCancelClick={handleDragDropCancelClick}
-            onDragDropDeleteClick={handleDragDropDeleteClick}
-            onOpenAddTechniqueDialogue={handleOpenAddTechniqueDialogue}
+                editable
+                onAccordionChange={handleAccordionChange}
+                expandedCollectionId={expandedCollectionId}
+                editingTechniquesCollection={editingTechniquesCollection}
+                onTechniqueEditClick={handleTechniqueEditClick}
+                onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
+                onCollectionEditClick={handleCollectionEditClick}
+                dragDropTechniques={dragDropTechniques}
+                onReorderDragDropTechniques={handleReorderDragDropTechniques}
+                onDragDropSaveClick={handleDragDropSaveClick}
+                onDragDropCancelClick={handleDragDropCancelClick}
+                onDragDropDeleteClick={handleDragDropDeleteClick}
+                onOpenAddTechniqueDialogue={handleOpenAddTechniqueDialogue}
             />
 
             <AddTechniqueToCollectionDialog
-            dialogOpen={addTechniqueToCollectionDialogueOpen}
-            onClose={handleCloseAddTechniqueDialogue}
-            onCancel={handleCloseAddTechniqueDialogue}
-            onSave={handleSaveAddTechniqueDialogue}
-            editingTechniquesCollection={editingTechniquesCollection}
+                dialogOpen={addTechniqueToCollectionDialogueOpen}
+                onClose={handleCloseAddTechniqueDialogue}
+                onCancel={handleCloseAddTechniqueDialogue}
+                onSave={handleSaveAddTechniqueDialogue}
+                editingTechniquesCollection={editingTechniquesCollection}
             />
 
             <EditTechniqueDialog
-            dialogOpen={editingTechniqueDialogOpen}
-            onClose={handleTechniqueCancelClick}
-            onCancel={handleTechniqueCancelClick}
-            onDelete={handleTechniqueDeleteClick}
-            onSave={handleTechniqueSaveClick}
-            editingTechnique={editedTechnique}
-            editingTechniqueId={editingTechniqueId}
+                dialogOpen={editingTechniqueDialogOpen}
+                onClose={handleTechniqueCancelClick}
+                onCancel={handleTechniqueCancelClick}
+                onDelete={handleTechniqueDeleteClick}
+                onSave={handleTechniqueSaveClick}
+                editingTechnique={editedTechnique}
+                editingTechniqueId={editingTechniqueId}
             />
 
             <EditCollectionDialog
-            dialogOpen={editingCollectionDialogOpen}
-            onClose={handleCollectionCancelClick}
-            onCancel={handleCollectionCancelClick}
-            onDelete={handleCollectionDeleteClick}
-            onSave={handleCollectionSaveClick}
-            editingCollection={editingCollection}
-            editingCollectionId={editingCollectionId}
+                dialogOpen={editingCollectionDialogOpen}
+                onClose={handleCollectionCancelClick}
+                onCancel={handleCollectionCancelClick}
+                onDelete={handleCollectionDeleteClick}
+                onSave={handleCollectionSaveClick}
+                editingCollection={editingCollection}
+                editingCollectionId={editingCollectionId}
             />
 
             <NewCollectionDialog
-            dialogOpen={newCollectionDialogOpen}
-            onClose={handleNewCollectionCancel}
-            onSave={handleNewCollectionSave}
-            onCancel={handleNewCollectionCancel}
+                dialogOpen={newCollectionDialogOpen}
+                onClose={handleNewCollectionCancel}
+                onSave={handleNewCollectionSave}
+                onCancel={handleNewCollectionCancel}
             />
 
             {showNewCollectionFab && (
                 <Fab
-                color="primary"
-                aria-label="add"
-                style={{ position: 'fixed', bottom: '16px', right: '16px' }}
-                onClick={handleNewCollectionOpen}
+                    color="primary"
+                    aria-label="add"
+                    style={{ position: 'fixed', bottom: '16px', right: '16px' }}
+                    onClick={handleNewCollectionOpen}
                 >
                     <AddIcon />
                 </Fab>

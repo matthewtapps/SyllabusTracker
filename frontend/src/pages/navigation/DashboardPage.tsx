@@ -5,22 +5,24 @@ import CoachDashboard from '../users/coach/Dashboard';
 import { useAuth0 } from '@auth0/auth0-react'
 import BaseLayout from '../../components/Base/BaseLayout';
 import { decodeAndAddRole } from '../../util/Utilities';
-import { useDispatch } from 'react-redux';
-import { setAccessToken } from '../../slices/auth';
-import { AppDispatch } from '../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAccessToken, shouldRefreshToken } from '../../slices/auth';
+import { AppDispatch, RootState } from '../../store/store';
 
 
 const DashboardPage: React.FC = () => {
-    
     let { user } = useAuth0();
     const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
+    const state = useSelector((state: RootState) => state.auth);
 
     React.useEffect(() => {
         const getAccessToken = async () => {
             try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
+                if (shouldRefreshToken(state)) {
+                    const token = await getAccessTokenSilently();
+                    dispatch(setAccessToken(token))
+                }
 
             } catch (error) {
                 console.log(error);
@@ -28,24 +30,24 @@ const DashboardPage: React.FC = () => {
         };
 
         getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
+    }, [getAccessTokenSilently, dispatch, state]);
 
-    if (user) {user = decodeAndAddRole(user)}
+    if (user) { user = decodeAndAddRole(user) }
 
     if (!user) {
-      return null;
+        return null;
     }
-    
+
     let content: React.ReactNode = <div></div>
 
-    switch(user.role) {
+    switch (user.role) {
         case Role.Student:
-        content = <StudentDashboard/>
-        break;
+            content = <StudentDashboard />
+            break;
 
         case Role.Coach:
-            content = <CoachDashboard/>
-        break;
+            content = <CoachDashboard />
+            break;
 
         case Role.Admin:
             content = (
@@ -53,8 +55,8 @@ const DashboardPage: React.FC = () => {
                     <p>Hello Admin!</p>
                     <p>Home page placeholder</p>
                 </div>
-        )
-        break;
+            )
+            break;
     }
 
     return (

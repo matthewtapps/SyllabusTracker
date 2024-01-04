@@ -3,15 +3,16 @@ import { Role } from 'common';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BaseLayout from '../../components/Base/BaseLayout';
-import { fetchCollectionTechniquesAsync } from '../../slices/collectionTechniques';
+import { setAccessToken, shouldRefreshToken } from '../../slices/auth';
 import { fetchCollectionsIfOld } from '../../slices/collections';
+import { fetchDescriptionsIfOld } from '../../slices/descriptions';
 import { fetchCollectionSuggestionsIfOld, fetchTechniqueSuggestionsIfOld } from '../../slices/suggestions';
 import { fetchTechniquesIfOld } from '../../slices/techniques';
 import { AppDispatch, RootState } from '../../store/store';
 import { decodeAndAddRole } from '../../util/Utilities';
 import CoachCollections from '../users/coach/Collections';
 import StudentCollections from '../users/student/Collections';
-import { shouldRefreshToken, setAccessToken } from '../../slices/auth';
+import { fetchCollectionTechniquesIfOld } from '../../slices/collectionTechniques';
 
 
 const CollectionsPage: React.FC = () => {
@@ -19,7 +20,7 @@ const CollectionsPage: React.FC = () => {
 
     const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
-    const state = useSelector((state: RootState) => state);
+    const state = useSelector((state: RootState) => state.auth);
 
     React.useEffect(() => {
         const getAccessToken = async () => {
@@ -40,9 +41,10 @@ const CollectionsPage: React.FC = () => {
     React.useEffect(() => {
         dispatch(fetchCollectionsIfOld());
         dispatch(fetchCollectionSuggestionsIfOld());
-        dispatch(fetchTechniqueSuggestionsIfOld())
-        dispatch(fetchTechniquesIfOld())
-        dispatch(fetchCollectionTechniquesAsync())
+        dispatch(fetchTechniqueSuggestionsIfOld());
+        dispatch(fetchTechniquesIfOld());
+        dispatch(fetchDescriptionsIfOld());
+        dispatch(fetchCollectionTechniquesIfOld());
     }, [dispatch]);
 
     if (user) { user = decodeAndAddRole(user) }

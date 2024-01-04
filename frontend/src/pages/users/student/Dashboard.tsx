@@ -1,12 +1,12 @@
-import React from 'react';
+import MuiArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Box from '@mui/material/Box';
 import MuiCard from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
-import { styled } from '@mui/material/styles';
-import MuiTypography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import MuiArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import Box from '@mui/material/Box'
-import { useNavigate } from 'react-router-dom'
+import MuiTypography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 const Typography = styled(MuiTypography)({

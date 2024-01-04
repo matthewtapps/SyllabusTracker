@@ -88,22 +88,26 @@ export const fetchTechniquesIfOld = createAsyncThunk(
     'techniques/fetchTechniquesIfOld',
     async (_, thunkAPI) => {
         const state = thunkAPI.getState() as RootState;
-        const techniques = state.techniques.techniques
+        const techniques = state.techniques.techniques;
 
         if (techniques.length > 0) {
             const now = Date.now();
-            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000');
+            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000'); // 5 minutes by default
 
             const mostRecentTechnique = techniques.reduce((latest, technique) => {
-                return (latest.lastUpdated.getTime() > technique.lastUpdated.getTime()) ? latest : technique;
+                const latestUpdateTime = new Date(latest.lastUpdated).getTime();
+                const techniqueUpdateTime = new Date(technique.lastUpdated).getTime();
+                return (latestUpdateTime > techniqueUpdateTime) ? latest : technique;
             }, techniques[0]);
 
-            const lastUpdated = mostRecentTechnique.lastUpdated.getTime();
+            const lastUpdated = new Date(mostRecentTechnique.lastUpdated).getTime();
             if (now - lastUpdated > expiryTime) {
-                return thunkAPI.dispatch(fetchTechniquesAsync());
+                const result = await thunkAPI.dispatch(fetchTechniquesAsync()).unwrap();
+                return result;
             }
         } else {
-            return thunkAPI.dispatch(fetchTechniquesAsync());
+            const result = await thunkAPI.dispatch(fetchTechniquesAsync()).unwrap();
+            return result;
         }
     }
 );
@@ -170,7 +174,7 @@ const techniquesSlice = createSlice({
                 state.deletingTechnique = false;
                 state.error = action.error.message || "Failed to delete technique"
             })
-            
+
             // Checking age of techniques
             .addCase(fetchTechniquesIfOld.pending, (state) => {
                 state.checkingAge = true;

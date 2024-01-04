@@ -1,26 +1,27 @@
+import { NewTechnique, UpdateTechnique } from 'common';
+import { AppDataSource } from '../data-source';
+import { CollectionTechnique } from '../entities/CollectionTechnique';
+import { OpenGuard } from '../entities/OpenGuard';
+import { Position } from '../entities/Position';
 import { Technique } from '../entities/Technique';
 import { TechniqueType } from '../entities/TechniqueType';
-import { Position } from '../entities/Position';
-import { OpenGuard } from '../entities/OpenGuard';
-import { AppDataSource } from '../data-source';
-import { NewTechnique, UpdateTechnique } from 'common';
-import { CollectionTechnique } from '../entities/CollectionTechnique';
+import { StudentTechnique } from '../entities/StudentTechnique';
 
 export class TechniqueService {
-    async createTechnique(data: {technique: NewTechnique}): Promise<Technique> {
+    async createTechnique(data: { technique: NewTechnique }): Promise<Technique> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
-      
-        let type = await typeRepo.findOne({ where: { title: data.technique.type.title }});
+
+        let type = await typeRepo.findOne({ where: { title: data.technique.type.title } });
         if (!type && data.technique.type.title && data.technique.type.description) {
             type = typeRepo.create({ title: data.technique.type.title, description: data.technique.type.description });
             await typeRepo.save(type);
         }
 
-        let position = await positionRepo.findOne({ where: { title: data.technique.position.title }});
-        if (!position&& data.technique.position.title && data.technique.position.description) {
+        let position = await positionRepo.findOne({ where: { title: data.technique.position.title } });
+        if (!position && data.technique.position.title && data.technique.position.description) {
             position = positionRepo.create({ title: data.technique.position.title, description: data.technique.position.description });
             await positionRepo.save(position);
         }
@@ -51,20 +52,20 @@ export class TechniqueService {
         return await techniqueRepo.save(technique);
     };
 
-    async updateTechnique(data: {technique: UpdateTechnique}): Promise<Technique> {
+    async updateTechnique(data: { technique: UpdateTechnique }): Promise<Technique> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
-      
-        let type = await typeRepo.findOne({ where: { title: data.technique.type.title }});
+
+        let type = await typeRepo.findOne({ where: { title: data.technique.type.title } });
         if (!type && data.technique.type.title && data.technique.type.description) {
             type = typeRepo.create({ title: data.technique.type.title, description: data.technique.type.description });
             await typeRepo.save(type);
         }
 
-        let position = await positionRepo.findOne({ where: { title: data.technique.position.title }});
-        if (!position&& data.technique.position.title && data.technique.position.description) {
+        let position = await positionRepo.findOne({ where: { title: data.technique.position.title } });
+        if (!position && data.technique.position.title && data.technique.position.description) {
             position = positionRepo.create({ title: data.technique.position.title, description: data.technique.position.description });
             await positionRepo.save(position);
         }
@@ -81,11 +82,11 @@ export class TechniqueService {
         }
 
         let technique;
-        technique = await techniqueRepo.findOne({ where: { techniqueId: data.technique.techniqueId }});
+        technique = await techniqueRepo.findOne({ where: { techniqueId: data.technique.techniqueId } });
         if (!technique) {
             throw new Error('Technique not found');
         }
-         
+
         technique.title = data.technique.title;
         technique.videoSrc = data.technique.videoSrc ?? null;
         technique.description = data.technique.description;
@@ -101,28 +102,45 @@ export class TechniqueService {
         return await techniqueRepo.save(technique);
     };
 
-    async deleteTechnique(data: {techniqueId: string}) {
+    async deleteTechnique(data: { techniqueId: string }) {
         const techniqueRepo = AppDataSource.getRepository(Technique);
         const collectionTechniqueRepo = AppDataSource.getRepository(CollectionTechnique)
+        const studentTechniqueRepo = AppDataSource.getRepository(StudentTechnique)
 
-        const technique = await techniqueRepo.findOne({ where: { techniqueId: data.techniqueId} })
+        const technique = await techniqueRepo.findOne({ where: { techniqueId: data.techniqueId } })
 
-        if (technique) {await collectionTechniqueRepo.createQueryBuilder()
-            .delete()
-            .from(CollectionTechnique)
-            .where("technique = :technique", { technique: technique.techniqueId })
-            .execute();}
+        if (technique) {
+            try {
 
-        if (technique) {await techniqueRepo.createQueryBuilder()
-            .delete()
-            .from(Technique)
-            .where("techniqueId = :techniqueId", { techniqueId: data.techniqueId })
-            .execute();}
+                await collectionTechniqueRepo.createQueryBuilder()
+                    .delete()
+                    .from(CollectionTechnique)
+                    .where("technique = :technique", { technique: technique.techniqueId })
+                    .execute();
+
+                await studentTechniqueRepo.createQueryBuilder()
+                    .delete()
+                    .from(StudentTechnique)
+                    .where("technique = :technique", { technique: technique.techniqueId })
+                    .execute();
+
+
+                await techniqueRepo.createQueryBuilder()
+                    .delete()
+                    .from(Technique)
+                    .where("techniqueId = :techniqueId", { techniqueId: technique.techniqueId })
+                    .execute();
+
+            } catch (error) {
+                console.log(`${error}`)
+            }
+
+        }
     }
 
     async getAllTechniqueTitlesWithDescriptions(): Promise<Technique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
-        const techniques = techniqueRepo.find({ select: ["title", "description"]})
+        const techniques = techniqueRepo.find({ select: ["title", "description"] })
 
         return techniques
     };
@@ -132,21 +150,21 @@ export class TechniqueService {
         return await techniqueRepo.find({
             relations: ["type", "position", "openGuard"]
         })
-        
+
     };
 
     async getAllTypes(): Promise<TechniqueType[]> {
         const typeRepo = AppDataSource.getRepository(TechniqueType);
-        return await typeRepo.find({ select: ["title", "description"]})
+        return await typeRepo.find({ select: ["title", "description"] })
     };
 
     async getAllPositions(): Promise<Position[]> {
         const positionRepo = AppDataSource.getRepository(Position);
-        return await positionRepo.find({ select: ["title", "description"]})
+        return await positionRepo.find({ select: ["title", "description"] })
     };
 
     async getAllOpenGuards(): Promise<OpenGuard[]> {
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
-        return await openGuardRepo.find({ select: ["title", "description"]})
+        return await openGuardRepo.find({ select: ["title", "description"] })
     };
 };

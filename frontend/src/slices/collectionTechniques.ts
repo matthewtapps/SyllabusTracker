@@ -9,12 +9,14 @@ interface CollectionTechniquesState {
     collectionTechniques: CollectionTechnique[];
     loading: boolean;
     error: string | null;
+    lastUpdated: number | null;
 }
 
 const initialState: CollectionTechniquesState = {
     collectionTechniques: [],
     loading: false,
     error: null,
+    lastUpdated: null,
 };
 
 interface CollectionTechniqueDTO { 
@@ -45,6 +47,25 @@ export const postCollectionTechniquesAsync = createAsyncThunk(
         const updatedCollectionTechniques = await postCollectionTechniques(data.collectionId, data.collectionTechniques, token);
         thunkAPI.dispatch(updateTechniquesInCollection({collectionId: data.collectionId, collectionTechniques: updatedCollectionTechniques}))
         return { collectionId: data.collectionId, collectionTechniques: updatedCollectionTechniques };
+    }
+);
+
+export const fetchCollectionTechniquesIfOld = createAsyncThunk(
+    'collectionTechniques/fetchCollectionTechniquesIfOld',
+    async (_, thunkAPI) => {
+        const state = thunkAPI.getState() as RootState;
+        const lastUpdated = state.collectionTechniques.lastUpdated;
+
+        if (lastUpdated) {
+            const now = Date.now();
+            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000'); // 5 minutes by default
+
+            if (now - lastUpdated > expiryTime) {
+                return thunkAPI.dispatch(fetchCollectionTechniquesAsync());
+            }
+        } else {
+            return thunkAPI.dispatch(fetchCollectionTechniquesAsync());
+        }
     }
 );
 
@@ -87,6 +108,7 @@ const collectionTechniquesSlice = createSlice({
                     ct.collection.collectionId !== collectionId
                 );
                 state.collectionTechniques = updatedCollectionTechniques.concat(collectionTechniques);
+                state.lastUpdated = Date.now()
             })
             .addCase(postCollectionTechniquesAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to post collection techniques';

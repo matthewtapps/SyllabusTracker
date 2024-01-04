@@ -3,6 +3,7 @@ import cors from "cors";
 import router from "./src/Router";
 import { AppDataSource } from "./src/data-source";
 import { auth } from 'express-oauth2-jwt-bearer';
+import morgan from 'morgan';
 import 'dotenv/config';
 
 const app = express();
@@ -20,8 +21,8 @@ const jwtCheck = auth({
 // You might want to disbale this on production.
 app.use(cors());
 app.use(express.json());
-
-app.use('/api', jwtCheck, router)
+app.use(morgan('combined', {immediate: true}));
+app.use('/api', jwtCheck, router);
 
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.log(req.headers.authorization)

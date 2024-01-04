@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store/store';
 
 
 interface AuthState {
@@ -30,8 +29,8 @@ const authSlice = createSlice({
 export const { setAccessToken } = authSlice.actions;
 export default authSlice.reducer;
 
-export function shouldRefreshToken(state: RootState): boolean {
-    const lastUpdated = state.auth.lastUpdated;
+export function shouldRefreshToken(state: AuthState): boolean {
+    const lastUpdated = state.lastUpdated;
     if (lastUpdated) {
         const now = Date.now();
         const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000');

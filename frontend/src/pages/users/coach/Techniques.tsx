@@ -1,16 +1,14 @@
-import React from 'react'
-import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
+import Fab from '@mui/material/Fab'
 import { Technique } from 'common'
-import { transformTechniqueForPost, transformTechniqueForPut } from '../../../util/Utilities'
+import React from 'react'
+import { useDispatch } from 'react-redux'
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
 import { NewTechniqueDialog } from '../../../components/Dialogs/NewTechniqueDialog'
-import { useAuth0 } from '@auth0/auth0-react'
 import { TechniqueListWithFilters } from '../../../components/Lists/TechniquesListWithFilters'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '../../../store/store'
 import { deleteTechniqueAsync, postTechniqueAsync, updateTechniqueAsync } from '../../../slices/techniques'
-import { setAccessToken } from '../../../slices/auth'
+import { AppDispatch } from '../../../store/store'
+import { transformTechniqueForPost, transformTechniqueForPut } from '../../../util/Utilities'
 
 
 interface TechniqueDTO {
@@ -44,22 +42,7 @@ const emptyTechniqueDTO: TechniqueDTO = {
 }
 
 function CoachTechniques(): JSX.Element {
-    const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
-
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
 
     const [showFab, setShowFab] = React.useState(true)
 

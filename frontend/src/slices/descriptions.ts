@@ -16,6 +16,7 @@ interface DescriptionsState {
     descriptions: Descriptions
     loading: boolean;
     error: string | null;
+    lastUpdated: number | null;
 }
 
 const initialState: DescriptionsState = {
@@ -25,7 +26,8 @@ const initialState: DescriptionsState = {
         openGuard: {}
     },
     loading: false,
-    error: null
+    error: null,
+    lastUpdated: null
 }
 
 export const fetchDescriptionsAsync = createAsyncThunk(
@@ -61,6 +63,27 @@ export const fetchDescriptionsAsync = createAsyncThunk(
     }
 );
 
+export const fetchDescriptionsIfOld = createAsyncThunk(
+    'descriptions/fetchDescriptionsIfOld',
+    async (_, thunkAPI) => {
+        const state = thunkAPI.getState() as RootState;
+
+        const lastUpdated = state.descriptions.lastUpdated;
+
+        if (lastUpdated) {
+            const now = Date.now();
+            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000'); // 5 minutes by default
+
+            if (now - lastUpdated > expiryTime) {
+                return thunkAPI.dispatch(fetchDescriptionsAsync());
+            }
+        } else {
+            // If lastUpdated is not available, fetch descriptions
+            return thunkAPI.dispatch(fetchDescriptionsAsync());
+        }
+    }
+);
+
 const descriptionsSlice = createSlice({
     name: 'descriptions',
     initialState,
@@ -90,6 +113,7 @@ const descriptionsSlice = createSlice({
                 state.descriptions.type = action.payload.type;
                 state.descriptions.openGuard = action.payload.openGuard;
                 state.loading = false;
+                state.lastUpdated = Date.now();
             })
             .addCase(fetchDescriptionsAsync.rejected, (state, action) => {
                 state.loading = false;

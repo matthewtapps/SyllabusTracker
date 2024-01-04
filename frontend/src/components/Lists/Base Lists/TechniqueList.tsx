@@ -112,8 +112,6 @@ interface TechniquesListProps {
     editingTechniqueId?: string | null;
     editingTechnique?: TechniqueDTO | null;
     onEditClick?: (technique: Technique) => void;
-    expandedTechniqueId?: string;
-    onAccordionChange?: (techniqueId: string) => void;
 }
 
 TechniqueList.defaultProps = {
@@ -124,30 +122,7 @@ TechniqueList.defaultProps = {
 }
 
 function TechniqueList(props: TechniquesListProps): JSX.Element {
-    const { getAccessTokenSilently } = useAuth0();
-    const dispatch = useDispatch<AppDispatch>();
-
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
-
-    const { techniques, techniquesLoading: loading } = useSelector((state: RootState) => state.techniques);
-
-    React.useEffect(() => {
-        if (techniques.length === 0 && !loading) {
-            dispatch(fetchTechniquesAsync());
-        }
-    }, [dispatch, techniques.length, loading]);
+    const { techniques } = useSelector((state: RootState) => state.techniques);
 
     const techniquesToDisplay = props.filteredTechniques || techniques
 
@@ -157,8 +132,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
             techniquesToDisplay.map((technique, index) => {
                 let currentOrder = props.ordered ? index + 1 : null;
             return (
-                <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId} 
-                expanded={props.expandedTechniqueId ? props.expandedTechniqueId === technique.techniqueId : undefined}>
+                <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
                     <AccordionSummary
                         expandIcon={<ExpandMore/>}
                         aria-controls="panel1a-content"

@@ -1,13 +1,16 @@
-import React from 'react';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Box, Checkbox, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import MuiAccordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { styled } from '@mui/material/styles'
-import MuiAccordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { styled } from '@mui/material/styles';
 import { Collection } from 'common';
-import { FormControl, InputLabel, Select, MenuItem, Box, Checkbox, Typography } from '@mui/material';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTechniqueSuggestionsIfOld } from '../../../slices/suggestions';
+import { AppDispatch, RootState } from '../../../store/store';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -20,13 +23,6 @@ const Accordion = styled(MuiAccordion)({
 
 interface CollectionFilterProps {
     onCollectionFiltersChange: (filters: CollectionFilters) => void;
-    options: {
-        giOptions: string[],
-        hierarchyOptions: string[],
-        typeOptions: string[],
-        positionOptions: string[],
-        openGuardOptions: string[]
-    };
     onAssignedFilterCheck?: () => void;
     showAssignedCollections: boolean;
 }
@@ -97,6 +93,8 @@ function CollectionFilter(props: CollectionFilterProps): JSX.Element {
         onFiltersChange(filters);
     }, [onFiltersChange, filters]);
 
+    const { collectionSuggestions } = useSelector((state: RootState) => state.suggestions);
+
     return (
         <Accordion disableGutters>
             <AccordionSummary expandIcon={<ExpandMore />}>
@@ -138,7 +136,7 @@ function CollectionFilter(props: CollectionFilterProps): JSX.Element {
                         }}
                     >
                         <MenuItem value=""><em>None</em></MenuItem>
-                        {props.options.giOptions.map(option => (
+                        {collectionSuggestions.giOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
@@ -157,13 +155,13 @@ function CollectionFilter(props: CollectionFilterProps): JSX.Element {
                         }}
                     >
                         <MenuItem value=""><em>None</em></MenuItem>
-                        {props.options.hierarchyOptions.map(option => (
+                        {collectionSuggestions.hierarchyOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
                 <Autocomplete
-                    options={props.options.typeOptions}
+                    options={collectionSuggestions.typeOptions}
                     value={filters.type}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, type: newValue || null };
@@ -183,7 +181,7 @@ function CollectionFilter(props: CollectionFilterProps): JSX.Element {
                     )}
                 />
                 <Autocomplete
-                    options={props.options.positionOptions}
+                    options={collectionSuggestions.positionOptions}
                     value={filters.position}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, position: newValue || null };
@@ -202,9 +200,9 @@ function CollectionFilter(props: CollectionFilterProps): JSX.Element {
                         />
                     )}
                 />
-                {props.options.openGuardOptions && (
+                {collectionSuggestions.openGuardOptions && (
                     <Autocomplete
-                        options={props.options.openGuardOptions}
+                        options={collectionSuggestions.openGuardOptions}
                         value={filters.openGuard}
                         onInputChange={(event, newValue) => {
                             const newFilters = { ...filters, openGuard: newValue || null };

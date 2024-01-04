@@ -50,13 +50,8 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
 
     const isPositionOpenGuard = localPositionState.toLowerCase() === 'open guard';
 
-    const dispatch = useDispatch<AppDispatch>();
     const { collectionSuggestions } = useSelector((state: RootState) => state.suggestions);
     const { descriptions } = useSelector((state: RootState) => state.descriptions)
-
-    React.useEffect(() => {
-        dispatch(fetchCollectionSuggestionsAsync())
-    }, [dispatch]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

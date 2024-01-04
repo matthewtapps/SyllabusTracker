@@ -23,17 +23,27 @@ const initialSuggestions: SuggestionsObject = {
 }
 
 interface SuggestionsState {
-    techniqueSuggestions: SuggestionsObject
-    collectionSuggestions: SuggestionsObject
-    loading: boolean,
-    error: string | null
+    techniqueSuggestions: SuggestionsObject;
+    collectionSuggestions: SuggestionsObject;
+    techniqueSuggestionsLoading: boolean;
+    collectionSuggestionsLoading: boolean;
+    techniqueSuggestionsLastUpdated: number | null;
+    collectionSuggestionsLastUpdated: number | null;
+    checkingTechniqueSuggestionsAge: boolean;
+    checkingCollectionSuggestionsAge: boolean;
+    suggestionsError: string | null;
 };
 
 const initialState: SuggestionsState = {
     techniqueSuggestions: initialSuggestions,
     collectionSuggestions: initialSuggestions,
-    loading: false,
-    error: null
+    techniqueSuggestionsLastUpdated: null,
+    collectionSuggestionsLastUpdated: null,
+    techniqueSuggestionsLoading: false,
+    collectionSuggestionsLoading: false,
+    checkingTechniqueSuggestionsAge: false,
+    checkingCollectionSuggestionsAge: false,
+    suggestionsError: null
 }
 
 export const fetchTechniqueSuggestionsAsync = createAsyncThunk(
@@ -115,6 +125,44 @@ export const fetchCollectionSuggestionsAsync = createAsyncThunk(
     }
 );
 
+export const fetchTechniqueSuggestionsIfOld = createAsyncThunk(
+    'suggestions/fetchTechniqueSuggestionsIfOld',
+    async (_, thunkAPI) => {
+        const state = thunkAPI.getState() as RootState;
+        const lastUpdated = state.suggestions.techniqueSuggestionsLastUpdated;
+
+        if (lastUpdated) {
+            const now = Date.now();
+            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000'); // 5 minutes by default
+
+            if (now - lastUpdated > expiryTime) {
+                thunkAPI.dispatch(fetchTechniqueSuggestionsAsync());
+            }
+        } else {
+            thunkAPI.dispatch(fetchTechniqueSuggestionsAsync());
+        }
+    }
+);
+
+export const fetchCollectionSuggestionsIfOld = createAsyncThunk(
+    'suggestions/fetchCollectionSuggestionsIfOld',
+    async (_, thunkAPI) => {
+        const state = thunkAPI.getState() as RootState;
+        const lastUpdated = state.suggestions.collectionSuggestionsLastUpdated;
+
+        if (lastUpdated) {
+            const now = Date.now();
+            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000'); // 5 minutes by default
+
+            if (now - lastUpdated > expiryTime) {
+                thunkAPI.dispatch(fetchCollectionSuggestionsAsync());
+            }
+        } else {
+            thunkAPI.dispatch(fetchCollectionSuggestionsAsync());
+        }
+    }
+);
+
 const suggestionsSlice = createSlice({
     name: 'suggestions',
     initialState,
@@ -123,9 +171,9 @@ const suggestionsSlice = createSlice({
             const item = action.payload;
 
             // Check if item is an instance of Technique or Collection
-            if ('techniqueId' in item  && !state.techniqueSuggestions.titleOptions.includes(item.title)) {
+            if ('techniqueId' in item && !state.techniqueSuggestions.titleOptions.includes(item.title)) {
                 state.techniqueSuggestions.titleOptions.push(item.title);
-            } 
+            }
             if ('collectionId' in item && !state.collectionSuggestions.titleOptions.includes(item.title)) {
                 state.collectionSuggestions.titleOptions.push(item.title);
             }
@@ -149,31 +197,57 @@ const suggestionsSlice = createSlice({
         builder
             // Technique Suggestions
             .addCase(fetchTechniqueSuggestionsAsync.pending, (state) => {
-                state.error = null;
-                state.loading = true;
+                state.suggestionsError = null;
+                state.techniqueSuggestionsLoading = true;
             })
             .addCase(fetchTechniqueSuggestionsAsync.fulfilled, (state, action) => {
-                state.loading = false;
-                state.techniqueSuggestions = {...action.payload};
+                state.techniqueSuggestionsLoading = false;
+                state.techniqueSuggestions = { ...action.payload };
             })
             .addCase(fetchTechniqueSuggestionsAsync.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || 'Failed to fetch technique suggestions';
+                state.techniqueSuggestionsLoading = false;
+                state.suggestionsError = action.error.message || 'Failed to fetch technique suggestions';
             })
 
             // Collection suggestions
             .addCase(fetchCollectionSuggestionsAsync.pending, (state) => {
-                state.error = null;
-                state.loading = true;
+                state.suggestionsError = null;
+                state.collectionSuggestionsLoading = true;
             })
             .addCase(fetchCollectionSuggestionsAsync.fulfilled, (state, action) => {
-                state.loading = false;
+                state.collectionSuggestionsLoading = false;
                 state.collectionSuggestions = action.payload;
             })
             .addCase(fetchCollectionSuggestionsAsync.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || 'Failed to fetch collection suggestions';
+                state.collectionSuggestionsLoading = false;
+                state.suggestionsError = action.error.message || 'Failed to fetch collection suggestions';
             })
+
+            // Fetch technique suggestions if old
+            .addCase(fetchTechniqueSuggestionsIfOld.pending, (state) => {
+                state.checkingTechniqueSuggestionsAge = true;
+            })
+            .addCase(fetchTechniqueSuggestionsIfOld.fulfilled, (state) => {
+                state.checkingTechniqueSuggestionsAge = false;
+                state.techniqueSuggestionsLastUpdated = Date.now();
+            })
+            .addCase(fetchTechniqueSuggestionsIfOld.rejected, (state, action) => {
+                state.checkingTechniqueSuggestionsAge = false;
+                state.suggestionsError = action.error.message || 'Failed to check if technique suggestions are old';
+            })
+            
+            // Fetch collection suggestions if old
+            .addCase(fetchCollectionSuggestionsIfOld.pending, (state) => {
+                state.checkingCollectionSuggestionsAge = true;
+            })
+            .addCase(fetchCollectionSuggestionsIfOld.fulfilled, (state) => {
+                state.checkingCollectionSuggestionsAge = false;
+                state.collectionSuggestionsLastUpdated = Date.now();
+            })
+            .addCase(fetchCollectionSuggestionsIfOld.rejected, (state, action) => {
+                state.checkingCollectionSuggestionsAge = false;
+                state.suggestionsError = action.error.message || 'Failed to check if collection suggestions are old';
+            });
     },
 });
 

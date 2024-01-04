@@ -9,6 +9,7 @@ interface StudentState {
     students: User[];
     selectedStudent: User | null;
     selectedStudentTechniques: StudentTechnique[];
+    selectedStudentTechniquesLastUpdated: number | null;
     allStudentTechniques: StudentTechnique[];
     loading: boolean;
     error: string | null;
@@ -18,6 +19,7 @@ const initialState: StudentState = {
     students: [],
     selectedStudent: null,
     selectedStudentTechniques: [],
+    selectedStudentTechniquesLastUpdated: null,
     allStudentTechniques: [],
     loading: false,
     error: null,
@@ -35,7 +37,7 @@ export const fetchStudentsAsync = createAsyncThunk(
     }
 );
 
-export const fetchStudentTechniquesAsync = createAsyncThunk(
+export const fetchSelectedStudentTechniquesAsync = createAsyncThunk(
     'student/fetchStudentTechniquesAsync',
     async (_, thunkAPI) => {
         const state = thunkAPI.getState() as RootState;
@@ -95,6 +97,30 @@ export const deleteStudentTechniqueAsync = createAsyncThunk(
     }
 );
 
+export const fetchSelectedStudentTechniquesIfOld = createAsyncThunk(
+    'student/fetchStudentTechniquesIfOld',
+    async (_, thunkAPI) => {
+        const state = thunkAPI.getState() as RootState;
+        const selectedStudent = state.student.selectedStudent;
+        const lastUpdated = state.student.selectedStudentTechniquesLastUpdated;
+
+        if (!selectedStudent) {
+            throw new Error('No student selected');
+        }
+
+        if (lastUpdated) {
+            const now = Date.now();
+            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000'); // 5 minutes by default
+
+            if (now - lastUpdated > expiryTime) {
+                return thunkAPI.dispatch(fetchSelectedStudentTechniquesAsync());
+            }
+        } else {
+            return thunkAPI.dispatch(fetchSelectedStudentTechniquesAsync());
+        }
+    }
+);
+
 const studentSlice = createSlice({
     name: 'student',
     initialState,
@@ -105,7 +131,7 @@ const studentSlice = createSlice({
                 ...state.selectedStudent,
                 user_id: stripAuth0FromUserId(state.selectedStudent.user_id)
             }
-        }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -121,15 +147,17 @@ const studentSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message || 'Failed to fetch students';
             })
+
             // Fetch student techniques for a given student
-            .addCase(fetchStudentTechniquesAsync.pending, (state) => {
+            .addCase(fetchSelectedStudentTechniquesAsync.pending, (state) => {
             })
-            .addCase(fetchStudentTechniquesAsync.fulfilled, (state, action) => {
+            .addCase(fetchSelectedStudentTechniquesAsync.fulfilled, (state, action) => {
                 state.selectedStudentTechniques = action.payload;
             })
-            .addCase(fetchStudentTechniquesAsync.rejected, (state, action) => {
+            .addCase(fetchSelectedStudentTechniquesAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to fetch student techniques';
             })
+
             // Post student techniques
             .addCase(postStudentTechniquesAsync.pending, (state) => {
             })
@@ -141,6 +169,7 @@ const studentSlice = createSlice({
             .addCase(postStudentTechniquesAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to post student techniques';
             })
+
             // Delete student technique
             .addCase(deleteStudentTechniqueAsync.pending, (state) => {
             })
@@ -152,6 +181,7 @@ const studentSlice = createSlice({
             .addCase(deleteStudentTechniqueAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to delete student technique';
             })
+
             // Update student technique
             .addCase(updateStudentTechniqueAsync.pending, (state) => {
             })
@@ -164,6 +194,19 @@ const studentSlice = createSlice({
             .addCase(updateStudentTechniqueAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to delete student technique';
             })
+            // Fetch student techniques if old
+            .addCase(fetchSelectedStudentTechniquesIfOld.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchSelectedStudentTechniquesIfOld.fulfilled, (state) => {
+                state.loading = false;
+                // Update the lastUpdated timestamp
+                state.selectedStudentTechniquesLastUpdated = Date.now();
+            })
+            .addCase(fetchSelectedStudentTechniquesIfOld.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || 'Failed to check if student techniques are old';
+            });
     },
 });
 

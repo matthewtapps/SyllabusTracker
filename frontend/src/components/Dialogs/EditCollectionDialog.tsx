@@ -48,24 +48,6 @@ interface EditCollectionDialogProps {
 }
 
 export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const { getAccessTokenSilently } = useAuth0();
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-        dispatch(fetchCollectionSuggestionsAsync())
-        dispatch(fetchDescriptionsAsync())
-    }, [getAccessTokenSilently, dispatch]);
-
     const { collectionSuggestions } = useSelector((state: RootState) => state.suggestions);
     const { descriptions } = useSelector((state: RootState) => state.descriptions)
     

@@ -1,17 +1,12 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { Box, CardContent, CircularProgress, Typography, styled } from "@mui/material";
+import { Box, CardContent, Typography, styled } from "@mui/material";
 import MuiCard from '@mui/material/Card';
 import { Technique, TechniqueStatus } from "common";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setAccessToken } from "../../slices/auth";
-import { fetchTechniquesAsync } from "../../slices/techniques";
-import { AppDispatch, RootState } from "../../store/store";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import Pageloader from "../Base/PageLoader";
 import StudentTechniqueList from "./Base Lists/StudentTechniqueList";
 import TechniqueFilter, { useHandleTechniqueFilterChange } from "./List Filters/TechniqueFilter";
-import Pageloader from "../Base/PageLoader";
-import { fetchTechniqueSuggestionsAsync } from "../../slices/suggestions";
-import { fetchStudentTechniquesAsync } from "../../slices/student";
 
 
 const Card = styled(MuiCard)({
@@ -35,40 +30,8 @@ StudentTechniqueListWithFilters.defaultProps = {
 }
 
 export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithFiltersProps): JSX.Element {
-    const { getAccessTokenSilently } = useAuth0();
-    const dispatch = useDispatch<AppDispatch>();
-    const [placeholderContent, setPlaceholderContent] = React.useState('')
-
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-                setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
-
-    const { techniques, techniquesLoading: loading } = useSelector((state: RootState) => state.techniques);
-    const { techniqueSuggestions } = useSelector((state: RootState) => state.suggestions);
+    const { techniques, techniquesLoading, checkingAge } = useSelector((state: RootState) => state.techniques);
     const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
-
-    React.useEffect(() => {
-        if (techniques.length === 0 && !loading) {
-            dispatch(fetchTechniquesAsync());
-        }
-        if (techniqueSuggestions.positionOptions.length === 0) {
-            dispatch(fetchTechniqueSuggestionsAsync())
-        }
-        if (selectedStudentTechniques.length === 0) {
-            dispatch(fetchStudentTechniquesAsync())
-        }
-    }, [dispatch, techniques.length, loading, techniqueSuggestions.positionOptions.length, selectedStudentTechniques.length]);
 
     const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange(techniques)
 
@@ -108,17 +71,16 @@ export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithF
             <Card>
                 <TechniqueFilter
                     onTechniqueFiltersChange={handleTechniqueFilterChange}
-                    options={techniqueSuggestions}
                     showAssignedTechniques={showAssignedTechniques}
                     onAssignedFiltersCheck={handleAssignedFiltersCheck}
                     />
             </Card>
             <Card>
-                {loading ? (
+                {(techniquesLoading || checkingAge) ? (
                     <Pageloader />
                 ) : filteredTechniques.length === 0 ? (
                     <CardContent>
-                        <Typography>{placeholderContent}</Typography>
+                        <Typography>No techniques found with current filters</Typography>
                     </CardContent>
                 ) : (
                     <Box>

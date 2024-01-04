@@ -93,7 +93,7 @@ export const fetchTechniquesIfOld = createAsyncThunk(
         if (techniques.length > 0) {
             const now = Date.now();
             const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000');
-            
+
             const mostRecentTechnique = techniques.reduce((latest, technique) => {
                 return (latest.lastUpdated.getTime() > technique.lastUpdated.getTime()) ? latest : technique;
             }, techniques[0]);
@@ -126,6 +126,7 @@ const techniquesSlice = createSlice({
                 state.techniquesLoading = false;
                 state.error = action.error.message || 'Failed to fetch techniques';
             })
+
             // Posting technique
             .addCase(postTechniqueAsync.pending, (state) => {
                 state.postingTechnique = true;
@@ -139,6 +140,7 @@ const techniquesSlice = createSlice({
                 state.postingTechnique = false;
                 state.error = action.error.message || "Failed to post technique"
             })
+
             // Updating technique
             .addCase(updateTechniqueAsync.pending, (state) => {
                 state.updatingTechnique = true;
@@ -156,6 +158,7 @@ const techniquesSlice = createSlice({
                 state.updatingTechnique = false;
                 state.error = action.error.message || "Failed to update technique"
             })
+
             // Deleting technique
             .addCase(deleteTechniqueAsync.pending, (state) => {
                 state.deletingTechnique = true;
@@ -167,6 +170,7 @@ const techniquesSlice = createSlice({
                 state.deletingTechnique = false;
                 state.error = action.error.message || "Failed to delete technique"
             })
+            
             // Checking age of techniques
             .addCase(fetchTechniquesIfOld.pending, (state) => {
                 state.checkingAge = true;

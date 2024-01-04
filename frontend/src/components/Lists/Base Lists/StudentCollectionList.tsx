@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
 import { CircleIcon } from '../../Buttons/CircleIcon';
 import StudentTechniqueList from './StudentTechniqueList';
-import { fetchStudentTechniquesAsync } from '../../../slices/student';
+import { fetchSelectedStudentTechniquesAsync } from '../../../slices/student';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -84,7 +84,6 @@ StudentCollectionList.defaultProps = {
 }
 
 function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element {
-    const dispatch = useDispatch<AppDispatch>()
     const iconColor = (statuses: (TechniqueStatus | null)[]): string => {
         const allPassed = statuses.every(status => status === TechniqueStatus.Passed);
         const anyStartedOrPassed = statuses.some(status => status === TechniqueStatus.Started || status === TechniqueStatus.Passed);
@@ -99,12 +98,6 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
     };
 
     const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
-
-    React.useEffect(() => {
-        if (selectedStudentTechniques.length === 0) {
-            dispatch(fetchStudentTechniquesAsync())
-        }
-    },[selectedStudentTechniques, dispatch])
 
     const handleIndicatorFill = (techniques: Technique[]): string => {
         const techniqueStatuses = techniques.map(technique => {

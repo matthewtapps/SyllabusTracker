@@ -1,5 +1,5 @@
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Checkbox, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -8,6 +8,9 @@ import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import { Technique } from 'common';
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTechniqueSuggestionsIfOld } from '../../../slices/suggestions';
+import { AppDispatch, RootState } from '../../../store/store';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -20,13 +23,6 @@ const Accordion = styled(MuiAccordion)({
 
 interface TechniqueFilterProps {
     onTechniqueFiltersChange: (filters: TechniqueFilters) => void;
-    options: {
-        giOptions: string[],
-        hierarchyOptions: string[],
-        typeOptions: string[],
-        positionOptions: string[],
-        openGuardOptions: string[]
-    };
     matchTechniqueFilters?: {
         title: string,
         hierarchy: string | null,
@@ -109,6 +105,8 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
         onTechniqueFiltersChange(filters);
     }, [onTechniqueFiltersChange, filters]);
 
+    const { techniqueSuggestions } = useSelector((state: RootState) => state.suggestions);
+
     return (
         <Accordion disableGutters>
             <AccordionSummary expandIcon={<ExpandMore />}>
@@ -153,7 +151,7 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                         }}
                     >
                         <MenuItem value=""><em>None</em></MenuItem>
-                        {props.options.giOptions.map(option => (
+                        {techniqueSuggestions.giOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
@@ -172,13 +170,13 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                         }}
                     >
                         <MenuItem value=""><em>None</em></MenuItem>
-                        {props.options.hierarchyOptions.map(option => (
+                        {techniqueSuggestions.hierarchyOptions.map(option => (
                             <MenuItem key={option} value={option}>{option}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
                 <Autocomplete
-                    options={props.options.typeOptions}
+                    options={techniqueSuggestions.typeOptions}
                     value={filters.type}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, type: newValue || null };
@@ -197,7 +195,7 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                     )}
                 />
                 <Autocomplete
-                    options={props.options.positionOptions}
+                    options={techniqueSuggestions.positionOptions}
                     value={filters.position}
                     onInputChange={(event, newValue) => {
                         const newFilters = { ...filters, position: newValue || null };
@@ -215,9 +213,9 @@ function TechniqueFilter(props: TechniqueFilterProps): JSX.Element {
                         />
                     )}
                 />
-                {props.options.openGuardOptions && (
+                {techniqueSuggestions.openGuardOptions && (
                     <Autocomplete
-                        options={props.options.openGuardOptions}
+                        options={techniqueSuggestions.openGuardOptions}
                         value={filters.openGuard}
                         onInputChange={(event, newValue) => {
                             const newFilters = { ...filters, openGuard: newValue || null };

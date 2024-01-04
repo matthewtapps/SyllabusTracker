@@ -9,13 +9,15 @@ import { updateSuggestions } from './suggestions';
 interface CollectionsState {
     collections: Collection[];
     loading: boolean;
+    lastUpdated: number | null;
     error: string | null;
 };
 
 const initialState: CollectionsState = {
     collections: [],
     loading: false,
-    error: null
+    error: null,
+    lastUpdated: null
 };
 
 export const fetchCollectionsAsync = createAsyncThunk(
@@ -79,6 +81,25 @@ export const deleteCollectionAsync = createAsyncThunk(
             throw new Error('Collection failed to delete');
         }
         return collectionId;
+    }
+);
+
+export const fetchCollectionsIfOld = createAsyncThunk(
+    'collections/fetchCollectionsIfOld',
+    async (_, thunkAPI) => {
+        const state = thunkAPI.getState() as RootState;
+        const lastUpdated = state.collections.lastUpdated;
+
+        if (lastUpdated) {
+            const now = Date.now();
+            const expiryTime = Number(process.env.REACT_APP_DATA_EXPIRY_MS || '300000'); // 5 minutes by default
+
+            if (now - lastUpdated > expiryTime) {
+                return thunkAPI.dispatch(fetchCollectionsAsync());
+            }
+        } else {
+            return thunkAPI.dispatch(fetchCollectionsAsync());
+        }
     }
 );
 
@@ -151,6 +172,20 @@ const collectionsSlice = createSlice({
             .addCase(deleteCollectionAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to delete collection';
             })
+
+            // Fetch collections if old
+            .addCase(fetchCollectionsIfOld.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchCollectionsIfOld.fulfilled, (state) => {
+                state.loading = false;
+                // Update the lastUpdated timestamp
+                state.lastUpdated = Date.now();
+            })
+            .addCase(fetchCollectionsIfOld.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || 'Failed to check if collections are old';
+            });
     },
 });
 

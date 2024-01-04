@@ -1,4 +1,3 @@
-import { useAuth0 } from '@auth0/auth0-react';
 import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
@@ -9,13 +8,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { Collection, Technique } from 'common';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAccessToken } from '../../slices/auth';
+import { postTechniqueAsync } from '../../slices/techniques';
 import { AppDispatch, RootState } from '../../store/store';
+import { transformTechniqueForPost } from '../../util/Utilities';
 import TechniqueList from '../Lists/Base Lists/TechniqueList';
 import TechniqueFilter, { useHandleTechniqueFilterChange } from '../Lists/List Filters/TechniqueFilter';
 import { NewTechniqueDialog } from './NewTechniqueDialog';
-import { postTechniqueAsync } from '../../slices/techniques';
-import { transformTechniqueForPost } from '../../util/Utilities';
 
 
 const Card = styled(MuiCard)({
@@ -42,21 +40,6 @@ interface AddTechniqueToCollectionDialogProps {
 
 export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDialogProps) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { getAccessTokenSilently } = useAuth0();
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
-
     const [selectedTechniques, setSelectedTechniques] = React.useState<{ index: number, technique: Technique }[]>([])
     const { techniques } = useSelector((state: RootState) => state.techniques)
     const [cleanedTechniques, setCleanedTechniques] = React.useState<Technique[]>([]);
@@ -65,8 +48,6 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
     React.useEffect(() => {
         setCleanedTechniques(techniques.filter(t => !props.editingTechniquesCollection?.collectionTechniques?.some(ct => ct.technique.techniqueId === t.techniqueId)));
     }, [techniques, setCleanedTechniques, props.editingTechniquesCollection?.collectionTechniques])
-
-    const { techniqueSuggestions } = useSelector((state: RootState) => state.suggestions)
 
     const handleTechniqueCheck = (techniqueId: string) => {
         setSelectedTechniques(prevSelectedTechniques => {
@@ -158,7 +139,6 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
                     <Card>
                         <TechniqueFilter
                             onTechniqueFiltersChange={handleTechniqueFilterChange}
-                            options={techniqueSuggestions}
                             matchTechniqueFilters={props.editingTechniquesCollection && (handleTechniqueFilterMatchClick(props.editingTechniquesCollection))} />
                     </Card>
                     <Box display="flex" flexDirection="column">

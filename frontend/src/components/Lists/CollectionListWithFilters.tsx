@@ -1,15 +1,10 @@
-import { Box, CircularProgress, CardContent, Typography, styled } from "@mui/material";
-import MuiCard from '@mui/material/Card'
+import { Box, CardContent, CircularProgress, Typography, styled } from "@mui/material";
+import MuiCard from '@mui/material/Card';
+import { Collection, Technique } from "common";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 import CollectionList from "./Base Lists/CollectionList";
 import CollectionFilter, { useHandleCollectionFilterChange } from "./List Filters/CollectionFilter";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store/store";
-import { useAuth0 } from "@auth0/auth0-react";
-import React from "react";
-import { setAccessToken } from "../../slices/auth";
-import { fetchCollectionsAsync } from "../../slices/collections";
-import { fetchCollectionSuggestionsAsync } from "../../slices/suggestions";
-import { Technique, Collection } from "common";
 
 
 const Card = styled(MuiCard)({
@@ -44,40 +39,7 @@ CollectionListWithFilters.defaultProps = {
 }
 
 export function CollectionListWithFilters(props: CollectionListWithFiltersProps): JSX.Element {
-    const { getAccessTokenSilently } = useAuth0();
-    const dispatch = useDispatch<AppDispatch>();
-    const [placeholderContent, setPlaceholderContent] = React.useState('')
-
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-                setPlaceholderContent(`Error fetching data: ${error}, \n please screenshot this and send to Matt`)
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
-
-    const { collections, loading, error } = useSelector((state: RootState) => state.collections);
-    const { collectionSuggestions } = useSelector((state: RootState) => state.suggestions);
-
-    React.useEffect(() => {
-        if (collections.length < 1 && !loading) {
-            dispatch(fetchCollectionsAsync());
-        }
-        if (!collectionSuggestions) {
-            dispatch(fetchCollectionSuggestionsAsync())
-        }
-        if (error) {
-            setPlaceholderContent(`Error fetching collections in Redux: ${error}`)
-        }
-    }, [dispatch, error, collections.length, collectionSuggestions, loading]);
-
+    const { collections, loading } = useSelector((state: RootState) => state.collections);
     const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collections)
 
     return (
@@ -85,7 +47,7 @@ export function CollectionListWithFilters(props: CollectionListWithFiltersProps)
             <Card>
                 <CollectionFilter
                     onCollectionFiltersChange={handleCollectionFilterChange}
-                    options={collectionSuggestions} />
+                />
             </Card>
             <Card>
                 {loading ? (
@@ -94,7 +56,7 @@ export function CollectionListWithFilters(props: CollectionListWithFiltersProps)
                     </Box>
                 ) : filteredCollections.length === 0 ? (
                     <CardContent>
-                        <Typography>{placeholderContent}</Typography>
+                        <Typography>No collections available for given filters</Typography>
                     </CardContent>
                 ) : (
                     <Box>

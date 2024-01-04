@@ -1,4 +1,3 @@
-import { useAuth0 } from '@auth0/auth0-react';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
@@ -13,9 +12,7 @@ import { styled } from '@mui/material/styles';
 import { Technique, TechniqueStatus } from 'common';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAccessToken } from '../../../slices/auth';
-import { deleteStudentTechniqueAsync, fetchStudentTechniquesAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
-import { fetchTechniquesAsync } from '../../../slices/techniques';
+import { deleteStudentTechniqueAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
 import { AppDispatch, RootState } from '../../../store/store';
 import { CircleIcon, Option } from '../../Buttons/CircleIcon';
 
@@ -118,7 +115,6 @@ StudentTechniqueList.defaultProps = {
 }
 
 function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
-    const { getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch<AppDispatch>();
 
     const iconColor = (techniqueStatus: TechniqueStatus | undefined): string => {
@@ -132,31 +128,8 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
 
     }
 
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                const token = await getAccessTokenSilently();
-                dispatch(setAccessToken(token))
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch]);
-
-    const { techniques, techniquesLoading: loading } = useSelector((state: RootState) => state.techniques);
+    const { techniques } = useSelector((state: RootState) => state.techniques);
     const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
-
-    React.useEffect(() => {
-        if (techniques.length === 0 && !loading) {
-            dispatch(fetchTechniquesAsync());
-        }
-        if (selectedStudentTechniques.length === 0) {
-            dispatch(fetchStudentTechniquesAsync())
-        }
-    }, [dispatch, techniques, loading, selectedStudentTechniques]);
 
     const techniquesToDisplay = props.filteredTechniques || techniques
 
@@ -196,7 +169,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
             }
         }
     };
-    
+
     const handleAction = (technique: Technique) => async (option: Option) => {
         const action = menuActions[option];
         if (action) {

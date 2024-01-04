@@ -54,7 +54,7 @@ export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithF
         getAccessToken();
     }, [getAccessTokenSilently, dispatch]);
 
-    const { techniques, loading } = useSelector((state: RootState) => state.techniques);
+    const { techniques, techniquesLoading: loading } = useSelector((state: RootState) => state.techniques);
     const { techniqueSuggestions } = useSelector((state: RootState) => state.suggestions);
     const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
 

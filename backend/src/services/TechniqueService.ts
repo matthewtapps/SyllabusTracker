@@ -129,25 +129,24 @@ export class TechniqueService {
 
     async getAllTechniques(): Promise<Technique[]> {
         const techniqueRepo = AppDataSource.getRepository(Technique);
-        const techniques = await techniqueRepo.find({
+        return await techniqueRepo.find({
             relations: ["type", "position", "openGuard"]
         })
-
-        return techniques
+        
     };
 
     async getAllTypes(): Promise<TechniqueType[]> {
         const typeRepo = AppDataSource.getRepository(TechniqueType);
-        return typeRepo.find({ select: ["title", "description"]})
+        return await typeRepo.find({ select: ["title", "description"]})
     };
 
     async getAllPositions(): Promise<Position[]> {
         const positionRepo = AppDataSource.getRepository(Position);
-        return positionRepo.find({ select: ["title", "description"]})
+        return await positionRepo.find({ select: ["title", "description"]})
     };
 
     async getAllOpenGuards(): Promise<OpenGuard[]> {
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
-        return openGuardRepo.find({ select: ["title", "description"]})
+        return await openGuardRepo.find({ select: ["title", "description"]})
     };
 };

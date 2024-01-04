@@ -53,7 +53,7 @@ export function TechniqueListWithFilters(props: TechniqueListWithFiltersProps): 
         getAccessToken();
     }, [getAccessTokenSilently, dispatch]);
 
-    const { techniques, loading } = useSelector((state: RootState) => state.techniques);
+    const { techniques, techniquesLoading: loading } = useSelector((state: RootState) => state.techniques);
     const { techniqueSuggestions } = useSelector((state: RootState) => state.suggestions);
 
     React.useEffect(() => {

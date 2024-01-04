@@ -146,7 +146,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
         getAccessToken();
     }, [getAccessTokenSilently, dispatch]);
 
-    const { techniques, loading } = useSelector((state: RootState) => state.techniques);
+    const { techniques, techniquesLoading: loading } = useSelector((state: RootState) => state.techniques);
     const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
 
     React.useEffect(() => {

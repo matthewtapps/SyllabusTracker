@@ -141,7 +141,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
         getAccessToken();
     }, [getAccessTokenSilently, dispatch]);
 
-    const { techniques, loading } = useSelector((state: RootState) => state.techniques);
+    const { techniques, techniquesLoading: loading } = useSelector((state: RootState) => state.techniques);
 
     React.useEffect(() => {
         if (techniques.length === 0 && !loading) {

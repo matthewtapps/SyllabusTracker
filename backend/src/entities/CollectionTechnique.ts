@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Generated, Column, ManyToOne, JoinTable } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Generated, Column, ManyToOne, JoinTable, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Technique } from "./Technique";
 import { Collection } from "./Collection";
 
@@ -17,4 +17,10 @@ export class CollectionTechnique implements CollectionTechnique{
 
     @ManyToOne(() => Technique, technique => technique.collectionTechniques)
     technique: Technique;
+
+    @UpdateDateColumn()
+    lastUpdated: Date;
+
+    @CreateDateColumn()
+    created: Date;
 }

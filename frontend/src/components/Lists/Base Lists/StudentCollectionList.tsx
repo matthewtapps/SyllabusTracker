@@ -10,11 +10,10 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { Collection, CollectionTechnique, Technique, TechniqueStatus } from 'common';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../../store/store';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 import { CircleIcon } from '../../Buttons/CircleIcon';
 import StudentTechniqueList from './StudentTechniqueList';
-import { fetchSelectedStudentTechniquesAsync } from '../../../slices/student';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -87,7 +86,7 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
     const iconColor = (statuses: (TechniqueStatus | null)[]): string => {
         const allPassed = statuses.every(status => status === TechniqueStatus.Passed);
         const anyStartedOrPassed = statuses.some(status => status === TechniqueStatus.Started || status === TechniqueStatus.Passed);
-    
+
         if (allPassed && statuses.length > 0) {
             return "#689d6a";
         } else if (anyStartedOrPassed && statuses.length > 0) {
@@ -104,10 +103,10 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
             const matchingTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
             return matchingTechnique ? matchingTechnique.status : null;
         }).filter(status => status !== null);
-    
+
         return iconColor(techniqueStatuses);
     };
-    
+
     return (
         <div>
             {props.filteredCollections.map(collection => {
@@ -127,7 +126,7 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                             <Box display="flex" flexDirection="row" flexGrow={1} alignItems="center" justifyContent="space-between" maxWidth="97%">
                                 <Typography variant="h6">{collection.title}</Typography>
                                 {props.editable && (
-                                    <CircleIcon 
+                                    <CircleIcon
                                         fill={handleIndicatorFill(collectionTechniques)}
                                     />
                                 )}

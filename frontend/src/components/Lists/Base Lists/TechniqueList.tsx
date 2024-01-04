@@ -1,24 +1,20 @@
-import React from 'react';
+import Edit from '@mui/icons-material/Edit';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import Edit from '@mui/icons-material/Edit'
-import { styled } from '@mui/material/styles'
-import { Technique } from 'common';
 import Box from '@mui/material/Box';
+import { default as Card, default as MuiCard } from '@mui/material/Card';
 import Checkbox from '@mui/material/Checkbox';
-import Typography from '@mui/material/Typography';
 import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
-import MuiCard from '@mui/material/Card';
-import Card from '@mui/material/Card';
-import { CardContent } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { useAuth0 } from '@auth0/auth0-react';
-import { setAccessToken } from '../../../slices/auth';
-import { AppDispatch, RootState } from '../../../store/store';
-import { fetchTechniquesAsync } from '../../../slices/techniques';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import { Technique } from 'common';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -70,10 +66,10 @@ interface TechniqueDTO {
 const BaseListItemText: React.FC<ExtendedListItemTextProps> = (props) => {
     const { smalltext, ...otherProps } = props;
     return (
-        <MuiListItemText 
-            {...otherProps} 
-            secondaryTypographyProps={{ component: 'div'}}
-            primaryTypographyProps={{ component: 'div'}}
+        <MuiListItemText
+            {...otherProps}
+            secondaryTypographyProps={{ component: 'div' }}
+            primaryTypographyProps={{ component: 'div' }}
         />
     );
 }
@@ -86,7 +82,7 @@ const ListItemText = styled(BaseListItemText)<ExtendedListItemTextProps>(({ them
         primaryVariant = 'body1';
         secondaryVariant = 'body2';
     }
-    
+
     return {
         '& .MuiTypography-root': {
             variant: primaryVariant
@@ -107,7 +103,7 @@ interface TechniquesListProps {
     ordered?: boolean;
     elevation: number;
     editable?: boolean;
-    checkedTechniques?: {index: number, technique: Technique}[];
+    checkedTechniques?: { index: number, technique: Technique }[];
     onTechniqueCheck?: (techniqueId: string) => void;
     editingTechniqueId?: string | null;
     editingTechnique?: TechniqueDTO | null;
@@ -129,160 +125,161 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
     return (
         <div>
             {techniquesToDisplay.length > 0 ? (
-            techniquesToDisplay.map((technique, index) => {
-                let currentOrder = props.ordered ? index + 1 : null;
-            return (
-                <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
-                    <AccordionSummary
-                        expandIcon={<ExpandMore/>}
-                        aria-controls="panel1a-content"
-                    >
-                        <Box display="flex" flexDirection="row" width="100%">
-                            {props.checkbox && (
-                                <Box display="flex" alignItems="center" marginLeft="0px">
-                                    <Checkbox
-                                        size='small'
-                                        checked={props.checkedTechniques?.some(item => item.technique === technique)}
-                                        onChange={() => props.onTechniqueCheck?.(technique.techniqueId)}
-                                        onClick={e => e.stopPropagation()}
-                                    />
-                                    <Typography variant="body1">{technique.title}</Typography>
-                                </Box>
-                            )}
-
-                            <Box display="flex" flexDirection="column" flexGrow={1}>
-                                <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
-                                    {!props.checkbox && (
+                techniquesToDisplay.map((technique, index) => {
+                    let currentOrder = props.ordered ? index + 1 : null;
+                    return (
+                        <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
+                            <AccordionSummary
+                                expandIcon={<ExpandMore />}
+                                aria-controls="panel1a-content"
+                            >
+                                <Box display="flex" flexDirection="row" width="100%">
+                                    {props.checkbox && (
                                         <Box display="flex" alignItems="center" marginLeft="0px">
-                                            {props.ordered && (
-                                            <Typography variant="body1" style={{marginRight: "8px"}}>{currentOrder + ". "}</Typography>
-                                            )}
-                                            <Typography variant="body1">{technique?.title}</Typography>
+                                            <Checkbox
+                                                size='small'
+                                                checked={props.checkedTechniques?.some(item => item.technique === technique)}
+                                                onChange={() => props.onTechniqueCheck?.(technique.techniqueId)}
+                                                onClick={e => e.stopPropagation()}
+                                            />
+                                            <Typography variant="body1">{technique.title}</Typography>
                                         </Box>
                                     )}
-                                    {props.editable && !(props.editingTechniqueId === technique.techniqueId) && !(props.editingTechniqueId) && (
-                                        <Edit onClick={(event) => { event.stopPropagation(); props.onEditClick?.(technique); }}/>
-                                    )}
+
+                                    <Box display="flex" flexDirection="column" flexGrow={1}>
+                                        <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
+                                            {!props.checkbox && (
+                                                <Box display="flex" alignItems="center" marginLeft="0px">
+                                                    {props.ordered && (
+                                                        <Typography variant="body1" style={{ marginRight: "8px" }}>{currentOrder + ". "}</Typography>
+                                                    )}
+                                                    <Typography variant="body1">{technique?.title}</Typography>
+                                                </Box>
+                                            )}
+                                            {props.editable && !(props.editingTechniqueId === technique.techniqueId) && !(props.editingTechniqueId) && (
+                                                <Edit onClick={(event) => { event.stopPropagation(); props.onEditClick?.(technique); }} />
+                                            )}
+                                        </Box>
+                                    </Box>
                                 </Box>
-                            </Box>
-                        </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <SubCard elevation={0}>
-                            <ListItem>                                
-                                <ListItemText sx={{margin: "0px"}}
-                                smalltext={(props.checkbox || props.ordered) ? true : false}
-                                primary="Description"
-                                secondary={technique?.description}
-                                />
-                            </ListItem>
-
-                            {technique?.globalNotes && (
-                                <ListItem>
-                                    <ListItemText
-                                    smalltext={(props.checkbox || props.ordered) ? true : false} 
-                                    primary="Global Notes"
-                                    secondary={technique?.globalNotes}/>
-                                </ListItem>
-                            )}
-
-                            {technique?.videoSrc && (
-                                <ListItem>
-                                    <ListItemText
-                                    smalltext={(props.checkbox || props.ordered) ? true : false} 
-                                    primary="Video Link"
-                                    secondary={technique?.videoSrc}/>
-                                </ListItem>
-                            )}
-    
-                            <SubAccordion elevation={0} disableGutters square>
-                                <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <SubCard elevation={0}>
                                     <ListItem>
-                                        <ListItemText
+                                        <ListItemText sx={{ margin: "0px" }}
                                             smalltext={(props.checkbox || props.ordered) ? true : false}
-                                            primary="Position"
-                                            secondary={technique?.position?.title}
+                                            primary="Description"
+                                            secondary={technique?.description}
                                         />
                                     </ListItem>
-                                </AccordionSummary>
 
-                                <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
-                                    <ListItem >
-                                        <ListItemText
-                                        smalltext={(props.checkbox || props.ordered) ? true : false}  
-                                        secondary={technique?.position.description}/>
-                                    </ListItem>
-                                </AccordionDetails>
-                            </SubAccordion>
-
-                            <ListItem>
-                                <ListItemText
-                                    smalltext={(props.checkbox || props.ordered) ? true : false}
-                                    primary="Hierarchy"
-                                    secondary={technique?.hierarchy}
-                                />
-                            </ListItem>
-
-                            <SubAccordion elevation={0} disableGutters square>
-                                <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
-                                    <ListItem>
-                                        <ListItemText
-                                            smalltext={(props.checkbox || props.ordered) ? true : false}
-                                            primary="Type"
-                                            secondary={technique?.type.title}
-                                        />
-                                    </ListItem>
-                                </AccordionSummary>
-
-                                <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
-                                    <ListItem>
-                                        <ListItemText
-                                        smalltext={(props.checkbox || props.ordered) ? true : false} 
-                                        secondary={technique?.type.description}/>
-                                    </ListItem>
-                                </AccordionDetails>
-                            </SubAccordion>
-
-                            {technique?.openGuard && (
-                                <SubAccordion elevation={0} disableGutters square>
-                                    <AccordionSummary expandIcon={<ExpandMore/>} sx={{padding: "0px", margin: "0px"}}>
+                                    {technique?.globalNotes && (
                                         <ListItem>
                                             <ListItemText
                                                 smalltext={(props.checkbox || props.ordered) ? true : false}
-                                                primary="Open Guard"
-                                                secondary={technique?.openGuard?.title}
-                                            />
+                                                primary="Global Notes"
+                                                secondary={technique?.globalNotes} />
                                         </ListItem>
-                                    </AccordionSummary>
+                                    )}
 
-                                    <AccordionDetails sx={{padding: "0px", margin: "0px"}}>
+                                    {technique?.videoSrc && (
                                         <ListItem>
                                             <ListItemText
-                                            smalltext={(props.checkbox || props.ordered) ? true : false}   
-                                            secondary={technique?.openGuard?.description}/>
+                                                smalltext={(props.checkbox || props.ordered) ? true : false}
+                                                primary="Video Link"
+                                                secondary={technique?.videoSrc} />
                                         </ListItem>
-                                    </AccordionDetails>
-                                </SubAccordion>
-                            )}
+                                    )}
 
-                            <ListItem>
-                                <ListItemText
-                                    smalltext={(props.checkbox || props.ordered) ? true : false}
-                                    primary="Gi or No Gi"
-                                    secondary={technique?.gi}
-                                />
-                            </ListItem>
-                        </SubCard>
-                    </AccordionDetails>
-                </Accordion>
-            )})
+                                    <SubAccordion elevation={0} disableGutters square>
+                                        <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                            <ListItem>
+                                                <ListItemText
+                                                    smalltext={(props.checkbox || props.ordered) ? true : false}
+                                                    primary="Position"
+                                                    secondary={technique?.position?.title}
+                                                />
+                                            </ListItem>
+                                        </AccordionSummary>
+
+                                        <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                            <ListItem >
+                                                <ListItemText
+                                                    smalltext={(props.checkbox || props.ordered) ? true : false}
+                                                    secondary={technique?.position.description} />
+                                            </ListItem>
+                                        </AccordionDetails>
+                                    </SubAccordion>
+
+                                    <ListItem>
+                                        <ListItemText
+                                            smalltext={(props.checkbox || props.ordered) ? true : false}
+                                            primary="Hierarchy"
+                                            secondary={technique?.hierarchy}
+                                        />
+                                    </ListItem>
+
+                                    <SubAccordion elevation={0} disableGutters square>
+                                        <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                            <ListItem>
+                                                <ListItemText
+                                                    smalltext={(props.checkbox || props.ordered) ? true : false}
+                                                    primary="Type"
+                                                    secondary={technique?.type.title}
+                                                />
+                                            </ListItem>
+                                        </AccordionSummary>
+
+                                        <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                            <ListItem>
+                                                <ListItemText
+                                                    smalltext={(props.checkbox || props.ordered) ? true : false}
+                                                    secondary={technique?.type.description} />
+                                            </ListItem>
+                                        </AccordionDetails>
+                                    </SubAccordion>
+
+                                    {technique?.openGuard && (
+                                        <SubAccordion elevation={0} disableGutters square>
+                                            <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                <ListItem>
+                                                    <ListItemText
+                                                        smalltext={(props.checkbox || props.ordered) ? true : false}
+                                                        primary="Open Guard"
+                                                        secondary={technique?.openGuard?.title}
+                                                    />
+                                                </ListItem>
+                                            </AccordionSummary>
+
+                                            <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                                <ListItem>
+                                                    <ListItemText
+                                                        smalltext={(props.checkbox || props.ordered) ? true : false}
+                                                        secondary={technique?.openGuard?.description} />
+                                                </ListItem>
+                                            </AccordionDetails>
+                                        </SubAccordion>
+                                    )}
+
+                                    <ListItem>
+                                        <ListItemText
+                                            smalltext={(props.checkbox || props.ordered) ? true : false}
+                                            primary="Gi or No Gi"
+                                            secondary={technique?.gi}
+                                        />
+                                    </ListItem>
+                                </SubCard>
+                            </AccordionDetails>
+                        </Accordion>
+                    )
+                })
             ) : (
-                <Card style={{backgroundColor: `#3c3836`}} elevation={0}>
+                <Card style={{ backgroundColor: `#3c3836` }} elevation={0}>
                     <CardContent>
                         <Typography variant='body1'>No techniques available</Typography>
                     </CardContent>
                 </Card>
-            ) }
+            )}
         </div>
     )
 }

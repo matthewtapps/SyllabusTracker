@@ -1,10 +1,8 @@
 import { Box, CardContent, CircularProgress, Typography, styled } from "@mui/material";
 import MuiCard from '@mui/material/Card';
 import { Technique } from "common";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchTechniquesIfOld } from "../../slices/techniques";
-import { AppDispatch, RootState } from "../../store/store";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 import TechniqueList from "./Base Lists/TechniqueList";
 import TechniqueFilter, { useHandleTechniqueFilterChange } from "./List Filters/TechniqueFilter";
 

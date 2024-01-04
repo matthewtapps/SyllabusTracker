@@ -1,4 +1,3 @@
-import { useAuth0 } from '@auth0/auth0-react';
 import { CardContent, styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
@@ -8,11 +7,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Collection } from 'common';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAccessToken } from '../../slices/auth';
-import { fetchDescriptionsAsync } from '../../slices/descriptions';
-import { fetchCollectionSuggestionsAsync } from '../../slices/suggestions';
-import { AppDispatch, RootState } from '../../store/store';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 import theme from '../../theme/Theme';
 import { FastTextField } from '../Fields/FastTextField';
 import { SelectField } from '../Fields/SelectField';
@@ -34,7 +30,7 @@ const Card = styled(MuiCard)({
 });
 
 const Button = styled((props: ButtonProps) => (
-    <MuiButton sx={{width: "100%", margin: "10px"}} variant='contained' {...props} />
+    <MuiButton sx={{ width: "100%", margin: "10px" }} variant='contained' {...props} />
 ))(({ theme }) => ({}));
 
 interface EditCollectionDialogProps {
@@ -50,7 +46,7 @@ interface EditCollectionDialogProps {
 export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
     const { collectionSuggestions } = useSelector((state: RootState) => state.suggestions);
     const { descriptions } = useSelector((state: RootState) => state.descriptions)
-    
+
     const [wasSubmitted, setWasSubmitted] = React.useState(false);
     const [localPositionState, setLocalPositionState] = React.useState(props.editingCollection?.position?.title || '')
 
@@ -71,51 +67,51 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
             console.log("Form is invalid");
         }
     };
-    
+
     return (
         <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="lg">
             <form noValidate onSubmit={handleSubmit}>
-                <DialogTitle sx={{padding: "0px", marginBottom: "10px"}}>
+                <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
                         <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
                         <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
                         <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingCollectionId); }}
-                            style={{backgroundColor: theme.palette.error.main}}
+                            style={{ backgroundColor: theme.palette.error.main }}
                         >Delete</Button>
                     </Box>
                 </DialogTitle>
-        
-                <DialogContent dividers={true} sx={{padding: "0px", borderBottom: "none"}}>
+
+                <DialogContent dividers={true} sx={{ padding: "0px", borderBottom: "none" }}>
                     <Card>
                         <CardContent>
                             <TitleTextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingCollection?.title || ''}
-                            name="title" label="Collection Title" options={collectionSuggestions.titleOptions}/>
+                                name="title" label="Collection Title" options={collectionSuggestions.titleOptions} />
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingCollection?.description}
-                            multiline rows={4} name="description" label="Collection Description"/>
+                                multiline rows={4} name="description" label="Collection Description" />
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth defaultValue={props.editingCollection?.globalNotes || ''}
-                            multiline rows={4} name="globalNotes" label="Global Notes"/>
+                                multiline rows={4} name="globalNotes" label="Global Notes" />
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="position"
-                            label="Position" descriptionLabel="Position Description" options={collectionSuggestions.positionOptions} 
-                            descriptions={descriptions} onPositionBlur={handlePositionBlur} defaultValue={props.editingCollection?.position?.title || ''} 
-                            descriptionDefaultValue={props.editingCollection?.position?.description || ''}/>
+                                label="Position" descriptionLabel="Position Description" options={collectionSuggestions.positionOptions}
+                                descriptions={descriptions} onPositionBlur={handlePositionBlur} defaultValue={props.editingCollection?.position?.title || ''}
+                                descriptionDefaultValue={props.editingCollection?.position?.description || ''} />
 
                             <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" defaultValue={props.editingCollection?.hierarchy || ''}
-                            options={collectionSuggestions.hierarchyOptions} required/>
+                                options={collectionSuggestions.hierarchyOptions} required />
 
-                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type" 
-                            defaultValue={props.editingCollection?.type?.title || ''} descriptionDefaultValue={props.editingCollection?.type?.description || ''}
-                            label="Type" descriptionLabel="Type Description" options={collectionSuggestions.typeOptions} descriptions={descriptions} />
+                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type"
+                                defaultValue={props.editingCollection?.type?.title || ''} descriptionDefaultValue={props.editingCollection?.type?.description || ''}
+                                label="Type" descriptionLabel="Type Description" options={collectionSuggestions.typeOptions} descriptions={descriptions} />
 
                             <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" defaultValue={props.editingCollection?.gi || ''}
-                            options={collectionSuggestions.giOptions} required/>
+                                options={collectionSuggestions.giOptions} required />
 
-                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth name="openGuard" 
-                            defaultValue={props.editingCollection?.openGuard?.title || ''} descriptionDefaultValue={props.editingCollection?.openGuard?.description || ''}
-                            label="Open Guard" descriptionLabel="Open Guard Description" options={collectionSuggestions.openGuardOptions} 
-                            descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard}/>
+                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth name="openGuard"
+                                defaultValue={props.editingCollection?.openGuard?.title || ''} descriptionDefaultValue={props.editingCollection?.openGuard?.description || ''}
+                                label="Open Guard" descriptionLabel="Open Guard Description" options={collectionSuggestions.openGuardOptions}
+                                descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard} />
                         </CardContent>
                     </Card>
                 </DialogContent>

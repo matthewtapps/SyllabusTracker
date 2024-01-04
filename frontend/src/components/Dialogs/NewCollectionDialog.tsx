@@ -6,13 +6,12 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 import { FastTextField } from '../Fields/FastTextField';
 import { SelectField } from '../Fields/SelectField';
 import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { TitleTextField } from '../Fields/TitleTextField';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCollectionSuggestionsAsync } from '../../slices/suggestions';
-import { AppDispatch, RootState } from '../../store/store';
 
 
 const TextField = styled(FastTextField)({

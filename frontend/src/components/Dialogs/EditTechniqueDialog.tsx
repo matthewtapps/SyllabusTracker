@@ -1,19 +1,18 @@
-import React from 'react';
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import MuiCard from '@mui/material/Card'
+import { CardContent, styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
+import MuiCard from '@mui/material/Card';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 import theme from '../../theme/Theme';
 import { FastTextField } from '../Fields/FastTextField';
-import { CardContent, styled } from '@mui/material';
-import { TitleTextField } from '../Fields/TitleTextField';
-import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { SelectField } from '../Fields/SelectField';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCollectionSuggestionsAsync, fetchTechniqueSuggestionsAsync } from '../../slices/suggestions';
-import { AppDispatch, RootState } from '../../store/store';
+import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
+import { TitleTextField } from '../Fields/TitleTextField';
 
 
 const TextField = styled(FastTextField)({
@@ -30,7 +29,7 @@ const Card = styled(MuiCard)({
 });
 
 const Button = styled((props: ButtonProps) => (
-    <MuiButton sx={{width: "100%", margin: "10px"}} variant='contained' {...props} />
+    <MuiButton sx={{ width: "100%", margin: "10px" }} variant='contained' {...props} />
 ))(({ theme }) => ({}));
 
 interface TechniqueDTO {
@@ -87,50 +86,50 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
     return (
         <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="lg">
             <form noValidate onSubmit={handleSubmit}>
-                <DialogTitle sx={{padding: "0px", marginBottom: "10px"}}>
+                <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
                         <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
                         <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
                         <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingTechniqueId); }}
-                            style={{backgroundColor: theme.palette.error.main}}
+                            style={{ backgroundColor: theme.palette.error.main }}
                         >Delete</Button>
                     </Box>
                 </DialogTitle>
-        
-                <DialogContent dividers={true} sx={{padding: "0px", borderBottom: "none"}}>
+
+                <DialogContent dividers={true} sx={{ padding: "0px", borderBottom: "none" }}>
                     <Card>
                         <CardContent>
                             <TitleTextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingTechnique?.title || ''}
-                            name="title" label="Technique Title" options={techniqueSuggestions.titleOptions}/>
+                                name="title" label="Technique Title" options={techniqueSuggestions.titleOptions} />
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingTechnique?.description || ''}
-                            multiline rows={4} name="description" label="Technique Description"/>
+                                multiline rows={4} name="description" label="Technique Description" />
 
-                            <TextField wasSubmitted={wasSubmitted} size="small" fullWidth defaultValue={props.editingTechnique?.globalNotes || ''} 
-                            multiline rows={4} name="globalNotes" label="Global Notes"/>
+                            <TextField wasSubmitted={wasSubmitted} size="small" fullWidth defaultValue={props.editingTechnique?.globalNotes || ''}
+                                multiline rows={4} name="globalNotes" label="Global Notes" />
 
                             <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="position"
-                            label="Position" descriptionLabel="Position Description" options={techniqueSuggestions.positionOptions} 
-                            descriptions={descriptions} onPositionBlur={handlePositionBlur} defaultValue={props.editingTechnique?.position || ''} 
-                            descriptionDefaultValue={props.editingTechnique?.positionDescription || ''}/>
+                                label="Position" descriptionLabel="Position Description" options={techniqueSuggestions.positionOptions}
+                                descriptions={descriptions} onPositionBlur={handlePositionBlur} defaultValue={props.editingTechnique?.position || ''}
+                                descriptionDefaultValue={props.editingTechnique?.positionDescription || ''} />
 
                             <SelectField wasSubmitted={wasSubmitted} name="hierarchy" label="Hierarchy" defaultValue={props.editingTechnique?.hierarchy || ''}
-                            options={techniqueSuggestions.hierarchyOptions} required/>
-                                    
-                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type" 
-                            defaultValue={props.editingTechnique?.type || ''} descriptionDefaultValue={props.editingTechnique?.typeDescription || ''}
-                            label="Type" descriptionLabel="Type Description" options={techniqueSuggestions.typeOptions} descriptions={descriptions} />
+                                options={techniqueSuggestions.hierarchyOptions} required />
+
+                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth required name="type"
+                                defaultValue={props.editingTechnique?.type || ''} descriptionDefaultValue={props.editingTechnique?.typeDescription || ''}
+                                label="Type" descriptionLabel="Type Description" options={techniqueSuggestions.typeOptions} descriptions={descriptions} />
 
                             <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" defaultValue={props.editingTechnique?.gi || ''}
-                            options={techniqueSuggestions.giOptions} required/>
+                                options={techniqueSuggestions.giOptions} required />
 
-                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth name="openGuard" 
-                            defaultValue={props.editingTechnique?.openGuard || ''} descriptionDefaultValue={props.editingTechnique?.openGuardDescription || ''}
-                            label="Open Guard" descriptionLabel="Open Guard Description" options={techniqueSuggestions.openGuardOptions} 
-                            descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard}/>
+                            <TextFieldWithDescriptionField wasSubmitted={wasSubmitted} size="small" fullWidth name="openGuard"
+                                defaultValue={props.editingTechnique?.openGuard || ''} descriptionDefaultValue={props.editingTechnique?.openGuardDescription || ''}
+                                label="Open Guard" descriptionLabel="Open Guard Description" options={techniqueSuggestions.openGuardOptions}
+                                descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard} />
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth label="Video Source"
-                            defaultValue={props.editingTechnique?.videoSrc} name="videoSrc"/>
+                                defaultValue={props.editingTechnique?.videoSrc} name="videoSrc" />
                         </CardContent>
                     </Card>
                 </DialogContent>

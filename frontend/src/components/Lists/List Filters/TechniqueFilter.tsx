@@ -8,9 +8,8 @@ import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import { Technique } from 'common';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchTechniqueSuggestionsIfOld } from '../../../slices/suggestions';
-import { AppDispatch, RootState } from '../../../store/store';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 
 const Accordion = styled(MuiAccordion)({

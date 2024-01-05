@@ -122,7 +122,6 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
                             onClick={(e) => e.stopPropagation()}
                             aria-describedby={titleError ? `${name}-error` : undefined}
                             error={titleError}
-                            helperText={titleError ? "Required" : ''}
                         />
                     )}
                 />
@@ -144,7 +143,6 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
                     rows={4}
                     label={descriptionLabel}
                     error={descriptionError}
-                    helperText={descriptionError ? "Required" : ''}
                 />
             </AccordionDetails>
         </Accordion>

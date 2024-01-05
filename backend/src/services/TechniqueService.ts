@@ -100,7 +100,9 @@ export class TechniqueService {
         })
 
         if (technique) {
-            return await techniqueRepo.findOne({ where: { techniqueId: data.technique.techniqueId } })
+            return await techniqueRepo.findOne({ where: { techniqueId: data.technique.techniqueId },
+                relations: ["type", "position", "openGuard"]
+            })
         }
     };
 

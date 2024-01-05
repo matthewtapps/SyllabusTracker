@@ -14,6 +14,7 @@ import { SelectField } from '../Fields/SelectField';
 import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { TitleTextField } from '../Fields/TitleTextField';
 import { Add, Remove } from '@mui/icons-material';
+import VideoTextFields from '../Fields/VideoTextFields';
 
 
 const TextField = styled(FastTextField)({
@@ -76,39 +77,11 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setWasSubmitted(true)
-        const formData = new FormData(event.currentTarget)
-        const fieldValues = Object.fromEntries(formData.entries());
-        console.log(fieldValues)
         if (event.currentTarget.checkValidity()) {
-            console.log(event.currentTarget)
             await props.onSave(event);
             setWasSubmitted(false)
         } else {
             console.log("Form is invalid");
-        }
-    };
-
-    const [videos, setVideos] = React.useState<{ title: string | undefined, hyperlink: string | undefined }[]>(props.editingTechnique.videos || [{ title: undefined, hyperlink: undefined }]);
-
-    React.useEffect(() => {
-        setVideos(props.editingTechnique.videos || [{ title: undefined, hyperlink: undefined }])
-    },[props.editingTechnique])
-
-    const handleVideoChange = (index: number, field: 'title' | 'hyperlink', value: string) => {
-        const newVideos = videos.map((video, i) => ({
-            ...video,
-            [field]: i === index ? value : video[field]
-        }));
-        setVideos(newVideos);
-    };
-
-    const addVideoField = () => {
-        setVideos([...videos, { title: undefined, hyperlink: undefined }]);
-    };
-
-    const subtractVideoField = () => {
-        if (videos.length > 1) {
-            setVideos(videos.slice(0, -1));
         }
     };
 
@@ -155,45 +128,8 @@ export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
                                 defaultValue={props.editingTechnique?.openGuard || ''} descriptionDefaultValue={props.editingTechnique?.openGuardDescription || ''}
                                 label="Open Guard" descriptionLabel="Open Guard Description" options={techniqueSuggestions.openGuardOptions}
                                 descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard} />
-
-                            {videos.map((video, index) => {
-                                let buttons: JSX.Element = <></>
-                                if (index === videos.length - 1) {
-                                    buttons =
-                                        (<>
-                                            <Button onClick={addVideoField} sx={{ minWidth: "100px" }}><Add /></Button>
-                                            <Button onClick={subtractVideoField} disabled={videos.length <= 1} sx={{ minWidth: "100px" }}><Remove /></Button>
-                                        </>)
-                                }
-                                return (
-                                    <React.Fragment key={"video_fields_" + index}>
-                                        <Typography variant="body2" sx={{ marginTop: "10px", marginLeft: "5px" }}>{`Video Set ${index + 1}`}</Typography>
-                                        <TextField
-                                            wasSubmitted={wasSubmitted}
-                                            size="small"
-                                            fullWidth
-                                            label="Video Title"
-                                            required={index > 0 || video.hyperlink !== undefined}
-                                            defaultValue={video.title}
-                                            name={"video_title_" + index}
-                                            onChange={(e) => handleVideoChange(index, 'title', e.target.value)}
-                                        />
-                                        <TextField
-                                            wasSubmitted={wasSubmitted}
-                                            size="small"
-                                            fullWidth
-                                            label="Video Hyperlink"
-                                            required={index > 0 || videos[index].title !== undefined}
-                                            defaultValue={video.hyperlink}
-                                            name={"video_link_" + index}
-                                            onChange={(e) => handleVideoChange(index, 'hyperlink', e.target.value)}
-                                        />
-                                        <Box display="flex" flexDirection="row" justifyContent="space-evenly" alignItems="center">
-                                            {buttons}
-                                        </Box>
-                                    </React.Fragment>
-                                )
-                            })}
+                            
+                            <VideoTextFields wasSubmitted={wasSubmitted} editingTechnique={props.editingTechnique} editingTechniqueId={props.editingTechniqueId}/>
                         </form>
                     </CardContent>
                 </Card>

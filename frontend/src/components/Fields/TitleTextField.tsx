@@ -55,7 +55,6 @@ export function TitleTextField({ name, wasSubmitted, required, options, defaultV
                     size="small"
                     aria-describedby={displayErrorMessage ? `${name}-error` : undefined}
                     error={displayErrorMessage}
-                    helperText={displayErrorMessage ? "Required" : undefined}
                 />
             )}
         />

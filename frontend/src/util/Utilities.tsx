@@ -56,7 +56,6 @@ export const transformTechniqueForPost = (technique: any): NewTechnique => {
 };
 
 export const transformTechniqueForPut = (technique: any): UpdateTechnique => {
-    console.log(technique)
     if (!Object.values(Gi).includes(technique.gi)) {
         throw new Error(`Invalid Gi value`)
     }
@@ -135,7 +134,6 @@ export const updateTechnique = async (technique: UpdateTechnique, accessToken: s
         });
         if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
         const responseData = await response.json();
-        console.log(responseData)
         return responseData
     } catch (error) { throw new Error(`Error updating technique: ${error}`) }
 };

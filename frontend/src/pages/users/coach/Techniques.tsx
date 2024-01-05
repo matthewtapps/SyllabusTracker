@@ -57,7 +57,7 @@ function CoachTechniques(): JSX.Element {
         setEditingTechniqueId(technique.techniqueId);
         setEditingTechnique({
             title: technique.title,
-            videos: technique.videos || [],
+            videos: technique.videos || [{title: '', hyperlink: ''}],
             description: technique.description,
             globalNotes: technique.globalNotes || undefined,
             gi: technique.gi,

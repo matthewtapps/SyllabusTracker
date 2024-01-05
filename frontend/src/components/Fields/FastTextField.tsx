@@ -45,7 +45,6 @@ export function FastTextField({ name, wasSubmitted, required, defaultValue, ...o
             size="small"
             aria-describedby={displayErrorMessage ? `${name}-error` : undefined}
             error={displayErrorMessage}
-            helperText={displayErrorMessage ? "Required" : undefined}
         />
     );
 };

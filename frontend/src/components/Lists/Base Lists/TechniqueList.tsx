@@ -51,7 +51,7 @@ interface ExtendedListItemTextProps extends ListItemTextProps {
 
 interface TechniqueDTO {
     title: string,
-    videoSrc: string | undefined,
+    videos: string | undefined,
     description: string,
     globalNotes: string | undefined,
     gi: string,
@@ -143,7 +143,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                                 onChange={() => props.onTechniqueCheck?.(technique.techniqueId)}
                                                 onClick={e => e.stopPropagation()}
                                             />
-                                            <Typography variant="body1">{technique.title}</Typography>
+                                            <Typography variant="h6">{technique.title}</Typography>
                                         </Box>
                                     )}
 
@@ -166,16 +166,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <SubCard elevation={0}>
-                                    {props.editable && (
-                                        <ListItem>
-                                            <Box display="flex" flexDirection="row" flexGrow={1} alignItems="center" justifyContent="center">
-                                                <Button variant="contained" sx={{ minWidth: "85px", marginRight: "10px" }}><EditNoteSharp sx={{ marginX: "2px" }} /><PublicSharp sx={{ marginX: "2px" }} /></Button>
-                                                <Button variant="contained" sx={{ minWidth: "85px", marginLeft: "10px" }}><VideocamSharp /></Button>
-                                            </Box>
-                                        </ListItem>
-                                    )}
-
-                                    <ListItem>
+                                    <ListItem key={`${technique.techniqueId}-description`}>
                                         <ListItemText sx={{ margin: "0px" }}
                                             smalltext={(props.checkbox || props.ordered) ? true : false}
                                             primary="Description"
@@ -184,7 +175,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                     </ListItem>
 
                                     {technique?.globalNotes && (
-                                        <ListItem>
+                                        <ListItem key={`${technique.techniqueId}-globalNotes`}>
                                             <ListItemText
                                                 smalltext={(props.checkbox || props.ordered) ? true : false}
                                                 primary="Global Notes"
@@ -192,18 +183,19 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         </ListItem>
                                     )}
 
-                                    {technique?.videos && technique.videos.map(video => (
-                                        <ListItem>
+                                    {technique?.videos && technique.videos.map((video, index) => (
+                                        <ListItem key={`${technique.techniqueId}-video-${index}`}>
                                             <ListItemText
                                                 smalltext={(props.checkbox || props.ordered) ? true : false}
-                                                primary={video.title}
-                                                secondary={video.hyperlink} />
+                                                primary={"Video: " + video.title}
+                                                secondary={<Button variant="contained" sx={{ minWidth: "85px", marginLeft: "5px", marginTop: "5px" }}><VideocamSharp /></Button>}
+                                            />
                                         </ListItem>
                                     ))}
 
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${technique.techniqueId}-position`}>
                                                 <ListItemText
                                                     smalltext={(props.checkbox || props.ordered) ? true : false}
                                                     primary="Position"
@@ -213,7 +205,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem >
+                                            <ListItem key={`${technique.techniqueId}-positionDescription`}>
                                                 <ListItemText
                                                     smalltext={(props.checkbox || props.ordered) ? true : false}
                                                     secondary={technique?.position.description} />
@@ -221,7 +213,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         </AccordionDetails>
                                     </SubAccordion>
 
-                                    <ListItem>
+                                    <ListItem key={`${technique.techniqueId}-hierarchy`}>
                                         <ListItemText
                                             smalltext={(props.checkbox || props.ordered) ? true : false}
                                             primary="Hierarchy"
@@ -231,7 +223,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
 
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${technique.techniqueId}-type`}>
                                                 <ListItemText
                                                     smalltext={(props.checkbox || props.ordered) ? true : false}
                                                     primary="Type"
@@ -241,7 +233,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${technique.techniqueId}-typeDescription`}>
                                                 <ListItemText
                                                     smalltext={(props.checkbox || props.ordered) ? true : false}
                                                     secondary={technique?.type.description} />
@@ -252,7 +244,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                     {technique?.openGuard && (
                                         <SubAccordion elevation={0} disableGutters square>
                                             <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                                <ListItem>
+                                                <ListItem key={`${technique.techniqueId}-openGuard`}>
                                                     <ListItemText
                                                         smalltext={(props.checkbox || props.ordered) ? true : false}
                                                         primary="Open Guard"
@@ -262,7 +254,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                             </AccordionSummary>
 
                                             <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                                <ListItem>
+                                                <ListItem key={`${technique.techniqueId}-openGuardDescription`}>
                                                     <ListItemText
                                                         smalltext={(props.checkbox || props.ordered) ? true : false}
                                                         secondary={technique?.openGuard?.description} />
@@ -271,7 +263,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                         </SubAccordion>
                                     )}
 
-                                    <ListItem>
+                                    <ListItem key={`${technique.techniqueId}-gi`}>
                                         <ListItemText
                                             smalltext={(props.checkbox || props.ordered) ? true : false}
                                             primary="Gi or No Gi"

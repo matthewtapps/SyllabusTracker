@@ -6,7 +6,7 @@ import { OpenGuard } from "./OpenGuard";
 import { CollectionTechnique } from "./CollectionTechnique";
 
 @Entity()
-export class Technique implements TechniqueInterface {
+export class Technique {
     @PrimaryGeneratedColumn('uuid')
     @Generated('uuid')
     techniqueId: string;
@@ -14,8 +14,8 @@ export class Technique implements TechniqueInterface {
     @Column()
     title: string;
 
-    @Column({nullable: true})
-    videoSrc: string;
+    @Column({nullable: true, type: 'json'})
+    videos: {title: string, hyperlink: string}[];
 
     @Column()
     description: string;

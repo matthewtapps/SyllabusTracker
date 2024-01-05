@@ -1,5 +1,5 @@
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { CardContent } from '@mui/material';
+import { Button, CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteStudentTechniqueAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
 import { AppDispatch, RootState } from '../../../store/store';
 import { CircleIcon, Option } from '../../Buttons/CircleIcon';
+import { EditNoteSharp, PersonSharp, PublicSharp, VideocamSharp } from '@mui/icons-material';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -50,7 +51,7 @@ interface ExtendedListItemTextProps extends ListItemTextProps {
 
 interface TechniqueDTO {
     title: string,
-    videoSrc: string | undefined,
+    videos: {title: string, hyperlink: string}[] | undefined,
     description: string,
     globalNotes: string | undefined,
     gi: string,
@@ -212,6 +213,13 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                             <AccordionDetails>
                                 <SubCard elevation={0}>
                                     <ListItem>
+                                        <Box display="flex" flexDirection="row" flexGrow={1} alignItems="center" justifyContent="center">
+                                            <Button variant="contained" sx={{ minWidth: "85px", marginRight: "10px" }}><EditNoteSharp sx={{ marginX: "2px" }} /><PersonSharp sx={{ marginX: "2px" }} /></Button>
+                                            <Button variant="contained" sx={{ minWidth: "85px", marginLeft: "10px" }}><EditNoteSharp sx={{ marginX: "2px" }} /><PublicSharp sx={{ marginX: "2px" }} /></Button>
+                                        </Box>
+                                    </ListItem>
+
+                                    <ListItem>
                                         <ListItemText sx={{ margin: "0px" }}
                                             smalltext={props.ordered ? true : false}
                                             primary="Description"
@@ -228,14 +236,15 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                         </ListItem>
                                     )}
 
-                                    {technique?.videoSrc && (
+                                    {technique?.videos && technique.videos.map(video => (
                                         <ListItem>
                                             <ListItemText
                                                 smalltext={props.ordered ? true : false}
-                                                primary="Video Link"
-                                                secondary={technique?.videoSrc} />
+                                                primary={video.title}
+                                                secondary={video.hyperlink} />
                                         </ListItem>
-                                    )}
+                                    ))}
+
 
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>

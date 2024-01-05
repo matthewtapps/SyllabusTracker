@@ -29,7 +29,7 @@ export const transformTechniqueForPost = (technique: any): NewTechnique => {
 
     const transformedTechnique: NewTechnique = {
         title: technique.title,
-        videoSrc: technique.videoSrc,
+        videos: technique.videoSrc,
         description: technique.description,
         globalNotes: technique.globalNotes,
         gi: technique.gi as Gi,
@@ -56,6 +56,7 @@ export const transformTechniqueForPost = (technique: any): NewTechnique => {
 };
 
 export const transformTechniqueForPut = (technique: any): UpdateTechnique => {
+    console.log(technique)
     if (!Object.values(Gi).includes(technique.gi)) {
         throw new Error(`Invalid Gi value`)
     }
@@ -64,10 +65,23 @@ export const transformTechniqueForPut = (technique: any): UpdateTechnique => {
         throw new Error(`Invalid Hierarchy value`)
     }
 
-    const transformedTechnique: UpdateTechnique = {
+    let videos: {title: string, hyperlink: string}[] = []
+
+    const videoKeys = Object.keys(technique).filter(key => key.startsWith("video"));
+    const videoTitles = videoKeys.filter(key => key.includes("title"));
+
+    videoTitles.forEach(titleKey => {
+        const index = titleKey.split("_")[2]; // Assuming format video_title_0, video_title_1, etc.
+        const linkKey = `video_link_${index}`;
+        if ((technique[titleKey] && technique[linkKey]) && technique[titleKey].length > 0 && technique[linkKey].length > 0) {
+            videos.push({ title: technique[titleKey], hyperlink: technique[linkKey] });
+        }
+    });
+
+    let transformedTechnique: UpdateTechnique = {
         techniqueId: technique.techniqueId,
         title: technique.title,
-        videoSrc: technique.videoSrc,
+        videos: videos.length > 0 ? videos : null,
         description: technique.description,
         globalNotes: technique.globalNotes,
         gi: technique.gi as Gi,
@@ -121,6 +135,7 @@ export const updateTechnique = async (technique: UpdateTechnique, accessToken: s
         });
         if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }
         const responseData = await response.json();
+        console.log(responseData)
         return responseData
     } catch (error) { throw new Error(`Error updating technique: ${error}`) }
 };

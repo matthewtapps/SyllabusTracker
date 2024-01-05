@@ -38,7 +38,7 @@ export class TechniqueService {
         let technique = new Technique();
 
         technique.title = data.technique.title;
-        technique.videoSrc = data.technique.videoSrc ?? null;
+        technique.videos = data.technique.videos ?? null;
         technique.description = data.technique.description;
         technique.globalNotes = data.technique.globalNotes ?? null;
         technique.gi = data.technique.gi;
@@ -81,25 +81,27 @@ export class TechniqueService {
             }
         }
 
-        let technique;
+        let technique: Partial<Technique> = {};
         technique = await techniqueRepo.findOne({ where: { techniqueId: data.technique.techniqueId } });
         if (!technique) {
             throw new Error('Technique not found');
         }
 
-        technique.title = data.technique.title;
-        technique.videoSrc = data.technique.videoSrc ?? null;
-        technique.description = data.technique.description;
-        technique.globalNotes = data.technique.globalNotes ?? null;
-        technique.gi = data.technique.gi;
-        technique.hierarchy = data.technique.hierarchy;
-        technique.type = type;
-        technique.position = position;
-        if (openGuard) {
-            technique.openGuard = openGuard;
-        } else technique.openGuard = null;
+        await techniqueRepo.update({ techniqueId: technique.techniqueId }, {
+            title: data.technique.title,
+            videos: data.technique.videos ?? null,
+            description: data.technique.description,
+            globalNotes: data.technique.globalNotes ?? null,
+            gi: data.technique.gi,
+            hierarchy: data.technique.hierarchy,
+            type: type,
+            position: position,
+            openGuard: openGuard ?? null,
+        })
 
-        return await techniqueRepo.save(technique);
+        if (technique) {
+            return await techniqueRepo.findOne({ where: { techniqueId: data.technique.techniqueId } })
+        }
     };
 
     async deleteTechnique(data: { techniqueId: string }) {
@@ -123,7 +125,6 @@ export class TechniqueService {
                     .from(StudentTechnique)
                     .where("technique = :technique", { technique: technique.techniqueId })
                     .execute();
-
 
                 await techniqueRepo.createQueryBuilder()
                     .delete()

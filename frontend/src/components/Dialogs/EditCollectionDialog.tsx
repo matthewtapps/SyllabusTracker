@@ -69,7 +69,7 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
     };
 
     return (
-        <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="lg">
+        <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="md" fullWidth>
             <form noValidate onSubmit={handleSubmit}>
                 <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>

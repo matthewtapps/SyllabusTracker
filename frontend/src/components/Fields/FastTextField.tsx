@@ -22,7 +22,11 @@ FastTextField.defaultProps = {
 export function FastTextField({ name, wasSubmitted, required, defaultValue, ...otherProps }: FastTextFieldProps) {
     const [fieldValue, setFieldValue] = React.useState(defaultValue || '');
     const [touched, setTouched] = React.useState(false);
-    const displayErrorMessage = ((wasSubmitted || touched) && required && fieldValue === '');
+    const [displayErrorMessage, setDisplayErrorMessage] = React.useState(false);
+
+    React.useEffect(() => {
+        setDisplayErrorMessage(((wasSubmitted || touched) && required && fieldValue === ''))
+    },[wasSubmitted, touched, required, fieldValue])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFieldValue(event.target.value);

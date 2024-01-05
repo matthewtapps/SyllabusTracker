@@ -61,17 +61,16 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
     };
 
     return (
-        <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="lg">
-            <form noValidate onSubmit={handleSubmit}>
-                <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
-                        <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
-                        <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
-                    </Box>
-                </DialogTitle>
-
-                <DialogContent dividers={true} sx={{ padding: "0px", borderBottom: "none" }}>
-                    <Card>
+        <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="md" fullWidth>
+            <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
+                    <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
+                    <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
+                </Box>
+            </DialogTitle>
+            <DialogContent dividers={true} sx={{ padding: "0px", borderBottom: "none" }}>
+                <Card>
+                    <form noValidate onSubmit={handleSubmit}>
                         <CardContent>
                             <TitleTextField wasSubmitted={wasSubmitted} size="small" fullWidth required
                                 name="title" label="Technique Title" options={techniqueSuggestions.titleOptions} />
@@ -99,9 +98,9 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth name="videoSrc" label="Video Link" />
                         </CardContent>
-                    </Card>
-                </DialogContent>
-            </form>
-        </Dialog>
+                    </form>
+                </Card>
+            </DialogContent>
+        </Dialog >
     );
 };

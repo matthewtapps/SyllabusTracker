@@ -3,7 +3,10 @@ import { Gi } from "./enums/Gi";
 export interface Technique {
     techniqueId: string;
     title: string;
-    videoSrc: string | null;
+    videos: {
+        title: string;
+        hyperlink: string;
+    }[] | null;
     description: string;
     globalNotes: string | null;
     gi: Gi;

@@ -17,7 +17,7 @@ import { transformCollectionForPost, transformCollectionForPut, transformTechniq
 
 interface TechniqueDTO {
     title: string,
-    videoSrc: string | undefined,
+    videos: {title: string, hyperlink: string}[],
     description: string,
     globalNotes: string | undefined,
     gi: string,
@@ -32,7 +32,7 @@ interface TechniqueDTO {
 
 const emptyTechniqueDTO: TechniqueDTO = {
     title: '',
-    videoSrc: undefined,
+    videos: [],
     description: '',
     globalNotes: undefined,
     gi: '',
@@ -96,7 +96,7 @@ function CoachCollections(): JSX.Element {
         setEditingTechniqueId(technique.techniqueId);
         setEditedTechnique({
             title: technique.title,
-            videoSrc: technique.videoSrc || undefined,
+            videos: technique.videos || [],
             description: technique.description,
             globalNotes: technique.globalNotes || undefined,
             gi: technique.gi,

@@ -134,7 +134,7 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
 
     return (
         <>
-            <Dialog open={props.dialogOpen} onClose={props.onCancel} scroll="paper">
+            <Dialog open={props.dialogOpen} onClose={props.onCancel} scroll="paper" maxWidth="md" fullWidth>
                 <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
                     <Card>
                         <TechniqueFilter

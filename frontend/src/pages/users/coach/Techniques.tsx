@@ -13,7 +13,7 @@ import { transformTechniqueForPost, transformTechniqueForPut } from '../../../ut
 
 interface TechniqueDTO {
     title: string,
-    videoSrc: string | undefined,
+    videos: {title: string, hyperlink: string}[],
     description: string,
     globalNotes: string | undefined,
     gi: string,
@@ -28,7 +28,7 @@ interface TechniqueDTO {
 
 const emptyTechniqueDTO: TechniqueDTO = {
     title: '',
-    videoSrc: undefined,
+    videos: [],
     description: '',
     globalNotes: undefined,
     gi: '',
@@ -48,16 +48,16 @@ function CoachTechniques(): JSX.Element {
 
     // Technique editing states and functions
     const [editingTechniqueId, setEditingTechniqueId] = React.useState<string>("");
-    const [editedTechnique, setEditedTechnique] = React.useState<TechniqueDTO>(emptyTechniqueDTO);
+    const [editingTechnique, setEditingTechnique] = React.useState<TechniqueDTO>(emptyTechniqueDTO);
     const [editingTechniqueDialogOpen, setEditingTechniqueDialogOpen] = React.useState(false)
 
     const [newTechniqueDialogOpen, setNewTechniqueDialogOpen] = React.useState(false)
     
     const handleEditClick = (technique: Technique) => {
         setEditingTechniqueId(technique.techniqueId);
-        setEditedTechnique({
+        setEditingTechnique({
             title: technique.title,
-            videoSrc: technique.videoSrc || undefined,
+            videos: technique.videos || [],
             description: technique.description,
             globalNotes: technique.globalNotes || undefined,
             gi: technique.gi,
@@ -102,7 +102,7 @@ function CoachTechniques(): JSX.Element {
 
     const handleNewTechniqueClick = () => {
         setNewTechniqueDialogOpen(true)
-        setEditedTechnique(emptyTechniqueDTO)
+        setEditingTechnique(emptyTechniqueDTO)
         setEditingTechniqueId("")
         setShowFab(false)
     }
@@ -125,7 +125,7 @@ function CoachTechniques(): JSX.Element {
             onTechniqueEditClick={handleEditClick}
             editable
             />
-            <Fab // Should only exist on coach version of techniques
+            <Fab
             color="primary" 
             aria-label="add" 
             style={{position: 'fixed', bottom: '16px', right: '16px'}}
@@ -140,7 +140,7 @@ function CoachTechniques(): JSX.Element {
                 onCancel={handleCancelClick}
                 onDelete={handleDeleteClick}
                 onSave={handleEditSaveClick}
-                editingTechnique={editedTechnique}
+                editingTechnique={editingTechnique}
                 editingTechniqueId={editingTechniqueId}
             />
             <NewTechniqueDialog

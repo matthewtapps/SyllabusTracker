@@ -1,12 +1,12 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { CardContent, Grid } from '@mui/material';
-import MuiLinearProgress from '@mui/material/LinearProgress'
+import { CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
 import { default as Card, default as MuiCard } from '@mui/material/Card';
+import MuiLinearProgress from '@mui/material/LinearProgress';
 import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';

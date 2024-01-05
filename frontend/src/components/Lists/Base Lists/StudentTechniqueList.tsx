@@ -1,3 +1,4 @@
+import { EditNoteSharp, PersonSharp, PublicSharp } from '@mui/icons-material';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Button, CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
@@ -15,7 +16,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteStudentTechniqueAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
 import { AppDispatch, RootState } from '../../../store/store';
 import { CircleIcon, Option } from '../../Buttons/CircleIcon';
-import { EditNoteSharp, PersonSharp, PublicSharp, VideocamSharp } from '@mui/icons-material';
 
 
 const Accordion = styled(MuiAccordion)({

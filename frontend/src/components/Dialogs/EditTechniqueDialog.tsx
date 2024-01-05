@@ -1,4 +1,4 @@
-import { CardContent, Typography, styled } from '@mui/material';
+import { CardContent, styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
@@ -13,7 +13,6 @@ import { FastTextField } from '../Fields/FastTextField';
 import { SelectField } from '../Fields/SelectField';
 import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { TitleTextField } from '../Fields/TitleTextField';
-import { Add, Remove } from '@mui/icons-material';
 import VideoTextFields from '../Fields/VideoTextFields';
 
 

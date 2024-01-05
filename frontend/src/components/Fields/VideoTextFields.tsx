@@ -1,10 +1,8 @@
 import { Add, Remove } from "@mui/icons-material";
-import { Typography, Box } from "@mui/material";
-import MuiTextField from '@mui/material/TextField'
+import { Box, Typography, styled } from "@mui/material";
+import MuiButton, { ButtonProps } from '@mui/material/Button';
+import MuiTextField from '@mui/material/TextField';
 import React from "react";
-import MuiButton, { ButtonProps } from '@mui/material/Button'
-import { styled } from "@mui/material";
-import { Technique } from "common";
 
 
 const TextField = styled(MuiTextField)({

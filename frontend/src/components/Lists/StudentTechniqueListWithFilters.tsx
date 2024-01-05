@@ -34,8 +34,6 @@ export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithF
     const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
 
     const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange(techniques)
-
-    const [expandedTechniqueId, setExpandedTechniqueId] = React.useState("");
     const [showAssignedTechniques, setShowAssignedTechniques] = React.useState(false)
 
     const handleAssignedFiltersCheck = () => {
@@ -59,12 +57,6 @@ export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithF
 
         filterTechniquesByAssigned();
     }, [filteredTechniques, selectedStudentTechniques]);
-
-    const handleAccordionChange = (techniqueId: string) => {
-        setExpandedTechniqueId(prevExpandedTechniqueId =>
-            prevExpandedTechniqueId === techniqueId ? "" : techniqueId
-        );
-    }
 
     return (
         <>

@@ -1,6 +1,6 @@
-import { AdminPanelSettingsSharp, EditNoteSharp, PublicSharp, SchoolSharp } from '@mui/icons-material';
+import { useAuth0 } from '@auth0/auth0-react';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Button, CardContent } from '@mui/material';
+import { CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -15,9 +15,8 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteStudentTechniqueAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
 import { AppDispatch, RootState } from '../../../store/store';
-import { CircleIcon, Option } from '../../Buttons/CircleIcon';
-import { useAuth0 } from '@auth0/auth0-react';
 import { decodeAndAddRole } from '../../../util/Utilities';
+import { CircleIcon, Option } from '../../Buttons/CircleIcon';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -49,21 +48,6 @@ const ListItem = styled(MuiListItem)({
 
 interface ExtendedListItemTextProps extends ListItemTextProps {
     smalltext: boolean
-}
-
-interface TechniqueDTO {
-    title: string,
-    videos: { title: string, hyperlink: string }[] | undefined,
-    description: string,
-    globalNotes: string | undefined,
-    gi: string,
-    hierarchy: string,
-    type: string,
-    typeDescription: string | undefined,
-    position: string,
-    positionDescription: string | undefined,
-    openGuard: string | undefined,
-    openGuardDescription: string | undefined,
 }
 
 const BaseListItemText: React.FC<ExtendedListItemTextProps> = (props) => {

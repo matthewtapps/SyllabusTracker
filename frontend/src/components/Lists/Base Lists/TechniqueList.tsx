@@ -1,3 +1,4 @@
+import { VideocamSharp } from '@mui/icons-material';
 import Edit from '@mui/icons-material/Edit';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Button, CardContent } from '@mui/material';
@@ -15,7 +16,6 @@ import { Technique } from 'common';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { EditNoteSharp, PublicSharp, VideocamSharp } from '@mui/icons-material';
 
 
 const Accordion = styled(MuiAccordion)({

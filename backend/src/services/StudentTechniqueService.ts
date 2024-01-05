@@ -4,13 +4,13 @@ import { StudentTechnique } from "../entities/StudentTechnique";
 import { Technique } from "../entities/Technique";
 
 export class StudentTechniqueService {
-    async addStudentTechniques(techniques: Technique[], studentId: string): Promise<StudentTechnique[]> {
+    async addStudentTechniques(techniques: Technique[], status: TechniqueStatus, studentId: string): Promise<StudentTechnique[]> {
         const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
         const newStudentTechniques = techniques.map(technique => {
             const studentTechnique = new StudentTechnique();
             studentTechnique.userId = studentId;
             studentTechnique.technique = technique;
-            studentTechnique.status = TechniqueStatus.NotYetStarted;
+            studentTechnique.status = status;
             studentTechnique.studentNotes = '';
             studentTechnique.coachNotes = '';
             studentTechnique.lastUpdated = new Date();

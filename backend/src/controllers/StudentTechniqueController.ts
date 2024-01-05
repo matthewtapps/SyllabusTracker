@@ -6,8 +6,8 @@ export class StudentTechniqueController {
     static async addStudentTechniques(req: Request, res: Response) {
         const studentTechniqueService = new StudentTechniqueService();
         try {
-            const { techniques, studentId } = req.body;
-            const newStudentTechniques = await studentTechniqueService.addStudentTechniques(techniques, studentId);
+            const { techniques, status, studentId } = req.body;
+            const newStudentTechniques = await studentTechniqueService.addStudentTechniques(techniques, status, studentId);
             res.status(201).json(newStudentTechniques);
         } catch (error) {
             res.status(500).json({ message: error.message });

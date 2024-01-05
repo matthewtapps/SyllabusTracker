@@ -1,4 +1,5 @@
 export declare enum TechniqueStatus {
+    Unassigned = "Unassigned",
     Passed = "Passed",
     Started = "Started",
     NotYetStarted = "Not Yet Started"

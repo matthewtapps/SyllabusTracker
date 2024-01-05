@@ -1,7 +1,6 @@
 import { Menu, MenuItem, SvgIcon } from "@mui/material";
-import { StudentTechnique, TechniqueStatus } from "common";
+import { TechniqueStatus } from "common";
 import { useState } from "react";
-import React from 'react'
 
 
 export enum Option {

@@ -126,29 +126,24 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
         [Option.Assign]: async (technique: Technique) => {
             const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
             if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync([technique])).unwrap();
-            }
-            await dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.NotYetStarted } })).unwrap();
+                await dispatch(postStudentTechniquesAsync({techniques: [technique], status: TechniqueStatus.NotYetStarted})).unwrap();
+            } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.NotYetStarted } }));
         },
         [Option.Started]: async (technique: Technique) => {
             const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
             if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync([technique])).unwrap();
-            }
-            await dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Started } })).unwrap();
+                await dispatch(postStudentTechniquesAsync({techniques: [technique], status: TechniqueStatus.Started})).unwrap();
+            } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Started } }));
         },
         [Option.Passed]: async (technique: Technique) => {
             const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
             if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync([technique])).unwrap();
-            }
-            await dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Passed } })).unwrap();
+                await dispatch(postStudentTechniquesAsync({techniques: [technique], status: TechniqueStatus.Passed})).unwrap();
+            } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Passed } }));
         },
-        [Option.Unassign]: (technique: Technique) => {
+        [Option.Unassign]: async (technique: Technique) => {
             const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
-            if (matchedTechnique) {
-                dispatch(deleteStudentTechniqueAsync(matchedTechnique.studentTechniqueId));
-            }
+            if (matchedTechnique) dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Unassigned } }));
         }
     };
 
@@ -162,6 +157,8 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
     let { user } = useAuth0();
     if (user) { user = decodeAndAddRole(user) }
     if (!user) { throw new Error(`Missing user when trying to load student technique list`) }
+
+
 
     return (
         <div>

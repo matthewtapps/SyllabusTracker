@@ -1,6 +1,6 @@
 import { User } from "@auth0/auth0-react";
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { StudentTechnique, Technique } from "common";
+import { StudentTechnique, Technique, TechniqueStatus } from "common";
 import { RootState } from "../store/store";
 import { deleteStudentTechnique, fetchStudentTechniques, fetchStudents, postStudentTechniques, stripAuth0FromUserId, updateStudentTechnique } from "../util/Utilities";
 
@@ -53,7 +53,7 @@ export const fetchSelectedStudentTechniquesAsync = createAsyncThunk(
 
 export const postStudentTechniquesAsync = createAsyncThunk(
     'student/postStudentTechniquesAsync',
-    async (techniques: Technique[], thunkAPI) => {
+    async (data: {techniques: Technique[], status: TechniqueStatus}, thunkAPI) => {
         const state = thunkAPI.getState() as RootState;
         const token = state.auth.accessToken;
         if (!token) {
@@ -63,7 +63,7 @@ export const postStudentTechniquesAsync = createAsyncThunk(
         if (!selectedStudentId) {
             throw new Error('No student selected')
         }
-        return await postStudentTechniques(selectedStudentId, techniques, token)
+        return await postStudentTechniques(selectedStudentId, data.techniques, data.status, token)
     }
 );
 

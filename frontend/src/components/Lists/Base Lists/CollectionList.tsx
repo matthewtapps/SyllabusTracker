@@ -104,7 +104,7 @@ CollectionList.defaultProps = {
 
 function CollectionList(props: CollectionsListProps): JSX.Element {
     return (
-        <div>
+        <>
             {props.filteredCollections.map(collection => {
                 let unsortedTechniques: CollectionTechnique[] = []
                 if (collection.collectionTechniques) {
@@ -245,7 +245,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                     </Accordion>
                 )
             })}
-        </div>
+        </>
     )
 }
 

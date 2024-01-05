@@ -1,4 +1,4 @@
-import { Technique, Hierarchy, Gi, Collection, CollectionTechnique, Role, NewTechnique, UpdateTechnique, NewCollection, UpdateCollection, StudentTechnique } from "common";
+import { Technique, Hierarchy, Gi, Collection, CollectionTechnique, Role, NewTechnique, UpdateTechnique, NewCollection, UpdateCollection, StudentTechnique, TechniqueStatus } from "common";
 import { User as Auth0User } from '@auth0/auth0-react'
 
 
@@ -406,7 +406,7 @@ export const stripAuth0FromUserId = (id: string): string => {
     return id.replace("auth0|", "")
 };
 
-export const postStudentTechniques = async (studentId: string, techniques: Technique[], accessToken: string | null): Promise<StudentTechnique[]> => {
+export const postStudentTechniques = async (studentId: string, techniques: Technique[], status: TechniqueStatus, accessToken: string | null): Promise<StudentTechnique[]> => {
     if (!accessToken) { throw new Error(`Invalid access token on add Student Techniques: ${accessToken}`); }
     try {
         const response = await fetch(`${API_SERVER_URL}studenttechnique`, {
@@ -415,7 +415,7 @@ export const postStudentTechniques = async (studentId: string, techniques: Techn
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({ studentId, techniques }),
+            body: JSON.stringify({ studentId, techniques, status }),
         });
 
         if (!response.ok) { throw new Error(`Failed with status ${response.status}`); }

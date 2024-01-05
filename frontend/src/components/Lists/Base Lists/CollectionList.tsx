@@ -1,19 +1,19 @@
-import React from 'react';
+import Edit from '@mui/icons-material/Edit';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import { styled } from '@mui/material/styles'
-import { Collection, Technique, CollectionTechnique } from 'common';
-import Typography from '@mui/material/Typography';
-import MuiListItem from '@mui/material/ListItem';
-import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText'
-import MuiCard from '@mui/material/Card';
-import TechniqueList from './TechniqueList';
 import Box from '@mui/material/Box';
-import Edit from '@mui/icons-material/Edit';
-import DragDropTechniquesList from './DragDropTechniques';
 import MuiButton, { ButtonProps } from '@mui/material/Button';
+import MuiCard from '@mui/material/Card';
+import MuiListItem from '@mui/material/ListItem';
+import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import { Collection, CollectionTechnique, Technique } from 'common';
+import React from 'react';
+import DragDropTechniquesList from './DragDropTechniques';
+import TechniqueList from './TechniqueList';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -79,9 +79,8 @@ interface CollectionsListProps {
     editableTechniques: boolean;
     orderedTechniques: boolean;
     onTechniqueEditClick?: (technique: Technique) => void;
-    expandedCollectionId: string;
-    onAccordionChange: (collectionId: string) => void;
-
+    lastAddedCollectionId: string | null;
+    onAccordionChange: () => void;
     editableCollection: boolean;
     editingTechniquesCollection: Collection | null;
     onCollectionTechniqueEditClick?: (collection: Collection) => void;
@@ -117,8 +116,8 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                     collectionTechniques.push(collectionTechnique.technique)
                 });
                 return (
-                    <Accordion disableGutters elevation={props.elevation} key={collection.collectionId} expanded={props.expandedCollectionId === collection.collectionId}
-                        onChange={() => props.onAccordionChange(collection.collectionId)}>
+                    <Accordion disableGutters elevation={props.elevation} key={collection.collectionId} expanded={props.lastAddedCollectionId ? props.lastAddedCollectionId === collection.collectionId : undefined}
+                        onChange={props.onAccordionChange}>
                         <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content">
                             <Box display="flex" flexDirection="column" flexGrow={1}>
                                 <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
@@ -133,7 +132,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                             <SubCard elevation={0}>
                                 <SubAccordion elevation={0} disableGutters square defaultExpanded>
                                     <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                        <ListItem>
+                                        <ListItem key={`${collection.collectionId}-collection-techniques`}>
                                             <Box display="flex" alignItems="center" justifyContent="flex-start" width="97%">
                                                 <ListItemText primary="Collection Techniques" />
                                                 {props.editableCollection && (
@@ -152,9 +151,9 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                                     onDragDropDeleteClick={props.onDragDropDeleteClick}
                                                     editable />
                                                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                                                    <Button 
-                                                    type="submit" 
-                                                    onClick={(event) => { event.stopPropagation(); props.onDragDropSaveClick?.(props.editingTechniquesCollection?.collectionId || "") }}>
+                                                    <Button
+                                                        type="submit"
+                                                        onClick={(event) => { event.stopPropagation(); props.onDragDropSaveClick?.(props.editingTechniquesCollection?.collectionId || "") }}>
                                                         Save
                                                     </Button>
                                                     <Button onClick={(event) => { event.stopPropagation(); props.onDragDropCancelClick?.(); }}>Cancel</Button>
@@ -171,12 +170,12 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                     </AccordionDetails>
                                 </SubAccordion>
 
-                                <ListItem>
+                                <ListItem key={`${collection.collectionId}-description`}>
                                     <ListItemText primary="Description" secondary={collection?.description} />
                                 </ListItem>
 
                                 {collection.globalNotes && (
-                                    <ListItem>
+                                    <ListItem key={`${collection.collectionId}-global-notes`}>
                                         <ListItemText primary="Global Notes" secondary={collection.globalNotes} />
                                     </ListItem>
                                 )}
@@ -184,13 +183,13 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                 {collection.position && (
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-position`}>
                                                 <ListItemText primary="Position" secondary={collection.position?.title} />
                                             </ListItem>
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem >
+                                            <ListItem key={`${collection.collectionId}-position-description`}>
                                                 <ListItemText secondary={collection.position?.description} />
                                             </ListItem>
                                         </AccordionDetails>
@@ -198,7 +197,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                 )}
 
                                 {collection.hierarchy && (
-                                    <ListItem>
+                                    <ListItem key={`${collection.collectionId}-hierarchy`}>
                                         <ListItemText primary=" Hierarchy" secondary={collection.hierarchy} />
                                     </ListItem>
                                 )}
@@ -206,13 +205,13 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                 {collection.type && (
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-type`}>
                                                 <ListItemText primary="Type" secondary={collection.type?.title} />
                                             </ListItem>
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-type-description`}>
                                                 <ListItemText secondary={collection.type?.description} />
                                             </ListItem>
                                         </AccordionDetails>
@@ -222,13 +221,13 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                 {collection.openGuard && (
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-open-guard`}>
                                                 <ListItemText primary="Open Guard" secondary={collection.openGuard?.title} />
                                             </ListItem>
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-open-guard-description`}>
                                                 <ListItemText secondary={collection.openGuard?.description} />
                                             </ListItem>
                                         </AccordionDetails>
@@ -236,7 +235,7 @@ function CollectionList(props: CollectionsListProps): JSX.Element {
                                 )}
 
                                 {(collection.gi) && (
-                                    <ListItem>
+                                    <ListItem key={`${collection.collectionId}-gi`}>
                                         <ListItemText primary="Gi or No Gi" secondary={collection.gi} />
                                     </ListItem>
                                 )}

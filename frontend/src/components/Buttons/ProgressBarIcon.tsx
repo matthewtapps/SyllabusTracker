@@ -1,4 +1,5 @@
 import { Menu, MenuItem, SvgIcon } from "@mui/material";
+import { StudentTechnique, TechniqueStatus } from "common";
 import { useState } from "react";
 import React from 'react'
 
@@ -10,13 +11,13 @@ export enum Option {
     Started = "Started",
 }
 
-interface CircleIconProps {
-    fill: string;
+interface ProgressBarIconProps {
+    statuses: TechniqueStatus[];
     onClick?: (event: any) => void;
     onMenuItemClick?: (option: Option) => void;
 }
 
-export function CircleIcon(props: CircleIconProps) {
+export function ProgressBarIcon(props: ProgressBarIconProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -39,14 +40,16 @@ export function CircleIcon(props: CircleIconProps) {
         handleClose(new Event('Custom'));
     };
 
+    const maximum = props.statuses.length
+    const startedPercentage = props.statuses.filter(status => status === TechniqueStatus.Started || status === TechniqueStatus.Passed).length / maximum
+    const passedPercentage = props.statuses.filter(status => status === TechniqueStatus.Passed).length / maximum
+
     return (
         <>
-            <SvgIcon onClick={e => { e.stopPropagation(); handleClick(e) }}>
-                <circle cx="12" cy="12" r="10"
-                    fill={props.fill}
-                    stroke="#bdae93"
-                    strokeWidth="2px"
-                />
+            <SvgIcon viewBox="-6 -6 120 49" style={{width: "80px"}} onClick={e => { e.stopPropagation(); handleClick(e) }}>
+                    <rect rx="20" fill="#665c54" width="120" height="40" stroke="#bdae93" strokeWidth="4px"/>
+                    <rect y="1.5" x="1.5" rx="18" fill="#d79921" width={117 * startedPercentage} height="37"/>
+                    <rect y="1.5" x="1.5" rx="18" fill="#689d6a" width={117 * passedPercentage} height="37"/>
             </SvgIcon>
             {props.onClick &&
                 <Menu

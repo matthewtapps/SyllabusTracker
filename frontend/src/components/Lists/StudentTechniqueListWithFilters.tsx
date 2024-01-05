@@ -86,8 +86,6 @@ export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithF
                     <Box>
                         <StudentTechniqueList
                             filteredTechniques={showAssignedTechniques ? assignedFilteredTechniques : filteredTechniques}
-                            expandedTechniqueId={expandedTechniqueId}
-                            onAccordionChange={handleAccordionChange}
                             editable={props.editable}
                         />
                     </Box>

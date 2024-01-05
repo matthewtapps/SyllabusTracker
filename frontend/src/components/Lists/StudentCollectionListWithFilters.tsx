@@ -18,8 +18,6 @@ const Card = styled(MuiCard)({
 });
 
 interface StudentCollectionListWithFiltersProps {
-    onAccordionChange: (collectionId: string) => void;
-    expandedCollectionId: string;
     editable: boolean;
 }
 
@@ -88,8 +86,6 @@ export function StudentCollectionListWithFilters(props: StudentCollectionListWit
                     <Box>
                         <StudentCollectionList
                             filteredCollections={showAssignedCollections ? assignedFilteredCollections : filteredCollections}
-                            expandedCollectionId={props.expandedCollectionId}
-                            onAccordionChange={props.onAccordionChange}
                             editable={props.editable}
                         />
                     </Box>

@@ -13,6 +13,7 @@ import { decodeAndAddRole } from '../../util/Utilities';
 import CoachCollections from '../users/coach/Collections';
 import StudentCollections from '../users/student/Collections';
 import { fetchCollectionTechniquesIfOld } from '../../slices/collectionTechniques';
+import { fetchSelectedStudentTechniquesIfOld, selectStudent } from '../../slices/student';
 
 
 const CollectionsPage: React.FC = () => {
@@ -44,6 +45,7 @@ const CollectionsPage: React.FC = () => {
         dispatch(fetchTechniqueSuggestionsIfOld());
         dispatch(fetchTechniquesIfOld());
         dispatch(fetchDescriptionsIfOld());
+        dispatch(fetchSelectedStudentTechniquesIfOld())
         dispatch(fetchCollectionTechniquesIfOld());
     }, [dispatch]);
 
@@ -57,6 +59,7 @@ const CollectionsPage: React.FC = () => {
 
     switch (user.role) {
         case Role.Student:
+            dispatch(selectStudent(user))
             content = <StudentCollections />
             break;
 

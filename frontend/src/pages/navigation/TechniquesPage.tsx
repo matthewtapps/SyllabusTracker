@@ -11,6 +11,7 @@ import { AppDispatch, RootState } from '../../store/store';
 import { decodeAndAddRole } from '../../util/Utilities';
 import CoachTechniques from '../users/coach/Techniques';
 import StudentTechniques from '../users/student/Techniques';
+import { fetchSelectedStudentTechniquesIfOld } from '../../slices/student';
 
 
 const TechniquesPage: React.FC = () => {
@@ -37,6 +38,7 @@ const TechniquesPage: React.FC = () => {
     React.useEffect(() => {
         dispatch(fetchTechniquesIfOld());
         dispatch(fetchTechniqueSuggestionsIfOld());
+        dispatch(fetchSelectedStudentTechniquesIfOld());
         dispatch(fetchDescriptionsIfOld());
     }, [dispatch]);
 

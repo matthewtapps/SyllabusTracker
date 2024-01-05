@@ -1,3 +1,4 @@
+import { useAuth0 } from '@auth0/auth0-react';
 import MuiArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Box from '@mui/material/Box';
 import MuiCard from '@mui/material/Card';
@@ -6,7 +7,10 @@ import Grid from '@mui/material/Grid';
 import MuiTypography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { decodeAndAddRole } from '../../../util/Utilities';
+import { selectStudent } from '../../../slices/student';
 
 
 const Typography = styled(MuiTypography)({
@@ -33,7 +37,7 @@ const StudentDashboard: React.FC = () => {
     const navigate = useNavigate();
     const navigateToTechniques = () => { navigate('/techniques') }
     const navigateToCollections = () => { navigate('/collections') }
-
+    
     return (
         <div>
             <Grid container spacing={1} padding={1}>

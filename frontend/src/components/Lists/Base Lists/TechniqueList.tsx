@@ -143,7 +143,7 @@ function TechniqueList(props: TechniquesListProps): JSX.Element {
                                                 onChange={() => props.onTechniqueCheck?.(technique.techniqueId)}
                                                 onClick={e => e.stopPropagation()}
                                             />
-                                            <Typography variant="h6">{technique.title}</Typography>
+                                            <Typography variant="body1">{technique.title}</Typography>
                                         </Box>
                                     )}
 

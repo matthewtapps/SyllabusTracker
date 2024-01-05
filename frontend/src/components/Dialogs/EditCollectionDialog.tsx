@@ -70,20 +70,21 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
 
     return (
         <Dialog open={props.dialogOpen} onClose={props.onClose} scroll="paper" maxWidth="md" fullWidth>
-            <form noValidate onSubmit={handleSubmit}>
-                <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
-                        <Button type="submit" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
-                        <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
-                        <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingCollectionId); }}
-                            style={{ backgroundColor: theme.palette.error.main }}
-                        >Delete</Button>
-                    </Box>
-                </DialogTitle>
+            <DialogTitle sx={{ padding: "0px", marginBottom: "10px" }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mt={0}>
+                <Button type="submit" form="collectionEditForm" onClick={(event) => { event.stopPropagation(); }}>Save</Button>
+                    <Button onClick={(event) => { event.stopPropagation(); props.onCancel(); }}>Cancel</Button>
+                    <Button onClick={(event) => { event.stopPropagation(); props.onDelete(props.editingCollectionId); }}
+                        style={{ backgroundColor: theme.palette.error.main }}
+                    >Delete</Button>
+                </Box>
+            </DialogTitle>
 
-                <DialogContent dividers={true} sx={{ padding: "0px", borderBottom: "none" }}>
-                    <Card>
-                        <CardContent>
+            <DialogContent dividers={true} sx={{ padding: "0px", borderBottom: "none" }}>
+                <Card>
+                    <CardContent>
+                        <form noValidate id="collectionEditForm" onSubmit={handleSubmit}>
+
                             <TitleTextField wasSubmitted={wasSubmitted} size="small" fullWidth required defaultValue={props.editingCollection?.title || ''}
                                 name="title" label="Collection Title" options={collectionSuggestions.titleOptions} />
 
@@ -112,10 +113,11 @@ export const EditCollectionDialog = (props: EditCollectionDialogProps) => {
                                 defaultValue={props.editingCollection?.openGuard?.title || ''} descriptionDefaultValue={props.editingCollection?.openGuard?.description || ''}
                                 label="Open Guard" descriptionLabel="Open Guard Description" options={collectionSuggestions.openGuardOptions}
                                 descriptions={descriptions} hidden={!isPositionOpenGuard} disabled={!isPositionOpenGuard} required={isPositionOpenGuard} />
-                        </CardContent>
-                    </Card>
-                </DialogContent>
-            </form>
+                        </form>
+
+                    </CardContent>
+                </Card>
+            </DialogContent>
         </Dialog>
     )
 }

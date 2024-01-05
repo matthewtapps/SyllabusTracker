@@ -3,6 +3,7 @@ import Fab from '@mui/material/Fab'
 import { Collection, CollectionTechnique, Technique } from 'common'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import Pageloader from '../../../components/Base/PageLoader'
 import { AddTechniqueToCollectionDialog } from '../../../components/Dialogs/AddTechniqueToCollectionDialog'
 import { EditCollectionDialog } from '../../../components/Dialogs/EditCollectionDialog'
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
@@ -17,7 +18,7 @@ import { transformCollectionForPost, transformCollectionForPut, transformTechniq
 
 interface TechniqueDTO {
     title: string,
-    videos: {title: string, hyperlink: string}[],
+    videos: { title: string, hyperlink: string }[],
     description: string,
     globalNotes: string | undefined,
     gi: string,
@@ -241,84 +242,101 @@ function CoachCollections(): JSX.Element {
             .unwrap()
             .then(postedCollection => {
                 setNewCollectionDialogOpen(false);
-                setShowNewCollectionFab(true);
                 handleCollectionTechniqueEditClick(postedCollection);
                 handleOpenAddTechniqueDialogue();
-                setExpandedCollectionId(postedCollection.collectionId);
+                setLastAddedCollectionId(postedCollection.collectionId);
             })
     }
 
-    const [expandedCollectionId, setExpandedCollectionId] = React.useState("");
+    const [lastAddedCollectionId, setLastAddedCollectionId] = React.useState<null | string>(null);
 
-    const handleAccordionChange = (collectionId: string) => {
-        setExpandedCollectionId(prevExpandedCollectionId =>
-            prevExpandedCollectionId === collectionId ? "" : collectionId
-        );
+    const handleAccordionChange = () => {
+        setLastAddedCollectionId(null);
     }
+
+    const { loading } = useSelector((state: RootState) => state.collections)
+    const { collectionSuggestionsLoading } = useSelector((state: RootState) => state.suggestions)
+    const { techniqueSuggestionsLoading } = useSelector((state: RootState) => state.suggestions)
+    const { techniquesLoading } = useSelector((state: RootState) => state.techniques)
+    const { loading: descriptionsLoading } = useSelector((state: RootState) => state.descriptions)
+    const { loading: selectedStudentTechniquesLoading } = useSelector((state: RootState) => state.student)
+    const { loading: collectionTechniquesLoading } = useSelector((state: RootState) => state.collectionTechniques)
 
     return (
         <div>
-            <CollectionListWithFilters
-                editable
-                onAccordionChange={handleAccordionChange}
-                expandedCollectionId={expandedCollectionId}
-                editingTechniquesCollection={editingTechniquesCollection}
-                onTechniqueEditClick={handleTechniqueEditClick}
-                onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
-                onCollectionEditClick={handleCollectionEditClick}
-                dragDropTechniques={dragDropTechniques}
-                onReorderDragDropTechniques={handleReorderDragDropTechniques}
-                onDragDropSaveClick={handleDragDropSaveClick}
-                onDragDropCancelClick={handleDragDropCancelClick}
-                onDragDropDeleteClick={handleDragDropDeleteClick}
-                onOpenAddTechniqueDialogue={handleOpenAddTechniqueDialogue}
-            />
+            {(loading ||
+                collectionSuggestionsLoading ||
+                techniqueSuggestionsLoading ||
+                techniquesLoading ||
+                descriptionsLoading ||
+                selectedStudentTechniquesLoading ||
+                collectionTechniquesLoading)
+                ? <Pageloader />
+                : (
+                    <>
+                        <CollectionListWithFilters
+                            editable
+                            onAccordionChange={handleAccordionChange}
+                            lastAddedCollectionId={lastAddedCollectionId}
+                            editingTechniquesCollection={editingTechniquesCollection}
+                            onTechniqueEditClick={handleTechniqueEditClick}
+                            onCollectionTechniqueEditClick={handleCollectionTechniqueEditClick}
+                            onCollectionEditClick={handleCollectionEditClick}
+                            dragDropTechniques={dragDropTechniques}
+                            onReorderDragDropTechniques={handleReorderDragDropTechniques}
+                            onDragDropSaveClick={handleDragDropSaveClick}
+                            onDragDropCancelClick={handleDragDropCancelClick}
+                            onDragDropDeleteClick={handleDragDropDeleteClick}
+                            onOpenAddTechniqueDialogue={handleOpenAddTechniqueDialogue}
+                        />
 
-            <AddTechniqueToCollectionDialog
-                dialogOpen={addTechniqueToCollectionDialogueOpen}
-                onClose={handleCloseAddTechniqueDialogue}
-                onCancel={handleCloseAddTechniqueDialogue}
-                onSave={handleSaveAddTechniqueDialogue}
-                editingTechniquesCollection={editingTechniquesCollection}
-            />
+                        <AddTechniqueToCollectionDialog
+                            dialogOpen={addTechniqueToCollectionDialogueOpen}
+                            onClose={handleCloseAddTechniqueDialogue}
+                            onCancel={handleCloseAddTechniqueDialogue}
+                            onSave={handleSaveAddTechniqueDialogue}
+                            editingTechniquesCollection={editingTechniquesCollection}
+                        />
 
-            <EditTechniqueDialog
-                dialogOpen={editingTechniqueDialogOpen}
-                onClose={handleTechniqueCancelClick}
-                onCancel={handleTechniqueCancelClick}
-                onDelete={handleTechniqueDeleteClick}
-                onSave={handleTechniqueSaveClick}
-                editingTechnique={editedTechnique}
-                editingTechniqueId={editingTechniqueId}
-            />
+                        <EditTechniqueDialog
+                            dialogOpen={editingTechniqueDialogOpen}
+                            onClose={handleTechniqueCancelClick}
+                            onCancel={handleTechniqueCancelClick}
+                            onDelete={handleTechniqueDeleteClick}
+                            onSave={handleTechniqueSaveClick}
+                            editingTechnique={editedTechnique}
+                            editingTechniqueId={editingTechniqueId}
+                        />
 
-            <EditCollectionDialog
-                dialogOpen={editingCollectionDialogOpen}
-                onClose={handleCollectionCancelClick}
-                onCancel={handleCollectionCancelClick}
-                onDelete={handleCollectionDeleteClick}
-                onSave={handleCollectionSaveClick}
-                editingCollection={editingCollection}
-                editingCollectionId={editingCollectionId}
-            />
+                        <EditCollectionDialog
+                            dialogOpen={editingCollectionDialogOpen}
+                            onClose={handleCollectionCancelClick}
+                            onCancel={handleCollectionCancelClick}
+                            onDelete={handleCollectionDeleteClick}
+                            onSave={handleCollectionSaveClick}
+                            editingCollection={editingCollection}
+                            editingCollectionId={editingCollectionId}
+                        />
 
-            <NewCollectionDialog
-                dialogOpen={newCollectionDialogOpen}
-                onClose={handleNewCollectionCancel}
-                onSave={handleNewCollectionSave}
-                onCancel={handleNewCollectionCancel}
-            />
+                        <NewCollectionDialog
+                            dialogOpen={newCollectionDialogOpen}
+                            onClose={handleNewCollectionCancel}
+                            onSave={handleNewCollectionSave}
+                            onCancel={handleNewCollectionCancel}
+                        />
 
-            {showNewCollectionFab && (
-                <Fab
-                    color="primary"
-                    aria-label="add"
-                    style={{ position: 'fixed', bottom: '16px', right: '16px' }}
-                    onClick={handleNewCollectionOpen}
-                >
-                    <AddIcon />
-                </Fab>
-            )}
+                        {showNewCollectionFab && (
+                            <Fab
+                                color="primary"
+                                aria-label="add"
+                                style={{ position: 'fixed', bottom: '16px', right: '16px' }}
+                                onClick={handleNewCollectionOpen}
+                            >
+                                <AddIcon />
+                            </Fab>
+                        )}
+                    </>
+                )}
         </div>
     );
 };

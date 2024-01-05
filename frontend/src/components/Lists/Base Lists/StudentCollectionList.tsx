@@ -12,8 +12,8 @@ import { Collection, CollectionTechnique, Technique, TechniqueStatus } from 'com
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { CircleIcon } from '../../Buttons/CircleIcon';
 import StudentTechniqueList from './StudentTechniqueList';
+import { ProgressBarIcon } from '../../Buttons/ProgressBarIcon';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -73,8 +73,6 @@ interface StudentCollectionsListProps {
     filteredCollections: Collection[];
     elevation: number;
     editable: boolean;
-    expandedCollectionId: string;
-    onAccordionChange: (collectionId: string) => void;
 }
 
 StudentCollectionList.defaultProps = {
@@ -83,29 +81,17 @@ StudentCollectionList.defaultProps = {
 }
 
 function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element {
-    const iconColor = (statuses: (TechniqueStatus | null)[]): string => {
-        const allPassed = statuses.every(status => status === TechniqueStatus.Passed);
-        const anyStartedOrPassed = statuses.some(status => status === TechniqueStatus.Started || status === TechniqueStatus.Passed);
-
-        if (allPassed && statuses.length > 0) {
-            return "#689d6a";
-        } else if (anyStartedOrPassed && statuses.length > 0) {
-            return "#d79921";
-        } else {
-            return "#665c54";
-        }
-    };
 
     const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
 
-    const handleIndicatorFill = (techniques: Technique[]): string => {
+    const fetchStatuses = (techniques: Technique[]): TechniqueStatus[] => {
         const techniqueStatuses = techniques.map(technique => {
             const matchingTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
-            return matchingTechnique ? matchingTechnique.status : null;
+            return matchingTechnique ? matchingTechnique.status : TechniqueStatus.NotYetStarted;
         }).filter(status => status !== null);
 
-        return iconColor(techniqueStatuses);
-    };
+        return techniqueStatuses
+    }
 
     return (
         <div>
@@ -120,23 +106,19 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                     collectionTechniques.push(collectionTechnique.technique)
                 });
                 return (
-                    <Accordion disableGutters elevation={props.elevation} key={collection.collectionId} expanded={props.expandedCollectionId === collection.collectionId}
-                        onChange={() => props.onAccordionChange(collection.collectionId)}>
+                    <Accordion disableGutters elevation={props.elevation} key={collection.collectionId}>
                         <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content">
                             <Box display="flex" flexDirection="row" flexGrow={1} alignItems="center" justifyContent="space-between" maxWidth="97%">
                                 <Typography variant="h6">{collection.title}</Typography>
-                                {props.editable && (
-                                    <CircleIcon
-                                        fill={handleIndicatorFill(collectionTechniques)}
+                                    <ProgressBarIcon statuses={fetchStatuses(collectionTechniques)}
                                     />
-                                )}
                             </Box>
                         </AccordionSummary>
                         <AccordionDetails>
                             <SubCard elevation={0}>
                                 <SubAccordion elevation={0} disableGutters square defaultExpanded>
                                     <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                        <ListItem>
+                                        <ListItem key={`${collection.collectionId}-collection-techniques`}>
                                             <ListItemText primary="Collection Techniques" />
                                         </ListItem>
                                     </AccordionSummary>
@@ -145,17 +127,17 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                                             filteredTechniques={collectionTechniques}
                                             elevation={0}
                                             ordered
-                                            editable
+                                            editable={props.editable}
                                         />
                                     </AccordionDetails>
                                 </SubAccordion>
 
-                                <ListItem>
+                                <ListItem key={`${collection.collectionId}-description`}>
                                     <ListItemText primary="Description" secondary={collection?.description} />
                                 </ListItem>
 
                                 {collection.globalNotes && (
-                                    <ListItem>
+                                    <ListItem key={`${collection.collectionId}-global-notes`}>
                                         <ListItemText primary="Global Notes" secondary={collection.globalNotes} />
                                     </ListItem>
                                 )}
@@ -163,13 +145,13 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                                 {collection.position && (
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-position`}>
                                                 <ListItemText primary="Position" secondary={collection.position?.title} />
                                             </ListItem>
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem >
+                                            <ListItem key={`${collection.collectionId}-position-description`}>
                                                 <ListItemText secondary={collection.position?.description} />
                                             </ListItem>
                                         </AccordionDetails>
@@ -177,7 +159,7 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                                 )}
 
                                 {collection.hierarchy && (
-                                    <ListItem>
+                                    <ListItem key={`${collection.collectionId}-hierarchy`}>
                                         <ListItemText primary=" Hierarchy" secondary={collection.hierarchy} />
                                     </ListItem>
                                 )}
@@ -185,13 +167,13 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                                 {collection.type && (
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-type`}>
                                                 <ListItemText primary="Type" secondary={collection.type?.title} />
                                             </ListItem>
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-type-description`}>
                                                 <ListItemText secondary={collection.type?.description} />
                                             </ListItem>
                                         </AccordionDetails>
@@ -201,13 +183,13 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                                 {collection.openGuard && (
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-open-guard`}>
                                                 <ListItemText primary="Open Guard" secondary={collection.openGuard?.title} />
                                             </ListItem>
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${collection.collectionId}-open-guard-description`}>
                                                 <ListItemText secondary={collection.openGuard?.description} />
                                             </ListItem>
                                         </AccordionDetails>
@@ -215,7 +197,7 @@ function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element 
                                 )}
 
                                 {(collection.gi) && (
-                                    <ListItem>
+                                    <ListItem key={`${collection.collectionId}-gi`}>
                                         <ListItemText primary="Gi or No Gi" secondary={collection.gi} />
                                     </ListItem>
                                 )}

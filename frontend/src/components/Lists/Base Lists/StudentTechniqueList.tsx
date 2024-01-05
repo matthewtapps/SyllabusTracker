@@ -1,4 +1,4 @@
-import { EditNoteSharp, PersonSharp, PublicSharp } from '@mui/icons-material';
+import { AdminPanelSettingsSharp, EditNoteSharp, PublicSharp, SchoolSharp } from '@mui/icons-material';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Button, CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
@@ -10,12 +10,14 @@ import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { Technique, TechniqueStatus } from 'common';
+import { Role, Technique, TechniqueStatus } from 'common';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteStudentTechniqueAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
 import { AppDispatch, RootState } from '../../../store/store';
 import { CircleIcon, Option } from '../../Buttons/CircleIcon';
+import { useAuth0 } from '@auth0/auth0-react';
+import { decodeAndAddRole } from '../../../util/Utilities';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -51,7 +53,7 @@ interface ExtendedListItemTextProps extends ListItemTextProps {
 
 interface TechniqueDTO {
     title: string,
-    videos: {title: string, hyperlink: string}[] | undefined,
+    videos: { title: string, hyperlink: string }[] | undefined,
     description: string,
     globalNotes: string | undefined,
     gi: string,
@@ -103,10 +105,6 @@ interface TechniquesListProps {
     ordered?: boolean;
     elevation: number;
     editable?: boolean;
-    editingTechniqueId?: string | null;
-    editingTechnique?: TechniqueDTO | null;
-    expandedTechniqueId?: string;
-    onAccordionChange?: (techniqueId: string) => void;
 }
 
 StudentTechniqueList.defaultProps = {
@@ -126,7 +124,6 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
         } else {
             return "#665c54";
         }
-
     }
 
     const { techniques } = useSelector((state: RootState) => state.techniques);
@@ -178,18 +175,19 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
         }
     };
 
+    let { user } = useAuth0();
+    if (user) { user = decodeAndAddRole(user) }
+    if (!user) { throw new Error(`Missing user when trying to load student technique list`) }
+
     return (
         <div>
             {techniquesToDisplay.length > 0 ? (
                 techniquesToDisplay.map((technique, index) => {
+                    const matchedStudentTechnique = selectedStudentTechniques.find(st => { return technique.techniqueId === st.technique.techniqueId })
                     let currentOrder = props.ordered ? index + 1 : null;
                     return (
-                        <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}
-                            expanded={props.expandedTechniqueId ? props.expandedTechniqueId === technique.techniqueId : undefined}>
-                            <AccordionSummary
-                                expandIcon={<ExpandMore />}
-                                aria-controls="panel1a-content"
-                            >
+                        <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
+                            <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" >
                                 <Box display="flex" flexDirection="row" width="100%">
                                     <Box display="flex" flexDirection="column" flexGrow={1}>
                                         <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
@@ -199,36 +197,39 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                                 )}
                                                 <Typography variant="body1">{technique?.title}</Typography>
                                             </Box>
-                                            {props.editable && !(props.editingTechniqueId === technique.techniqueId) && !(props.editingTechniqueId) && (
-                                                <CircleIcon
-                                                    fill={handleIndicatorFill(technique)}
-                                                    onClick={(event) => event.stopPropagation()}
-                                                    onMenuItemClick={handleAction(technique)}
-                                                />
-                                            )}
+                                            <CircleIcon
+                                                fill={handleIndicatorFill(technique)}
+                                                onClick={props.editable ? (event) => event.stopPropagation() : undefined}
+                                                onMenuItemClick={props.editable ? handleAction(technique) : undefined}
+                                            />
                                         </Box>
                                     </Box>
                                 </Box>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <SubCard elevation={0}>
-                                    <ListItem>
-                                        <Box display="flex" flexDirection="row" flexGrow={1} alignItems="center" justifyContent="center">
-                                            <Button variant="contained" sx={{ minWidth: "85px", marginRight: "10px" }}><EditNoteSharp sx={{ marginX: "2px" }} /><PersonSharp sx={{ marginX: "2px" }} /></Button>
-                                            <Button variant="contained" sx={{ minWidth: "85px", marginLeft: "10px" }}><EditNoteSharp sx={{ marginX: "2px" }} /><PublicSharp sx={{ marginX: "2px" }} /></Button>
-                                        </Box>
-                                    </ListItem>
+                                    {((user?.role === Role.Student && matchedStudentTechnique?.coachNotes) || user?.role === Role.Coach) && (
+                                        <ListItem key={`${technique.techniqueId}-coach-notes`}>
+                                            <ListItemText sx={{ margin: "0px" }}
+                                                smalltext={props.ordered ? true : false}
+                                                primary="Coach Notes"
+                                                secondary={matchedStudentTechnique?.coachNotes || "--"}
+                                            />
+                                        </ListItem>
+                                    )}
 
-                                    <ListItem>
-                                        <ListItemText sx={{ margin: "0px" }}
-                                            smalltext={props.ordered ? true : false}
-                                            primary="Description"
-                                            secondary={technique?.description}
-                                        />
-                                    </ListItem>
+                                    {((user?.role === Role.Coach && matchedStudentTechnique?.studentNotes) || user?.role === Role.Student) && (
+                                        <ListItem key={`${technique.techniqueId}-student-notes`}>
+                                            <ListItemText sx={{ margin: "0px" }}
+                                                smalltext={props.ordered ? true : false}
+                                                primary={user?.role === Role.Student ? "My Notes" : "Student Notes"}
+                                                secondary={matchedStudentTechnique?.studentNotes || "--"}
+                                            />
+                                        </ListItem>
+                                    )}
 
                                     {technique?.globalNotes && (
-                                        <ListItem>
+                                        <ListItem key={`${technique.techniqueId}-global-notes`}>
                                             <ListItemText
                                                 smalltext={props.ordered ? true : false}
                                                 primary="Global Notes"
@@ -236,8 +237,8 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                         </ListItem>
                                     )}
 
-                                    {technique?.videos && technique.videos.map(video => (
-                                        <ListItem>
+                                    {technique?.videos && technique.videos.map((video, index) => (
+                                        <ListItem key={`${technique.techniqueId}-video-${index}`}>
                                             <ListItemText
                                                 smalltext={props.ordered ? true : false}
                                                 primary={video.title}
@@ -245,10 +246,18 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                         </ListItem>
                                     ))}
 
+                                    <ListItem key={`${technique.techniqueId}-description`}>
+                                        <ListItemText sx={{ margin: "0px" }}
+                                            smalltext={props.ordered ? true : false}
+                                            primary="Description"
+                                            secondary={technique?.description}
+                                        />
+                                    </ListItem>
+
 
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${technique.techniqueId}-position`}>
                                                 <ListItemText
                                                     smalltext={props.ordered ? true : false}
                                                     primary="Position"
@@ -258,7 +267,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem >
+                                            <ListItem key={`${technique.techniqueId}-position-description`}>
                                                 <ListItemText
                                                     smalltext={props.ordered ? true : false}
                                                     secondary={technique?.position.description} />
@@ -266,7 +275,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                         </AccordionDetails>
                                     </SubAccordion>
 
-                                    <ListItem>
+                                    <ListItem key={`${technique.techniqueId}-hierarchy`}>
                                         <ListItemText
                                             smalltext={props.ordered ? true : false}
                                             primary="Hierarchy"
@@ -276,7 +285,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
 
                                     <SubAccordion elevation={0} disableGutters square>
                                         <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${technique.techniqueId}-type`}>
                                                 <ListItemText
                                                     smalltext={props.ordered ? true : false}
                                                     primary="Type"
@@ -286,7 +295,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                         </AccordionSummary>
 
                                         <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem>
+                                            <ListItem key={`${technique.techniqueId}-type-description`}>
                                                 <ListItemText
                                                     smalltext={props.ordered ? true : false}
                                                     secondary={technique?.type.description} />
@@ -297,7 +306,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                     {technique?.openGuard && (
                                         <SubAccordion elevation={0} disableGutters square>
                                             <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                                <ListItem>
+                                                <ListItem key={`${technique.techniqueId}-open-guard`}>
                                                     <ListItemText
                                                         smalltext={props.ordered ? true : false}
                                                         primary="Open Guard"
@@ -307,7 +316,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                             </AccordionSummary>
 
                                             <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                                <ListItem>
+                                                <ListItem key={`${technique.techniqueId}-open-guard-description`}>
                                                     <ListItemText
                                                         smalltext={props.ordered ? true : false}
                                                         secondary={technique?.openGuard?.description} />
@@ -316,7 +325,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
                                         </SubAccordion>
                                     )}
 
-                                    <ListItem>
+                                    <ListItem key={`${technique.techniqueId}-gi`}>
                                         <ListItemText
                                             smalltext={props.ordered ? true : false}
                                             primary="Gi or No Gi"

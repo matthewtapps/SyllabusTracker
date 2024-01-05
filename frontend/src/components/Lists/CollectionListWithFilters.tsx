@@ -18,8 +18,8 @@ const Card = styled(MuiCard)({
 });
 
 interface CollectionListWithFiltersProps {
-    onAccordionChange: (collectionId: string) => void;
-    expandedCollectionId: string;
+    onAccordionChange: () => void;
+    lastAddedCollectionId: string | null;
     editable: boolean;
     editingTechniquesCollection?: Collection | null;
     onTechniqueEditClick?: (technique: Technique) => void;
@@ -66,7 +66,7 @@ export function CollectionListWithFilters(props: CollectionListWithFiltersProps)
                             editableTechniques={props.editable}
                             onTechniqueEditClick={props.onTechniqueEditClick}
                             editingTechniquesCollection={props.editingTechniquesCollection}
-                            expandedCollectionId={props.expandedCollectionId}
+                            lastAddedCollectionId={props.lastAddedCollectionId}
                             onAccordionChange={props.onAccordionChange}
                             onCollectionTechniqueEditClick={props.onCollectionTechniqueEditClick}
                             onCollectionEditClick={props.onCollectionEditClick}

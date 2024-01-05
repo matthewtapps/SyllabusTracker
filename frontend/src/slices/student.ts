@@ -69,7 +69,7 @@ export const postStudentTechniquesAsync = createAsyncThunk(
 
 export const updateStudentTechniqueAsync = createAsyncThunk(
     'student/updateStudentTechniqueAsync',
-    async (data: {techniqueId: string, updatedData: Partial<StudentTechnique>}, thunkAPI) => {
+    async (data: { techniqueId: string, updatedData: Partial<StudentTechnique> }, thunkAPI) => {
         const state = thunkAPI.getState() as RootState;
         const token = state.auth.accessToken;
         if (!token) {
@@ -127,10 +127,17 @@ const studentSlice = createSlice({
     reducers: {
         selectStudent: (state, action: PayloadAction<User>) => {
             state.selectedStudent = action.payload
-            state.selectedStudent = {
-                ...state.selectedStudent,
-                user_id: stripAuth0FromUserId(state.selectedStudent.user_id)
-            }
+            if (state.selectedStudent.user_id) {
+                state.selectedStudent = {
+                    ...state.selectedStudent,
+                    user_id: stripAuth0FromUserId(state.selectedStudent.user_id)
+                }
+            } else if (state.selectedStudent.sub) {
+                state.selectedStudent = {
+                    ...state.selectedStudent,
+                    user_id: stripAuth0FromUserId(state.selectedStudent.sub)
+                }
+            } else throw new Error(`Failed to strip user ID from given user object`)
         },
     },
     extraReducers: (builder) => {
@@ -188,7 +195,7 @@ const studentSlice = createSlice({
             .addCase(updateStudentTechniqueAsync.fulfilled, (state, action) => {
                 const index = state.selectedStudentTechniques.findIndex(st => st.studentTechniqueId === action.payload.studentTechniqueId);
                 if (index !== -1) {
-                    state.selectedStudentTechniques[index] = {...state.selectedStudentTechniques[index], ...action.payload};
+                    state.selectedStudentTechniques[index] = { ...state.selectedStudentTechniques[index], ...action.payload };
                 }
             })
             .addCase(updateStudentTechniqueAsync.rejected, (state, action) => {

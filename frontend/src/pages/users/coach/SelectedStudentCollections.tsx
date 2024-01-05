@@ -15,19 +15,9 @@ function SelectedStudentCollections(): JSX.Element {
         }
     }, [selectedStudent, navigate]);
 
-    const [expandedCollectionId, setExpandedCollectionId] = React.useState("");
-
-    const handleAccordionChange = (collectionId: string) => {
-        setExpandedCollectionId(prevExpandedCollectionId =>
-            prevExpandedCollectionId === collectionId ? "" : collectionId
-        );
-    }
-
     return (
         <StudentCollectionListWithFilters
             editable
-            expandedCollectionId={expandedCollectionId}
-            onAccordionChange={handleAccordionChange}
         />
     );
 };

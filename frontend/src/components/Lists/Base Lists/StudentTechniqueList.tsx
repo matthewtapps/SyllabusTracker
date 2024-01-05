@@ -1,6 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { CardContent } from '@mui/material';
+import { CardContent, Grid } from '@mui/material';
+import MuiLinearProgress from '@mui/material/LinearProgress'
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -13,7 +14,7 @@ import { styled } from '@mui/material/styles';
 import { Role, Technique, TechniqueStatus } from 'common';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteStudentTechniqueAsync, postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
+import { postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
 import { AppDispatch, RootState } from '../../../store/store';
 import { decodeAndAddRole } from '../../../util/Utilities';
 import { CircleIcon, Option } from '../../Buttons/CircleIcon';
@@ -44,6 +45,12 @@ const ListItem = styled(MuiListItem)({
     '&.MuiListItem-root.Mui-selected': {
         backgroundColor: 'inherit'
     }
+})
+
+const LinearProgress = styled(MuiLinearProgress)({
+    '.MuiLinearProgress-bar': {
+        transition: 'none'
+      }
 })
 
 interface ExtendedListItemTextProps extends ListItemTextProps {
@@ -111,7 +118,7 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
     }
 
     const { techniques } = useSelector((state: RootState) => state.techniques);
-    const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
+    const { selectedStudentTechniques, postingOrUpdatingStudentTechniqueIds } = useSelector((state: RootState) => state.student)
 
     const techniquesToDisplay = props.filteredTechniques || techniques
 
@@ -126,19 +133,19 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
         [Option.Assign]: async (technique: Technique) => {
             const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
             if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync({techniques: [technique], status: TechniqueStatus.NotYetStarted})).unwrap();
+                await dispatch(postStudentTechniquesAsync({ techniques: [technique], status: TechniqueStatus.NotYetStarted })).unwrap();
             } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.NotYetStarted } }));
         },
         [Option.Started]: async (technique: Technique) => {
             const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
             if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync({techniques: [technique], status: TechniqueStatus.Started})).unwrap();
+                await dispatch(postStudentTechniquesAsync({ techniques: [technique], status: TechniqueStatus.Started })).unwrap();
             } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Started } }));
         },
         [Option.Passed]: async (technique: Technique) => {
             const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
             if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync({techniques: [technique], status: TechniqueStatus.Passed})).unwrap();
+                await dispatch(postStudentTechniquesAsync({ techniques: [technique], status: TechniqueStatus.Passed })).unwrap();
             } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Passed } }));
         },
         [Option.Unassign]: async (technique: Technique) => {
@@ -153,36 +160,36 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
             await action(technique);
         }
     };
-
     let { user } = useAuth0();
     if (user) { user = decodeAndAddRole(user) }
     if (!user) { throw new Error(`Missing user when trying to load student technique list`) }
-
-
-
     return (
         <div>
             {techniquesToDisplay.length > 0 ? (
                 techniquesToDisplay.map((technique, index) => {
                     const matchedStudentTechnique = selectedStudentTechniques.find(st => { return technique.techniqueId === st.technique.techniqueId })
                     let currentOrder = props.ordered ? index + 1 : null;
+                    const techniqueLoadingStatus = postingOrUpdatingStudentTechniqueIds.includes(technique.techniqueId)
                     return (
                         <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
                             <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" >
                                 <Box display="flex" flexDirection="row" width="100%">
+                                    {techniqueLoadingStatus && <LinearProgress style={{width: "100%"}}/>}
                                     <Box display="flex" flexDirection="column" flexGrow={1}>
                                         <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
                                             <Box display="flex" alignItems="center" marginLeft="0px">
-                                                {props.ordered && (
+                                                {props.ordered && !techniqueLoadingStatus && (
                                                     <Typography variant="body1" style={{ marginRight: "8px" }}>{currentOrder + ". "}</Typography>
                                                 )}
-                                                <Typography variant="body1">{technique?.title}</Typography>
+                                                <Typography variant="body1">{!techniqueLoadingStatus && technique?.title}</Typography>
                                             </Box>
-                                            <CircleIcon
-                                                fill={handleIndicatorFill(technique)}
-                                                onClick={props.editable ? (event) => event.stopPropagation() : undefined}
-                                                onMenuItemClick={props.editable ? handleAction(technique) : undefined}
-                                            />
+                                            {!techniqueLoadingStatus && (
+                                                <CircleIcon
+                                                    fill={handleIndicatorFill(technique)}
+                                                    onClick={props.editable ? (event) => event.stopPropagation() : undefined}
+                                                    onMenuItemClick={props.editable ? handleAction(technique) : undefined}
+                                                />
+                                            )}
                                         </Box>
                                     </Box>
                                 </Box>

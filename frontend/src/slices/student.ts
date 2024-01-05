@@ -11,6 +11,7 @@ interface StudentState {
     selectedStudentTechniques: StudentTechnique[];
     selectedStudentTechniquesLastUpdated: number | null;
     allStudentTechniques: StudentTechnique[];
+    postingOrUpdatingStudentTechniqueIds: string[];
     loading: boolean;
     error: string | null;
 }
@@ -21,6 +22,7 @@ const initialState: StudentState = {
     selectedStudentTechniques: [],
     selectedStudentTechniquesLastUpdated: null,
     allStudentTechniques: [],
+    postingOrUpdatingStudentTechniqueIds: [],
     loading: false,
     error: null,
 };
@@ -166,15 +168,18 @@ const studentSlice = createSlice({
             })
 
             // Post student techniques
-            .addCase(postStudentTechniquesAsync.pending, (state) => {
+            .addCase(postStudentTechniquesAsync.pending, (state, action) => {
+                state.postingOrUpdatingStudentTechniqueIds = action.meta.arg.techniques.map(t => t.techniqueId)
             })
             .addCase(postStudentTechniquesAsync.fulfilled, (state, action) => {
                 action.payload.map(studentTechnique =>
                     state.selectedStudentTechniques.push(studentTechnique)
                 )
+                state.postingOrUpdatingStudentTechniqueIds = []
             })
             .addCase(postStudentTechniquesAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to post student techniques';
+                state.postingOrUpdatingStudentTechniqueIds = []
             })
 
             // Delete student technique
@@ -190,16 +195,19 @@ const studentSlice = createSlice({
             })
 
             // Update student technique
-            .addCase(updateStudentTechniqueAsync.pending, (state) => {
+            .addCase(updateStudentTechniqueAsync.pending, (state, action) => {
+                state.postingOrUpdatingStudentTechniqueIds = [action.meta.arg.techniqueId]
             })
             .addCase(updateStudentTechniqueAsync.fulfilled, (state, action) => {
                 const index = state.selectedStudentTechniques.findIndex(st => st.studentTechniqueId === action.payload.studentTechniqueId);
                 if (index !== -1) {
                     state.selectedStudentTechniques[index] = { ...state.selectedStudentTechniques[index], ...action.payload };
                 }
+                state.postingOrUpdatingStudentTechniqueIds = []
             })
             .addCase(updateStudentTechniqueAsync.rejected, (state, action) => {
                 state.error = action.error.message || 'Failed to delete student technique';
+                state.postingOrUpdatingStudentTechniqueIds = []
             })
             // Fetch student techniques if old
             .addCase(fetchSelectedStudentTechniquesIfOld.pending, (state) => {

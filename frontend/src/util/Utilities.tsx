@@ -27,9 +27,22 @@ export const transformTechniqueForPost = (technique: any): NewTechnique => {
         throw new Error(`Invalid Hierarchy value`)
     }
 
+    let videos: {title: string, hyperlink: string}[] = []
+
+    const videoKeys = Object.keys(technique).filter(key => key.startsWith("video"));
+    const videoTitles = videoKeys.filter(key => key.includes("title"));
+
+    videoTitles.forEach(titleKey => {
+        const index = titleKey.split("_")[2]; // Assuming format video_title_0, video_title_1, etc.
+        const linkKey = `video_link_${index}`;
+        if ((technique[titleKey] && technique[linkKey]) && technique[titleKey].length > 0 && technique[linkKey].length > 0) {
+            videos.push({ title: technique[titleKey], hyperlink: technique[linkKey] });
+        }
+    });
+
     const transformedTechnique: NewTechnique = {
         title: technique.title,
-        videos: technique.videoSrc,
+        videos: videos.length > 0 ? videos : null,
         description: technique.description,
         globalNotes: technique.globalNotes,
         gi: technique.gi as Gi,

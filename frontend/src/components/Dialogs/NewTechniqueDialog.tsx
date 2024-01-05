@@ -12,6 +12,7 @@ import { FastTextField as TextField } from '../Fields/FastTextField';
 import { SelectField } from '../Fields/SelectField';
 import { TextFieldWithDescriptionField } from '../Fields/TextFieldWithDescriptionField';
 import { TitleTextField } from '../Fields/TitleTextField';
+import VideoTextFields from '../Fields/VideoTextFields';
 
 
 const Card = styled(MuiCard)({
@@ -97,6 +98,8 @@ export const NewTechniqueDialog = (props: NewTechniqueDialogProps) => {
                             <SelectField wasSubmitted={wasSubmitted} name="gi" label="Gi" options={techniqueSuggestions.giOptions} required />
 
                             <TextField wasSubmitted={wasSubmitted} size="small" fullWidth name="videoSrc" label="Video Link" />
+
+                            <VideoTextFields wasSubmitted={wasSubmitted}/>
                         </CardContent>
                     </form>
                 </Card>

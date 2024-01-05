@@ -29,19 +29,19 @@ interface TechniqueDTO {
 }
 
 interface VideoTextFieldsProps {
-    editingTechnique: TechniqueDTO;
-    editingTechniqueId: string;
+    editingTechnique?: TechniqueDTO;
+    editingTechniqueId?: string;
     wasSubmitted: boolean;
 }
 
 export function VideoTextFields(props: VideoTextFieldsProps) {
     const [videoCount, setVideoCount] = React.useState(1)
-    const [values, setValues] = React.useState(props.editingTechnique.videos);
-    const [errors, setErrors] = React.useState(props.editingTechnique.videos.map(() => ({ title: false, hyperlink: false })));
+    const [values, setValues] = React.useState(props.editingTechnique?.videos || [{ title: '', hyperlink: '' }]);
+    const [errors, setErrors] = React.useState(props.editingTechnique?.videos.map(() => ({ title: false, hyperlink: false })) || [{ title: false, hyperlink: false }]);
 
     React.useEffect(() => {
-        setVideoCount(props.editingTechnique.videos.length || 1)
-    }, [props.editingTechnique.videos])
+        setVideoCount(props.editingTechnique?.videos.length || 1)
+    }, [props.editingTechnique?.videos])
 
     const addVideoField = () => {
         setVideoCount(prev => prev + 1)

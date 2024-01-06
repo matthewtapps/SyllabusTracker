@@ -1,9 +1,9 @@
-import { Technique } from "./Types";
+import { Collection } from "./Types";
 export interface CollectionSet {
     collectionSetId: string;
     title: string;
     description: string;
-    techniques: Technique[] | null;
+    collections: Collection[] | null;
     lastUpdated: Date;
     created: Date;
 }

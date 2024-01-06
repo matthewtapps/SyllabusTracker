@@ -6,7 +6,7 @@ import { OpenGuard } from "./OpenGuard";
 import { CollectionTechnique } from "./CollectionTechnique";
 
 @Entity()
-export class Technique {
+export class Technique implements TechniqueInterface {
     @PrimaryGeneratedColumn('uuid')
     @Generated('uuid')
     techniqueId: string;

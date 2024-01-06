@@ -2,6 +2,7 @@ import { CollectionSet as CollectionSetInterface} from "common";
 import { Entity, PrimaryGeneratedColumn, Column, Generated, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { CollectionTechnique } from "./CollectionTechnique";
 import { Technique } from "./Technique";
+import { Collection } from "./Collection";
 
 @Entity()
 export class CollectionSet implements CollectionSetInterface {
@@ -15,8 +16,8 @@ export class CollectionSet implements CollectionSetInterface {
     @Column()
     description: string;
 
-    @OneToMany(() => CollectionTechnique, ct => ct.collection, {nullable: true})
-    techniques: Technique[];
+    @OneToMany(() => Collection, col => col.collectionSets, {nullable: true})
+    collections: Collection[];
 
     @UpdateDateColumn()
     lastUpdated: Date;

@@ -6,7 +6,7 @@ import suggestionsReducer from '../slices/suggestions';
 import collectionTechniquesReducer from '../slices/collectionTechniques';
 import descriptionsReducer from '../slices/descriptions';
 import studentReducer from '../slices/student';
-
+import { syllabusTrackerApi } from '../services/syllabusTrackerApi';
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -16,6 +16,7 @@ const rootReducer = combineReducers({
     collectionTechniques: collectionTechniquesReducer,
     descriptions: descriptionsReducer,
     student: studentReducer,
+    [syllabusTrackerApi.reducerPath]: syllabusTrackerApi.reducer    
 });
 
 export default rootReducer;

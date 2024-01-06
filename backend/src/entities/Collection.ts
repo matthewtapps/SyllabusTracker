@@ -1,9 +1,10 @@
 import { Gi, Hierarchy, Collection as CollectionInterface} from "common";
-import { Entity, PrimaryGeneratedColumn, Column, Generated, OneToMany, ManyToOne, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Generated, OneToMany, ManyToOne, CreateDateColumn, UpdateDateColumn, ManyToMany} from "typeorm";
 import { CollectionTechnique } from "./CollectionTechnique";
 import { Position } from "./Position";
 import { TechniqueType } from "./TechniqueType";
 import { OpenGuard } from "./OpenGuard";
+import { CollectionSet } from "./CollectionSet";
 
 @Entity()
 export class Collection implements CollectionInterface {
@@ -26,8 +27,6 @@ export class Collection implements CollectionInterface {
     @Column({nullable: true})
     hierarchy: Hierarchy;
 
-    @OneToMany(() => CollectionTechnique, ct => ct.collection, {nullable: true})
-    collectionTechniques: CollectionTechnique[];
 
     @ManyToOne(type => Position, position => position.title, {nullable: true})
     position?: Position;
@@ -43,4 +42,10 @@ export class Collection implements CollectionInterface {
 
     @CreateDateColumn()
     created: Date;
+
+    @OneToMany(() => CollectionTechnique, ct => ct.collection, {nullable: true})
+    collectionTechniques: CollectionTechnique[];
+
+    @ManyToMany(() => CollectionSet, cs => cs.collections, {nullable: true})
+    collectionSets: CollectionSet[]
 }

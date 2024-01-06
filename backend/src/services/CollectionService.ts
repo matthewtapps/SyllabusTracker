@@ -57,48 +57,48 @@ export class CollectionService {
         } catch (error) { console.error(`Error setting collection techniques: ${error}`) }
     }
 
-    async createCollection(data: { collection: NewCollection }): Promise<Collection> {
+    async createCollection(collection: NewCollection): Promise<Collection> {
         const collectionRepo = AppDataSource.getRepository(Collection);
         const typeRepo = AppDataSource.getRepository(TechniqueType);
         const positionRepo = AppDataSource.getRepository(Position);
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
 
-        let collection = new Collection();
+        let newCollection = new Collection();
 
-        collection.title = data.collection.title;
-        collection.description = data.collection.description;
-        collection.globalNotes = data.collection.globalNotes ?? null;
-        collection.gi = data.collection.gi ?? null;
-        collection.hierarchy = data.collection.hierarchy ?? null;
+        newCollection.title = collection.title;
+        newCollection.description = collection.description;
+        newCollection.globalNotes = collection.globalNotes ?? null;
+        newCollection.gi = collection.gi ?? null;
+        newCollection.hierarchy = collection.hierarchy ?? null;
 
-        if (data.collection.type) {
-            let type = await typeRepo.findOne({ where: { title: data.collection.type.title } });
-            if (!type && data.collection.type.title && data.collection.type.description) {
-                type = typeRepo.create({ title: data.collection.type.title, description: data.collection.type.description });
+        if (newCollection.type) {
+            let type = await typeRepo.findOne({ where: { title: collection.type.title } });
+            if (!type && collection.type.title && collection.type.description) {
+                type = typeRepo.create({ title: collection.type.title, description: collection.type.description });
                 type = await typeRepo.save(type);
             }
-            collection.type = type
-        } else collection.type = null;
+            newCollection.type = type
+        } else newCollection.type = null;
 
-        if (data.collection.position) {
-            let position = await positionRepo.findOne({ where: { title: data.collection.position.title } });
-            if (!position && data.collection.position.title && data.collection.position.description) {
-                position = positionRepo.create({ title: data.collection.position.title, description: data.collection.position.description });
+        if (newCollection.position) {
+            let position = await positionRepo.findOne({ where: { title: collection.position.title } });
+            if (!position && collection.position.title && collection.position.description) {
+                position = positionRepo.create({ title: collection.position.title, description: collection.position.description });
                 await positionRepo.save(position);
             }
-            collection.position = position
-        } else collection.position = null;
+            newCollection.position = position
+        } else newCollection.position = null;
 
-        if (data.collection.openGuard) {
-            let openGuard = await openGuardRepo.findOne({ where: { title: data.collection.openGuard.title } });
-            if (!openGuard && data.collection.openGuard.title && data.collection.openGuard.description) {
-                openGuard = openGuardRepo.create({ title: data.collection.openGuard.title, description: data.collection.openGuard.description });
+        if (newCollection.openGuard) {
+            let openGuard = await openGuardRepo.findOne({ where: { title: collection.openGuard.title } });
+            if (!openGuard && collection.openGuard.title && collection.openGuard.description) {
+                openGuard = openGuardRepo.create({ title: collection.openGuard.title, description: collection.openGuard.description });
                 await openGuardRepo.save(openGuard);
             }
-            collection.openGuard = openGuard
-        } else collection.openGuard = null;
+            newCollection.openGuard = openGuard
+        } else newCollection.openGuard = null;
 
-        return await collectionRepo.save(collection)
+        return await collectionRepo.save(newCollection)
     };
 
     async updateCollection(collection: UpdateCollection): Promise<Collection> {

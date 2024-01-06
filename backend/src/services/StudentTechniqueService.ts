@@ -4,7 +4,7 @@ import { StudentTechnique } from "../entities/StudentTechnique";
 import { Technique } from "../entities/Technique";
 
 export class StudentTechniqueService {
-    async addStudentTechniques(techniques: Technique[], status: TechniqueStatus, studentId: string): Promise<StudentTechnique[]> {
+    async postStudentTechniques(techniques: Technique[], status: TechniqueStatus, studentId: string): Promise<StudentTechnique[]> {
         const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
         const newStudentTechniques = techniques.map(technique => {
             const studentTechnique = new StudentTechnique();
@@ -17,39 +17,35 @@ export class StudentTechniqueService {
         return await studentTechniqueRepository.save(newStudentTechniques);
     }
 
-    async updateOrPostStudentTechnique(studentId: string, techniqueId: string, updatedData: Partial<StudentTechnique>): Promise<StudentTechnique> {
+    async postStudentTechnique(studentId: string, status: TechniqueStatus, technique: Technique): Promise<StudentTechnique> {
+        const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
+        const studentTechnique = new StudentTechnique();
+        studentTechnique.userId = studentId;
+        studentTechnique.technique = technique;
+        studentTechnique.status = status;
+
+        return await studentTechniqueRepository.save(studentTechnique);
+    }
+
+    async updateStudentTechnique(updatedData: Partial<StudentTechnique>): Promise<StudentTechnique> {
         const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
         const selectedStudentTechnique = await studentTechniqueRepository.findOne({
             where: {
-                userId: studentId,
-                technique: { techniqueId: techniqueId }
+                studentTechniqueId: updatedData.studentTechniqueId
             },
             relations: ["technique"]
         });
 
         try {
+            if (!selectedStudentTechnique) { throw new Error(`Student technique not found when updating`) }
 
-            if (selectedStudentTechnique) {
+            await studentTechniqueRepository.update(selectedStudentTechnique.studentTechniqueId, {
+                ...updatedData
+            });
 
-                await studentTechniqueRepository.update(selectedStudentTechnique.studentTechniqueId, {
-                    ...updatedData,
-                    lastUpdated: new Date()
-                });
+            return studentTechniqueRepository.findOne({ where: { studentTechniqueId: selectedStudentTechnique.studentTechniqueId } });
 
-                return studentTechniqueRepository.findOne({ where: { studentTechniqueId: selectedStudentTechnique.studentTechniqueId } });
-
-            } else {
-                const newStudentTechnique = new StudentTechnique();
-                newStudentTechnique.coachNotes = updatedData.coachNotes
-                newStudentTechnique.status = updatedData.status
-                newStudentTechnique.studentNotes = updatedData.studentNotes
-                newStudentTechnique.technique = updatedData.technique
-                newStudentTechnique.userId = studentId
-
-                return studentTechniqueRepository.save(newStudentTechnique)
-            }
-
-        } catch (error) { console.error(`Error updating or creating student technique: ${error}`) }
+        } catch (error) { console.error(`Error updating student technique: ${error}`) }
     }
 
     async fetchStudentTechniques(userId: string): Promise<{ status: number, res: StudentTechnique[] | { message: string } }> {

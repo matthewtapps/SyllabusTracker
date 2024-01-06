@@ -58,7 +58,6 @@ interface EditTechniqueDialogProps {
     editingTechniqueId: string;
 }
 
-
 export const EditTechniqueDialog = (props: EditTechniqueDialogProps) => {
     const [wasSubmitted, setWasSubmitted] = React.useState(false);
     const [localPositionState, setLocalPositionState] = React.useState(props.editingTechnique?.position || '')

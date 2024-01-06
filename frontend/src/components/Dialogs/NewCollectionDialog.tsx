@@ -56,7 +56,7 @@ export const NewCollectionDialog = (props: NewCollectionDialogProps) => {
         event.preventDefault();
         setWasSubmitted(true)
         if (event.currentTarget.checkValidity()) {
-            await props.onSave(event);
+            props.onSave(event);
             setWasSubmitted(false)
         } else {
             console.log("Form is invalid");

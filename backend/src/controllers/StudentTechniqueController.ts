@@ -3,30 +3,40 @@ import { StudentTechniqueService } from "../services/StudentTechniqueService";
 import { StudentTechnique } from "common";
 
 export class StudentTechniqueController {
-    static async addStudentTechniques(req: Request, res: Response) {
+    static async postStudentTechniques(req: Request, res: Response) {
         const studentTechniqueService = new StudentTechniqueService();
         try {
             const studentId = req.params.userId
             const { techniques, status } = req.body;
-            const newStudentTechniques = await studentTechniqueService.addStudentTechniques(techniques, status, studentId);
+            const newStudentTechniques = await studentTechniqueService.postStudentTechniques(techniques, status, studentId);
             res.status(201).json(newStudentTechniques);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     }
 
-    static async updateOrPostStudentTechnique(req: Request, res: Response) {
+    static async postStudentTechnique(req: Request, res: Response) {
         const studentTechniqueService = new StudentTechniqueService();
         try {
             const studentId = req.params.userId
-            const techniqueId = req.params.techniqueId
-            const { updatedData } = req.body;
-            const updatedStudentTechnique = await studentTechniqueService.updateOrPostStudentTechnique(studentId, techniqueId, updatedData);
-            res.status(200).json(updatedStudentTechnique);
+            const { status, technique } = req.body;
+            const newStudentTechnique = await studentTechniqueService.postStudentTechnique(studentId, status, technique);
+            res.status(200).json(newStudentTechnique);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     }
+
+    static async updateStudentTechnique(req: Request, res: Response) {
+        const studentTechniqueService = new StudentTechniqueService();
+        try {
+            const updatedData = req.body;
+            const updatedStudentTechnique = await studentTechniqueService.updateStudentTechnique(updatedData);
+            res.status(200).json(updatedStudentTechnique);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }    
 
     static async fetchStudentTechniques(req: Request, res: Response) {
         const studentTechniqueService = new StudentTechniqueService();

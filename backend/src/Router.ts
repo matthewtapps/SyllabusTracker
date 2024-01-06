@@ -21,19 +21,20 @@ router.get('/openguard', TechniqueController.getAllOpenGuards);
 
 router.get('/collection', CollectionController.getAllCollections);
 router.post('/collection', CollectionController.createCollection);
+router.post('/collection/:collectionId', CollectionController.setCollectionTechniques);
 router.put('/collection/:collectionId', CollectionController.updateCollection);
 router.delete('/collection/:collectionId', CollectionController.deleteCollection);
 router.get('/collection/suggestions', CollectionController.getSuggestions)
 
 router.get('/collectiontechnique', CollectionController.getCollectionTechniques);
-router.post('/collectiontechnique/:collectionId', CollectionController.setCollectionTechniques);
 
 router.get('/student', StudentController.fetchStudents);
 router.get('/student/:userId/technique', StudentTechniqueController.fetchStudentTechniques)
-router.post('/student/:userId/technique', StudentTechniqueController.addStudentTechniques)
-router.put('/student/:userId/technique/:techniqueId', StudentTechniqueController.updateOrPostStudentTechnique)
+router.post('/student/:userId/technique', StudentTechniqueController.postStudentTechniques)
+router.post('/student/:userId/technique/:techniqueId', StudentTechniqueController.postStudentTechnique)
+router.put('/student/:userId/technique/:studentTechniqueId', StudentTechniqueController.updateStudentTechnique)
 router.get('/student/technique', StudentTechniqueController.fetchAllStudentTechniques)
-router.delete('/student/technique/:techniqueId', StudentTechniqueController.deleteStudentTechnique)
+router.delete('/student/technique/:studentTechniqueId', StudentTechniqueController.deleteStudentTechnique)
 
 router.get('/collectionset', CollectionSetController.getCollectionSets)
 router.post('/collectionset', CollectionSetController.createCollectionSet)

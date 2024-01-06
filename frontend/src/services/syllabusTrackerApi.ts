@@ -1,7 +1,6 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { Collection, CollectionSet, CollectionTechnique, Descriptions, StudentTechnique, Suggestions, Technique, TechniqueStatus } from 'common'
-import { RootState } from '../store/store'
-import { User as Auth0User } from '@auth0/auth0-react'
+import { User as Auth0User } from '@auth0/auth0-react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { Collection, CollectionSet, CollectionTechnique, Descriptions, StudentTechnique, Suggestions, Technique, TechniqueStatus } from 'common';
 import { sec } from '../store/security';
 
 
@@ -211,16 +210,17 @@ export const syllabusTrackerApi = createApi({
         getSelectedStudentTechniques: build.query<StudentTechnique[], string>({
             query: studentId => `student/${studentId}/technique`,
             providesTags: (result) =>
+                
                 result ?
                     [
-                        ...result.map(({ studentTechniqueId }) => ({ type: 'StudentTechniques' as const, studentTechniqueId })),
+                        ...result.map(({ studentTechniqueId }) => ({ type: 'StudentTechniques' as const, studentTechniqueId})),
                         { type: 'StudentTechniques', id: 'LIST' }
                     ]
                     : [{ type: 'StudentTechniques', id: 'LIST' }]
         }),
         postStudentTechniques: build.mutation<StudentTechnique[], { studentId: string, status: TechniqueStatus, techniques: Technique[] }>({
             query: data => ({
-                url: `student/${data.studentId}/technique`,
+                url: `student/${data.studentId}/techniques`,
                 method: `POST`,
                 body: { status: data.status, techniques: data.techniques }
             }),
@@ -228,15 +228,25 @@ export const syllabusTrackerApi = createApi({
                 { type: 'StudentTechniques', id: 'LIST' },
             ]
         }),
-        editStudentTechnique: build.mutation<StudentTechnique, { studentId: string, techniqueId: string, updatedData: Partial<StudentTechnique> }>({
+        postStudentTechnique: build.mutation<StudentTechnique, { studentId: string, status: TechniqueStatus, technique: Technique }>({
             query: data => ({
-                url: `student/${data.studentId}/technique/${data.techniqueId}`,
-                method: `PUT`,
-                body: data.updatedData
+                url: `student/${data.studentId}/technique/${data.technique.techniqueId}`,
+                method: `POST`,
+                body: { status: data.status, technique: data.technique }
             }),
             invalidatesTags: [
                 { type: 'StudentTechniques', id: 'LIST' },
             ]
+        }),
+        editStudentTechnique: build.mutation<StudentTechnique, Partial<StudentTechnique>>({
+            query: data => ({
+                url: `student/${data.studentTechniqueId}/technique/${data.technique?.techniqueId}`,
+                method: `PUT`,
+                body: data
+            }),
+            invalidatesTags: [
+                { type: 'StudentTechniques', id: 'LIST' },
+            ],
         }),
         getAllStudentTechniques: build.query<StudentTechnique[], void>({
             query: () => `student/technique`,
@@ -349,6 +359,7 @@ export const {
     useEditStudentTechniqueMutation,
     useDeleteStudentTechniqueMutation,
     usePostStudentTechniquesMutation,
+    usePostStudentTechniqueMutation,
 
     // Collection set exports
     useGetCollectionSetsQuery,

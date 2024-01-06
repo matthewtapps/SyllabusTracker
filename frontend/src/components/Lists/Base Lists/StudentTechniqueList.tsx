@@ -5,7 +5,7 @@ import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
-import { default as Card, default as MuiCard } from '@mui/material/Card';
+import { default as MuiCard } from '@mui/material/Card';
 import MuiLinearProgress from '@mui/material/LinearProgress';
 import MuiListItem from '@mui/material/ListItem';
 import MuiListItemText, { ListItemTextProps } from '@mui/material/ListItemText';
@@ -13,11 +13,10 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { Role, Technique, TechniqueStatus } from 'common';
 import React from 'react';
-import { useEditStudentTechniqueMutation, useGetSelectedStudentTechniquesQuery, useGetTechniquesQuery, usePostStudentTechniquesMutation } from '../../../services/syllabusTrackerApi';
-import { postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
+import { useEditStudentTechniqueMutation, useGetSelectedStudentTechniquesQuery, useGetTechniquesQuery, usePostStudentTechniqueMutation } from '../../../services/syllabusTrackerApi';
 import { decodeAndAddRole } from '../../../util/Utilities';
-import { CircleIcon, Option } from '../../Buttons/CircleIcon';
 import Pageloader from '../../Base/PageLoader';
+import { CircleIcon, Option } from '../../Buttons/CircleIcon';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -118,9 +117,9 @@ function StudentTechniqueList(props: StudentTechniqueListProps): JSX.Element {
     }
 
     const { data: techniques, isLoading, isSuccess, isError, error } = useGetTechniquesQuery()
-    const { data: selectedStudentTechniques, isLoading: stLoading, isSuccess: stSuccess, isError: stIsError, error: stError } = useGetSelectedStudentTechniquesQuery(selectedStudent.user_id)
-    const [postStudentTechniques, { isLoading: isPostingStudentTechnique }] = usePostStudentTechniquesMutation()
-    const [updateStudentTechniques] = useEditStudentTechniqueMutation()
+    const { data: selectedStudentTechniques, isLoading: stLoading, isSuccess: stSuccess } = useGetSelectedStudentTechniquesQuery(selectedStudent.user_id)
+    const [postStudentTechnique, { isLoading: isPostingStudentTechnique }] = usePostStudentTechniqueMutation()
+    const [updateStudentTechnique] = useEditStudentTechniqueMutation()
 
     const techniquesToDisplay = props.filteredTechniques || techniques!
 
@@ -135,27 +134,24 @@ function StudentTechniqueList(props: StudentTechniqueListProps): JSX.Element {
 
     const menuActions = {
         [Option.Assign]: async (technique: Technique) => {
-            stSuccess &&
-            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
-                ? postStudentTechniques({ studentId: selectedStudent.user_id, techniques: [technique], status: TechniqueStatus.NotYetStarted })
-                : updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.NotYetStarted } });
+            const matchedTechnique = selectedStudentTechniques!.find(st => st.technique.techniqueId === technique.techniqueId)
+            matchedTechnique ? updateStudentTechnique({...matchedTechnique, status: TechniqueStatus.NotYetStarted})
+                : postStudentTechnique({ studentId: selectedStudent.user_id, technique: technique, status: TechniqueStatus.NotYetStarted })
         },
         [Option.Started]: async (technique: Technique) => {
-            stSuccess &&
-            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
-                ? postStudentTechniques({ studentId: selectedStudent.user_id, techniques: [technique], status: TechniqueStatus.Started })
-                : updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Started } });
+            const matchedTechnique = selectedStudentTechniques!.find(st => st.technique.techniqueId === technique.techniqueId)
+            matchedTechnique ? updateStudentTechnique({...matchedTechnique, status: TechniqueStatus.Started})
+                : postStudentTechnique({ studentId: selectedStudent.user_id, technique: technique, status: TechniqueStatus.Started })
         },
         [Option.Passed]: async (technique: Technique) => {
-            stSuccess &&
-            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
-                ? postStudentTechniques({ studentId: selectedStudent.user_id, techniques: [technique], status: TechniqueStatus.Passed })
-                : updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Passed } });
+            const matchedTechnique = selectedStudentTechniques!.find(st => st.technique.techniqueId === technique.techniqueId)
+            matchedTechnique ? updateStudentTechnique({...matchedTechnique, status: TechniqueStatus.Passed})
+                : postStudentTechnique({ studentId: selectedStudent.user_id, technique: technique, status: TechniqueStatus.Passed })
         },
         [Option.Unassign]: async (technique: Technique) => {
-            stSuccess &&
-            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
-                && updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Unassigned } })
+            const matchedTechnique = selectedStudentTechniques!.find(st => st.technique.techniqueId === technique.techniqueId)
+            matchedTechnique ? updateStudentTechnique({...matchedTechnique, status: TechniqueStatus.Unassigned})
+                : postStudentTechnique({ studentId: selectedStudent.user_id, technique: technique, status: TechniqueStatus.Unassigned })
         }
     };
 

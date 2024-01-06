@@ -90,6 +90,8 @@ export const transformTechniqueForPut = (technique: any): UpdateTechnique => {
         }
     });
 
+    console.log(technique)
+
     let transformedTechnique: UpdateTechnique = {
         techniqueId: technique.techniqueId,
         title: technique.title,
@@ -173,22 +175,6 @@ export const postCollectionTechniques = async (
 };
 
 export const transformCollectionForPost = (collection: any): NewCollection => {
-    if (!collection.title) {
-        throw new Error(`Collection title missing`)
-    }
-
-    if (!collection.description) {
-        throw new Error(`Collection description missing`)
-    }
-
-    if (collection.gi && !Object.values(Gi).includes(collection.gi)) {
-        throw new Error(`Gi value is invalid`)
-    }
-
-    if (collection.hierarchy && !Object.values(Hierarchy).includes(collection.hierarchy)) {
-        throw new Error(`Hierarchy value is invalid`)
-    }
-
     const transformedCollection: NewCollection = {
         title: collection.title,
         description: collection.description,
@@ -208,14 +194,7 @@ export const transformCollectionForPost = (collection: any): NewCollection => {
             description: collection.openGuardDescription
         } || null,
     };
-
-    if (collection.openGuard && collection.openGuardDescription) {
-        transformedCollection.openGuard = {
-            title: collection.openGuard,
-            description: collection.openGuardDescription
-        };
-    }
-
+    
     return transformedCollection;
 };
 

@@ -1,4 +1,6 @@
+import { User } from '@auth0/auth0-react';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import { CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -10,14 +12,10 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { Collection, CollectionTechnique, Technique, TechniqueStatus } from 'common';
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
-import StudentTechniqueList from './StudentTechniqueList';
-import { ProgressBarIcon } from '../../Buttons/ProgressBarIcon';
-import { User } from '@auth0/auth0-react';
 import { useGetSelectedStudentTechniquesQuery } from '../../../services/syllabusTrackerApi';
 import Pageloader from '../../Base/PageLoader';
-import { CardContent } from '@mui/material';
+import { ProgressBarIcon } from '../../Buttons/ProgressBarIcon';
+import StudentTechniqueList from './StudentTechniqueList';
 
 
 const Accordion = styled(MuiAccordion)({

@@ -4,6 +4,7 @@ import { CollectionService } from '../services/CollectionService';
 export class CollectionController {
     static async createCollection(req: Request, res: Response) {
         const collectionService = new CollectionService();
+        console.log(req.body)
         try {
             const collection = await collectionService.createCollection(req.body);
             res.json(collection);

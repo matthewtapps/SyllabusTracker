@@ -97,7 +97,7 @@ function CoachCollections(): JSX.Element {
         setEditingTechniqueId(technique.techniqueId);
         setEditedTechnique({
             title: technique.title,
-            videos: technique.videos || [],
+            videos: technique.videos || [{title: '', hyperlink: ''}],
             description: technique.description,
             globalNotes: technique.globalNotes || undefined,
             gi: technique.gi,
@@ -235,7 +235,9 @@ function CoachCollections(): JSX.Element {
 
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
+        console.log(fieldValues)
         const validCollection = transformCollectionForPost(fieldValues);
+        console.log(validCollection)
 
         await postCollection(validCollection)
             .unwrap()

@@ -1,4 +1,4 @@
-import { useAuth0 } from '@auth0/auth0-react';
+import { User, useAuth0 } from '@auth0/auth0-react';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { CardContent } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
@@ -13,11 +13,11 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { Role, Technique, TechniqueStatus } from 'common';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEditStudentTechniqueMutation, useGetSelectedStudentTechniquesQuery, useGetTechniquesQuery, usePostStudentTechniquesMutation } from '../../../services/syllabusTrackerApi';
 import { postStudentTechniquesAsync, updateStudentTechniqueAsync } from '../../../slices/student';
-import { AppDispatch, RootState } from '../../../store/store';
 import { decodeAndAddRole } from '../../../util/Utilities';
 import { CircleIcon, Option } from '../../Buttons/CircleIcon';
+import Pageloader from '../../Base/PageLoader';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -50,7 +50,7 @@ const ListItem = styled(MuiListItem)({
 const LinearProgress = styled(MuiLinearProgress)({
     '.MuiLinearProgress-bar': {
         transition: 'none'
-      }
+    }
 })
 
 interface ExtendedListItemTextProps extends ListItemTextProps {
@@ -91,11 +91,12 @@ const SubCard = styled(MuiCard)({
     backgroundColor: 'inherit',
 })
 
-interface TechniquesListProps {
+interface StudentTechniqueListProps {
     filteredTechniques?: Technique[];
     ordered?: boolean;
     elevation: number;
     editable?: boolean;
+    selectedStudent: User;
 }
 
 StudentTechniqueList.defaultProps = {
@@ -104,9 +105,8 @@ StudentTechniqueList.defaultProps = {
     editable: false,
 }
 
-function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
-    const dispatch = useDispatch<AppDispatch>();
-
+function StudentTechniqueList(props: StudentTechniqueListProps): JSX.Element {
+    const selectedStudent = props.selectedStudent
     const iconColor = (techniqueStatus: TechniqueStatus | undefined): string => {
         if (techniqueStatus === TechniqueStatus.Started) {
             return "#d79921";
@@ -117,222 +117,227 @@ function StudentTechniqueList(props: TechniquesListProps): JSX.Element {
         }
     }
 
-    const { techniques } = useSelector((state: RootState) => state.techniques);
-    const { selectedStudentTechniques, postingOrUpdatingStudentTechniqueIds } = useSelector((state: RootState) => state.student)
+    const { data: techniques, isLoading, isSuccess, isError, error } = useGetTechniquesQuery()
+    const { data: selectedStudentTechniques, isLoading: stLoading, isSuccess: stSuccess, isError: stIsError, error: stError } = useGetSelectedStudentTechniquesQuery(selectedStudent.user_id)
+    const [postStudentTechniques, { isLoading: isPostingStudentTechnique }] = usePostStudentTechniquesMutation()
+    const [updateStudentTechniques] = useEditStudentTechniqueMutation()
 
-    const techniquesToDisplay = props.filteredTechniques || techniques
+    const techniquesToDisplay = props.filteredTechniques || techniques!
 
     const handleIndicatorFill = (technique: Technique) => {
-        const matchingTechnique = selectedStudentTechniques.find(st =>
-            st.technique.techniqueId === technique.techniqueId
-        )
-        return iconColor(matchingTechnique?.status)
+        if (stSuccess) {
+            const matchingTechnique = selectedStudentTechniques.find(st =>
+                st.technique.techniqueId === technique.techniqueId
+            )
+            return iconColor(matchingTechnique?.status)
+        } else return "#665c54"
     }
 
     const menuActions = {
         [Option.Assign]: async (technique: Technique) => {
-            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
-            if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync({ techniques: [technique], status: TechniqueStatus.NotYetStarted })).unwrap();
-            } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.NotYetStarted } }));
+            stSuccess &&
+            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
+                ? postStudentTechniques({ studentId: selectedStudent.user_id, techniques: [technique], status: TechniqueStatus.NotYetStarted })
+                : updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.NotYetStarted } });
         },
         [Option.Started]: async (technique: Technique) => {
-            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
-            if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync({ techniques: [technique], status: TechniqueStatus.Started })).unwrap();
-            } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Started } }));
+            stSuccess &&
+            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
+                ? postStudentTechniques({ studentId: selectedStudent.user_id, techniques: [technique], status: TechniqueStatus.Started })
+                : updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Started } });
         },
         [Option.Passed]: async (technique: Technique) => {
-            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
-            if (!matchedTechnique) {
-                await dispatch(postStudentTechniquesAsync({ techniques: [technique], status: TechniqueStatus.Passed })).unwrap();
-            } else dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Passed } }));
+            stSuccess &&
+            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
+                ? postStudentTechniques({ studentId: selectedStudent.user_id, techniques: [technique], status: TechniqueStatus.Passed })
+                : updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Passed } });
         },
         [Option.Unassign]: async (technique: Technique) => {
-            const matchedTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
-            if (matchedTechnique) dispatch(updateStudentTechniqueAsync({ techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Unassigned } }));
+            stSuccess &&
+            selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId)
+                && updateStudentTechniques({ studentId: selectedStudent.user_id, techniqueId: technique.techniqueId, updatedData: { status: TechniqueStatus.Unassigned } })
         }
     };
 
     const handleAction = (technique: Technique) => async (option: Option) => {
-        const action = menuActions[option];
-        if (action) {
+        if (stSuccess) {
+            const action = menuActions[option];
             await action(technique);
         }
     };
+
     let { user } = useAuth0();
     if (user) { user = decodeAndAddRole(user) }
     if (!user) { throw new Error(`Missing user when trying to load student technique list`) }
     return (
-        <div>
-            {techniquesToDisplay.length > 0 ? (
-                techniquesToDisplay.map((technique, index) => {
-                    const matchedStudentTechnique = selectedStudentTechniques.find(st => { return technique.techniqueId === st.technique.techniqueId })
-                    let currentOrder = props.ordered ? index + 1 : null;
-                    const techniqueLoadingStatus = postingOrUpdatingStudentTechniqueIds.includes(technique.techniqueId)
-                    return (
-                        <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
-                            <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" >
-                                <Box display="flex" flexDirection="row" width="100%">
-                                    {techniqueLoadingStatus && <LinearProgress style={{width: "100%"}}/>}
-                                    <Box display="flex" flexDirection="column" flexGrow={1}>
-                                        <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
-                                            <Box display="flex" alignItems="center" marginLeft="0px">
-                                                {props.ordered && !techniqueLoadingStatus && (
-                                                    <Typography variant="body1" style={{ marginRight: "8px" }}>{currentOrder + ". "}</Typography>
-                                                )}
-                                                <Typography variant="body1">{!techniqueLoadingStatus && technique?.title}</Typography>
+        <>
+            {
+                (isLoading || stLoading) ? <Pageloader />
+                    : (isSuccess && stSuccess && selectedStudentTechniques) ?
+                        techniquesToDisplay.map((technique, index) => {
+                            const matchedStudentTechnique = selectedStudentTechniques.find(st => { return technique.techniqueId === st.technique.techniqueId })
+                            let currentOrder = props.ordered ? index + 1 : null
+                            return (
+                                <Accordion disableGutters elevation={props.elevation} key={technique.techniqueId}>
+                                    <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content" >
+                                        <Box display="flex" flexDirection="row" width="100%">
+                                            {isPostingStudentTechnique && <LinearProgress style={{ width: "100%" }} />}
+                                            <Box display="flex" flexDirection="column" flexGrow={1}>
+                                                <Box display="flex" alignItems="center" justifyContent="space-between" width="97%">
+                                                    <Box display="flex" alignItems="center" marginLeft="0px">
+                                                        {props.ordered && !isPostingStudentTechnique && (
+                                                            <Typography variant="body1" style={{ marginRight: "8px" }}>{currentOrder + ". "}</Typography>
+                                                        )}
+                                                        <Typography variant="body1">{!isPostingStudentTechnique && technique?.title}</Typography>
+                                                    </Box>
+                                                    {!isPostingStudentTechnique && (
+                                                        <CircleIcon
+                                                            fill={handleIndicatorFill(technique)}
+                                                            onClick={props.editable ? (event) => event.stopPropagation() : undefined}
+                                                            onMenuItemClick={props.editable ? handleAction(technique) : undefined}
+                                                        />
+                                                    )}
+                                                </Box>
                                             </Box>
-                                            {!techniqueLoadingStatus && (
-                                                <CircleIcon
-                                                    fill={handleIndicatorFill(technique)}
-                                                    onClick={props.editable ? (event) => event.stopPropagation() : undefined}
-                                                    onMenuItemClick={props.editable ? handleAction(technique) : undefined}
-                                                />
-                                            )}
                                         </Box>
-                                    </Box>
-                                </Box>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <SubCard elevation={0}>
-                                    {((user?.role === Role.Student && matchedStudentTechnique?.coachNotes) || user?.role === Role.Coach) && (
-                                        <ListItem key={`${technique.techniqueId}-coach-notes`}>
-                                            <ListItemText sx={{ margin: "0px" }}
-                                                smalltext={props.ordered ? true : false}
-                                                primary="Coach Notes"
-                                                secondary={matchedStudentTechnique?.coachNotes || "--"}
-                                            />
-                                        </ListItem>
-                                    )}
-
-                                    {((user?.role === Role.Coach && matchedStudentTechnique?.studentNotes) || user?.role === Role.Student) && (
-                                        <ListItem key={`${technique.techniqueId}-student-notes`}>
-                                            <ListItemText sx={{ margin: "0px" }}
-                                                smalltext={props.ordered ? true : false}
-                                                primary={user?.role === Role.Student ? "My Notes" : "Student Notes"}
-                                                secondary={matchedStudentTechnique?.studentNotes || "--"}
-                                            />
-                                        </ListItem>
-                                    )}
-
-                                    {technique?.globalNotes && (
-                                        <ListItem key={`${technique.techniqueId}-global-notes`}>
-                                            <ListItemText
-                                                smalltext={props.ordered ? true : false}
-                                                primary="Global Notes"
-                                                secondary={technique?.globalNotes} />
-                                        </ListItem>
-                                    )}
-
-                                    {technique?.videos && technique.videos.map((video, index) => (
-                                        <ListItem key={`${technique.techniqueId}-video-${index}`}>
-                                            <ListItemText
-                                                smalltext={props.ordered ? true : false}
-                                                primary={video.title}
-                                                secondary={video.hyperlink} />
-                                        </ListItem>
-                                    ))}
-
-                                    <ListItem key={`${technique.techniqueId}-description`}>
-                                        <ListItemText sx={{ margin: "0px" }}
-                                            smalltext={props.ordered ? true : false}
-                                            primary="Description"
-                                            secondary={technique?.description}
-                                        />
-                                    </ListItem>
-
-
-                                    <SubAccordion elevation={0} disableGutters square>
-                                        <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${technique.techniqueId}-position`}>
-                                                <ListItemText
-                                                    smalltext={props.ordered ? true : false}
-                                                    primary="Position"
-                                                    secondary={technique?.position?.title}
-                                                />
-                                            </ListItem>
-                                        </AccordionSummary>
-
-                                        <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${technique.techniqueId}-position-description`}>
-                                                <ListItemText
-                                                    smalltext={props.ordered ? true : false}
-                                                    secondary={technique?.position.description} />
-                                            </ListItem>
-                                        </AccordionDetails>
-                                    </SubAccordion>
-
-                                    <ListItem key={`${technique.techniqueId}-hierarchy`}>
-                                        <ListItemText
-                                            smalltext={props.ordered ? true : false}
-                                            primary="Hierarchy"
-                                            secondary={technique?.hierarchy}
-                                        />
-                                    </ListItem>
-
-                                    <SubAccordion elevation={0} disableGutters square>
-                                        <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${technique.techniqueId}-type`}>
-                                                <ListItemText
-                                                    smalltext={props.ordered ? true : false}
-                                                    primary="Type"
-                                                    secondary={technique?.type.title}
-                                                />
-                                            </ListItem>
-                                        </AccordionSummary>
-
-                                        <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${technique.techniqueId}-type-description`}>
-                                                <ListItemText
-                                                    smalltext={props.ordered ? true : false}
-                                                    secondary={technique?.type.description} />
-                                            </ListItem>
-                                        </AccordionDetails>
-                                    </SubAccordion>
-
-                                    {technique?.openGuard && (
-                                        <SubAccordion elevation={0} disableGutters square>
-                                            <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                                <ListItem key={`${technique.techniqueId}-open-guard`}>
-                                                    <ListItemText
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <SubCard elevation={0}>
+                                            {((user?.role === Role.Student && matchedStudentTechnique?.coachNotes) || user?.role === Role.Coach) && (
+                                                <ListItem key={`${technique.techniqueId}-coach-notes`}>
+                                                    <ListItemText sx={{ margin: "0px" }}
                                                         smalltext={props.ordered ? true : false}
-                                                        primary="Open Guard"
-                                                        secondary={technique?.openGuard?.title}
+                                                        primary="Coach Notes"
+                                                        secondary={matchedStudentTechnique?.coachNotes || "--"}
                                                     />
                                                 </ListItem>
-                                            </AccordionSummary>
+                                            )}
 
-                                            <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                                <ListItem key={`${technique.techniqueId}-open-guard-description`}>
+                                            {((user?.role === Role.Coach && matchedStudentTechnique?.studentNotes) || user?.role === Role.Student) && (
+                                                <ListItem key={`${technique.techniqueId}-student-notes`}>
+                                                    <ListItemText sx={{ margin: "0px" }}
+                                                        smalltext={props.ordered ? true : false}
+                                                        primary={user?.role === Role.Student ? "My Notes" : "Student Notes"}
+                                                        secondary={matchedStudentTechnique?.studentNotes || "--"}
+                                                    />
+                                                </ListItem>
+                                            )}
+
+                                            {technique?.globalNotes && (
+                                                <ListItem key={`${technique.techniqueId}-global-notes`}>
                                                     <ListItemText
                                                         smalltext={props.ordered ? true : false}
-                                                        secondary={technique?.openGuard?.description} />
+                                                        primary="Global Notes"
+                                                        secondary={technique?.globalNotes} />
                                                 </ListItem>
-                                            </AccordionDetails>
-                                        </SubAccordion>
-                                    )}
+                                            )}
 
-                                    <ListItem key={`${technique.techniqueId}-gi`}>
-                                        <ListItemText
-                                            smalltext={props.ordered ? true : false}
-                                            primary="Gi or No Gi"
-                                            secondary={technique?.gi}
-                                        />
-                                    </ListItem>
-                                </SubCard>
-                            </AccordionDetails>
-                        </Accordion>
-                    )
-                })
-            ) : (
-                <Card style={{ backgroundColor: `#3c3836` }} elevation={0}>
-                    <CardContent>
-                        <Typography variant='body1'>No techniques available</Typography>
-                    </CardContent>
-                </Card>
-            )}
-        </div>
+                                            {technique?.videos && technique.videos.map((video, index) => (
+                                                <ListItem key={`${technique.techniqueId}-video-${index}`}>
+                                                    <ListItemText
+                                                        smalltext={props.ordered ? true : false}
+                                                        primary={video.title}
+                                                        secondary={video.hyperlink} />
+                                                </ListItem>
+                                            ))}
+
+                                            <ListItem key={`${technique.techniqueId}-description`}>
+                                                <ListItemText sx={{ margin: "0px" }}
+                                                    smalltext={props.ordered ? true : false}
+                                                    primary="Description"
+                                                    secondary={technique?.description}
+                                                />
+                                            </ListItem>
+
+
+                                            <SubAccordion elevation={0} disableGutters square>
+                                                <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${technique.techniqueId}-position`}>
+                                                        <ListItemText
+                                                            smalltext={props.ordered ? true : false}
+                                                            primary="Position"
+                                                            secondary={technique?.position?.title}
+                                                        />
+                                                    </ListItem>
+                                                </AccordionSummary>
+
+                                                <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${technique.techniqueId}-position-description`}>
+                                                        <ListItemText
+                                                            smalltext={props.ordered ? true : false}
+                                                            secondary={technique?.position.description} />
+                                                    </ListItem>
+                                                </AccordionDetails>
+                                            </SubAccordion>
+
+                                            <ListItem key={`${technique.techniqueId}-hierarchy`}>
+                                                <ListItemText
+                                                    smalltext={props.ordered ? true : false}
+                                                    primary="Hierarchy"
+                                                    secondary={technique?.hierarchy}
+                                                />
+                                            </ListItem>
+
+                                            <SubAccordion elevation={0} disableGutters square>
+                                                <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${technique.techniqueId}-type`}>
+                                                        <ListItemText
+                                                            smalltext={props.ordered ? true : false}
+                                                            primary="Type"
+                                                            secondary={technique?.type.title}
+                                                        />
+                                                    </ListItem>
+                                                </AccordionSummary>
+
+                                                <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${technique.techniqueId}-type-description`}>
+                                                        <ListItemText
+                                                            smalltext={props.ordered ? true : false}
+                                                            secondary={technique?.type.description} />
+                                                    </ListItem>
+                                                </AccordionDetails>
+                                            </SubAccordion>
+
+                                            {technique?.openGuard && (
+                                                <SubAccordion elevation={0} disableGutters square>
+                                                    <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                        <ListItem key={`${technique.techniqueId}-open-guard`}>
+                                                            <ListItemText
+                                                                smalltext={props.ordered ? true : false}
+                                                                primary="Open Guard"
+                                                                secondary={technique?.openGuard?.title}
+                                                            />
+                                                        </ListItem>
+                                                    </AccordionSummary>
+
+                                                    <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                                        <ListItem key={`${technique.techniqueId}-open-guard-description`}>
+                                                            <ListItemText
+                                                                smalltext={props.ordered ? true : false}
+                                                                secondary={technique?.openGuard?.description} />
+                                                        </ListItem>
+                                                    </AccordionDetails>
+                                                </SubAccordion>
+                                            )}
+
+                                            <ListItem key={`${technique.techniqueId}-gi`}>
+                                                <ListItemText
+                                                    smalltext={props.ordered ? true : false}
+                                                    primary="Gi or No Gi"
+                                                    secondary={technique?.gi}
+                                                />
+                                            </ListItem>
+                                        </SubCard>
+                                    </AccordionDetails>
+                                </Accordion>
+                            )
+                        })
+                        : isError &&
+                        <CardContent>
+                            <Typography>{`Failed to fetch techniques: ${error}`}</Typography>
+                        </CardContent>
+            }
+        </>
     )
 }
 

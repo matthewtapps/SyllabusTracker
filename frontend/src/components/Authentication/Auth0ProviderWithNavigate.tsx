@@ -3,39 +3,39 @@ import React, { PropsWithChildren } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface Auth0ProviderWithNavigateProps {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }
 
 export const Auth0ProviderWithNavigate = ({
-  children,
+    children,
 }: PropsWithChildren<Auth0ProviderWithNavigateProps>): JSX.Element | null => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const domain = process.env.REACT_APP_AUTH0_DOMAIN;
-  const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
-  const redirectUri = process.env.REACT_APP_AUTH0_CALLBACK_URL;
-  const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
+    const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+    const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
+    const redirectUri = process.env.REACT_APP_AUTH0_CALLBACK_URL;
+    const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
 
-  const onRedirectCallback = (appState?: AppState) => {
-    navigate(appState?.returnTo || window.location.pathname);
-  };
+    const onRedirectCallback = (appState?: AppState) => {
+        navigate(appState?.returnTo || window.location.pathname);
+    };
 
-  if (!(domain && clientId && redirectUri)) {
-    return null;
-  }
+    if (!(domain && clientId && redirectUri)) {
+        return null;
+    }
 
-  return (
-    <Auth0Provider
-      domain={domain}
-      clientId={clientId}
-      authorizationParams={{
-        redirect_uri: redirectUri,
-        audience: audience
-      }}
-      onRedirectCallback={onRedirectCallback}
-      useRefreshTokens={true}
-    >
-      {children}
-    </Auth0Provider>
-  );
+    return (
+        <Auth0Provider
+            domain={domain}
+            clientId={clientId}
+            authorizationParams={{
+                redirect_uri: redirectUri,
+                audience: audience
+            }}
+            onRedirectCallback={onRedirectCallback}
+            useRefreshTokens={true}
+        >
+            {children}
+        </Auth0Provider>
+    );
 };

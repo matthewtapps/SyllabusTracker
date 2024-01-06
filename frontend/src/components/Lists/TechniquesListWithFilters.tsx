@@ -1,8 +1,8 @@
-import { Box, CardContent, CircularProgress, Typography, styled } from "@mui/material";
+import { CardContent, Typography, styled } from "@mui/material";
 import MuiCard from '@mui/material/Card';
 import { Technique } from "common";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { useGetTechniquesQuery } from "../../services/syllabusTrackerApi";
+import Pageloader from "../Base/PageLoader";
 import TechniqueList from "./Base Lists/TechniqueList";
 import TechniqueFilter, { useHandleTechniqueFilterChange } from "./List Filters/TechniqueFilter";
 
@@ -29,9 +29,9 @@ TechniqueListWithFilters.defaultProps = {
 }
 
 export function TechniqueListWithFilters(props: TechniqueListWithFiltersProps): JSX.Element {
-    const { techniques, techniquesLoading, checkingAge } = useSelector((state: RootState) => state.techniques);
+    const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange()
 
-    const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange(techniques)
+    const { isLoading, isSuccess, error } = useGetTechniquesQuery()
 
     return (
         <>
@@ -41,21 +41,18 @@ export function TechniqueListWithFilters(props: TechniqueListWithFiltersProps): 
                 />
             </Card>
             <Card>
-                {(techniquesLoading || checkingAge) ? (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-                        <CircularProgress />
-                    </Box>
-                ) : filteredTechniques.length === 0 ? (
-                    <CardContent>
-                        <Typography>No techniques for current filters</Typography>
-                    </CardContent>
-                ) : (
-                    <TechniqueList
-                        filteredTechniques={filteredTechniques}
-                        editable={props.editable}
-                        onEditClick={props.onTechniqueEditClick}
-                    />
-                )}
+                {isLoading ? <Pageloader />
+                    : isSuccess ?
+                        <TechniqueList
+                            filteredTechniques={filteredTechniques}
+                            editable={props.editable}
+                            onEditClick={props.onTechniqueEditClick}
+                        />
+                        :
+                        <CardContent>
+                            <Typography>{`Failed to fetch techniques: ${error}`}</Typography>
+                        </CardContent>
+                }
             </Card>
         </>
     )

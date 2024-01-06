@@ -8,6 +8,7 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
+import { Descriptions } from 'common';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -31,7 +32,7 @@ const AccordionDetails = styled(MuiAccordionDetails)({
 })
 
 type TextFieldWithDescriptionFieldProps = {
-    name: string,
+    name: 'type' | 'position' | 'openGuard',
     wasSubmitted: boolean,
     required: boolean,
     options: string[] | undefined,
@@ -54,14 +55,6 @@ TextFieldWithDescriptionField.defaultProps = {
     descriptionDefaultValue: undefined,
 }
 
-interface DescriptionMap {
-    [key: string]: string | undefined;
-}
-
-interface Descriptions {
-    [key: string]: DescriptionMap;
-}
-
 export function TextFieldWithDescriptionField({ name, wasSubmitted, required, options, descriptions, descriptionLabel, hidden, disabled, onPositionBlur, defaultValue, descriptionDefaultValue, ...otherProps }: TextFieldWithDescriptionFieldProps) {
     const [titleValue, setTitleValue] = React.useState(defaultValue || '');
     const [descriptionValue, setDescriptionValue] = React.useState(descriptionDefaultValue || '');
@@ -74,7 +67,7 @@ export function TextFieldWithDescriptionField({ name, wasSubmitted, required, op
     const handleTitleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         setTouched(true);
         setTitleValue(event.target.value || '');
-        setDescriptionValue((event.target.value && descriptions[name][event.target.value]) || '');
+        setDescriptionValue((event.target.value && descriptions[name][event.target.value].description) || '');
         if (onPositionBlur) onPositionBlur(event);
     };
 

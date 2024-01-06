@@ -14,6 +14,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import StudentTechniqueList from './StudentTechniqueList';
 import { ProgressBarIcon } from '../../Buttons/ProgressBarIcon';
+import { User } from '@auth0/auth0-react';
+import { useGetSelectedStudentTechniquesQuery } from '../../../services/syllabusTrackerApi';
+import Pageloader from '../../Base/PageLoader';
+import { CardContent } from '@mui/material';
 
 
 const Accordion = styled(MuiAccordion)({
@@ -73,6 +77,7 @@ interface StudentCollectionsListProps {
     filteredCollections: Collection[];
     elevation: number;
     editable: boolean;
+    selectedStudent: User;
 }
 
 StudentCollectionList.defaultProps = {
@@ -81,133 +86,143 @@ StudentCollectionList.defaultProps = {
 }
 
 function StudentCollectionList(props: StudentCollectionsListProps): JSX.Element {
+    const selectedStudent = props.selectedStudent
 
-    const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
+    const { data: selectedStudentTechniques, isLoading, isSuccess, error } = useGetSelectedStudentTechniquesQuery(selectedStudent.user_id)
 
     const fetchStatuses = (techniques: Technique[]): TechniqueStatus[] => {
-        const techniqueStatuses = techniques.map(technique => {
-            const matchingTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
-            return matchingTechnique ? matchingTechnique.status : TechniqueStatus.NotYetStarted;
-        }).filter(status => status !== null);
+        if (isSuccess) {
+            const techniqueStatuses = techniques.map(technique => {
+                const matchingTechnique = selectedStudentTechniques.find(st => st.technique.techniqueId === technique.techniqueId);
+                return matchingTechnique ? matchingTechnique.status : TechniqueStatus.NotYetStarted;
+            }).filter(status => status !== null);
 
-        return techniqueStatuses
+            return techniqueStatuses
+        } else return []
     }
 
     return (
-        <div>
-            {props.filteredCollections.map(collection => {
-                let unsortedTechniques: CollectionTechnique[] = []
-                if (collection.collectionTechniques) {
-                    unsortedTechniques = [...collection.collectionTechniques];
-                }
-                let collectionTechniques: Technique[] = []
-                unsortedTechniques.sort((a, b) => a.order - b.order)
-                unsortedTechniques.forEach(collectionTechnique => {
-                    collectionTechniques.push(collectionTechnique.technique)
-                });
-                return (
-                    <Accordion disableGutters elevation={props.elevation} key={collection.collectionId}>
-                        <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content">
-                            <Box display="flex" flexDirection="row" flexGrow={1} alignItems="center" justifyContent="space-between" maxWidth="97%">
-                                <Typography variant="h6">{collection.title}</Typography>
-                                    <ProgressBarIcon statuses={fetchStatuses(collectionTechniques)}
-                                    />
-                            </Box>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <SubCard elevation={0}>
-                                <SubAccordion elevation={0} disableGutters square defaultExpanded>
-                                    <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                        <ListItem key={`${collection.collectionId}-collection-techniques`}>
-                                            <ListItemText primary="Collection Techniques" />
-                                        </ListItem>
-                                    </AccordionSummary>
-                                    <AccordionDetails sx={{ padding: "0px" }}>
-                                        <StudentTechniqueList
-                                            filteredTechniques={collectionTechniques}
-                                            elevation={0}
-                                            ordered
-                                            editable={props.editable}
+        <>
+            {isLoading ? <CardContent><Pageloader /></CardContent>
+                : isSuccess ?
+                    props.filteredCollections.map(collection => {
+                        let unsortedTechniques: CollectionTechnique[] = []
+                        if (collection.collectionTechniques) {
+                            unsortedTechniques = [...collection.collectionTechniques];
+                        }
+                        let collectionTechniques: Technique[] = []
+                        unsortedTechniques.sort((a, b) => a.order - b.order)
+                        unsortedTechniques.forEach(collectionTechnique => {
+                            collectionTechniques.push(collectionTechnique.technique)
+                        });
+                        return (
+                            <Accordion disableGutters elevation={props.elevation} key={collection.collectionId}>
+                                <AccordionSummary expandIcon={<ExpandMore />} aria-controls="panel1a-content">
+                                    <Box display="flex" flexDirection="row" flexGrow={1} alignItems="center" justifyContent="space-between" maxWidth="97%">
+                                        <Typography variant="h6">{collection.title}</Typography>
+                                        <ProgressBarIcon statuses={fetchStatuses(collectionTechniques)}
                                         />
-                                    </AccordionDetails>
-                                </SubAccordion>
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <SubCard elevation={0}>
+                                        <SubAccordion elevation={0} disableGutters square defaultExpanded>
+                                            <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                <ListItem key={`${collection.collectionId}-collection-techniques`}>
+                                                    <ListItemText primary="Collection Techniques" />
+                                                </ListItem>
+                                            </AccordionSummary>
+                                            <AccordionDetails sx={{ padding: "0px" }}>
+                                                <StudentTechniqueList
+                                                    filteredTechniques={collectionTechniques}
+                                                    elevation={0}
+                                                    ordered
+                                                    editable={props.editable}
+                                                    selectedStudent={selectedStudent}
+                                                />
+                                            </AccordionDetails>
+                                        </SubAccordion>
 
-                                <ListItem key={`${collection.collectionId}-description`}>
-                                    <ListItemText primary="Description" secondary={collection?.description} />
-                                </ListItem>
+                                        <ListItem key={`${collection.collectionId}-description`}>
+                                            <ListItemText primary="Description" secondary={collection?.description} />
+                                        </ListItem>
 
-                                {collection.globalNotes && (
-                                    <ListItem key={`${collection.collectionId}-global-notes`}>
-                                        <ListItemText primary="Global Notes" secondary={collection.globalNotes} />
-                                    </ListItem>
-                                )}
-
-                                {collection.position && (
-                                    <SubAccordion elevation={0} disableGutters square>
-                                        <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${collection.collectionId}-position`}>
-                                                <ListItemText primary="Position" secondary={collection.position?.title} />
+                                        {collection.globalNotes && (
+                                            <ListItem key={`${collection.collectionId}-global-notes`}>
+                                                <ListItemText primary="Global Notes" secondary={collection.globalNotes} />
                                             </ListItem>
-                                        </AccordionSummary>
+                                        )}
 
-                                        <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${collection.collectionId}-position-description`}>
-                                                <ListItemText secondary={collection.position?.description} />
+                                        {collection.position && (
+                                            <SubAccordion elevation={0} disableGutters square>
+                                                <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${collection.collectionId}-position`}>
+                                                        <ListItemText primary="Position" secondary={collection.position?.title} />
+                                                    </ListItem>
+                                                </AccordionSummary>
+
+                                                <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${collection.collectionId}-position-description`}>
+                                                        <ListItemText secondary={collection.position?.description} />
+                                                    </ListItem>
+                                                </AccordionDetails>
+                                            </SubAccordion>
+                                        )}
+
+                                        {collection.hierarchy && (
+                                            <ListItem key={`${collection.collectionId}-hierarchy`}>
+                                                <ListItemText primary=" Hierarchy" secondary={collection.hierarchy} />
                                             </ListItem>
-                                        </AccordionDetails>
-                                    </SubAccordion>
-                                )}
+                                        )}
 
-                                {collection.hierarchy && (
-                                    <ListItem key={`${collection.collectionId}-hierarchy`}>
-                                        <ListItemText primary=" Hierarchy" secondary={collection.hierarchy} />
-                                    </ListItem>
-                                )}
+                                        {collection.type && (
+                                            <SubAccordion elevation={0} disableGutters square>
+                                                <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${collection.collectionId}-type`}>
+                                                        <ListItemText primary="Type" secondary={collection.type?.title} />
+                                                    </ListItem>
+                                                </AccordionSummary>
 
-                                {collection.type && (
-                                    <SubAccordion elevation={0} disableGutters square>
-                                        <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${collection.collectionId}-type`}>
-                                                <ListItemText primary="Type" secondary={collection.type?.title} />
+                                                <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${collection.collectionId}-type-description`}>
+                                                        <ListItemText secondary={collection.type?.description} />
+                                                    </ListItem>
+                                                </AccordionDetails>
+                                            </SubAccordion>
+                                        )}
+
+                                        {collection.openGuard && (
+                                            <SubAccordion elevation={0} disableGutters square>
+                                                <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${collection.collectionId}-open-guard`}>
+                                                        <ListItemText primary="Open Guard" secondary={collection.openGuard?.title} />
+                                                    </ListItem>
+                                                </AccordionSummary>
+
+                                                <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
+                                                    <ListItem key={`${collection.collectionId}-open-guard-description`}>
+                                                        <ListItemText secondary={collection.openGuard?.description} />
+                                                    </ListItem>
+                                                </AccordionDetails>
+                                            </SubAccordion>
+                                        )}
+
+                                        {(collection.gi) && (
+                                            <ListItem key={`${collection.collectionId}-gi`}>
+                                                <ListItemText primary="Gi or No Gi" secondary={collection.gi} />
                                             </ListItem>
-                                        </AccordionSummary>
+                                        )}
 
-                                        <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${collection.collectionId}-type-description`}>
-                                                <ListItemText secondary={collection.type?.description} />
-                                            </ListItem>
-                                        </AccordionDetails>
-                                    </SubAccordion>
-                                )}
-
-                                {collection.openGuard && (
-                                    <SubAccordion elevation={0} disableGutters square>
-                                        <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${collection.collectionId}-open-guard`}>
-                                                <ListItemText primary="Open Guard" secondary={collection.openGuard?.title} />
-                                            </ListItem>
-                                        </AccordionSummary>
-
-                                        <AccordionDetails sx={{ padding: "0px", margin: "0px" }}>
-                                            <ListItem key={`${collection.collectionId}-open-guard-description`}>
-                                                <ListItemText secondary={collection.openGuard?.description} />
-                                            </ListItem>
-                                        </AccordionDetails>
-                                    </SubAccordion>
-                                )}
-
-                                {(collection.gi) && (
-                                    <ListItem key={`${collection.collectionId}-gi`}>
-                                        <ListItemText primary="Gi or No Gi" secondary={collection.gi} />
-                                    </ListItem>
-                                )}
-
-                            </SubCard>
-                        </AccordionDetails>
-                    </Accordion>
-                )
-            })}
-        </div>
+                                    </SubCard>
+                                </AccordionDetails>
+                            </Accordion>
+                        )
+                    })
+                    : <CardContent>
+                        <Typography>{`Failed to fetch student techniques: ${error}`}</Typography>
+                    </CardContent>
+            }
+        </>
     )
 }
 

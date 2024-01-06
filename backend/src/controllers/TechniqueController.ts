@@ -83,4 +83,25 @@ export class TechniqueController {
             res.status(400).json({ error: error.message })
         }
     }
+
+    static async getDescriptions(req: Request, res: Response) {
+        const techniqueService = new TechniqueService();
+        try {
+            const descriptions = await techniqueService.getDescriptions();
+            res.status(200).json(descriptions)
+        } catch (error) {
+            res.status(400).json({ error: error.message })
+        }
+    }
+
+    static async getSuggestions(req: Request, res: Response) {
+        const techniqueService = new TechniqueService();
+        try {
+            const suggestions = await techniqueService.getSuggestions();
+            res.status(200).json(suggestions)
+        } catch (error) {
+            res.status(400).json({ error: error.message })
+        }
+    }
+
 }

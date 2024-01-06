@@ -1,4 +1,4 @@
-import { NewCollection, UpdateCollection } from 'common';
+import { NewCollection, Suggestions, UpdateCollection } from 'common';
 import { AppDataSource } from '../data-source';
 import { Collection } from '../entities/Collection';
 import { CollectionTechnique } from '../entities/CollectionTechnique';
@@ -208,4 +208,20 @@ export class CollectionService {
         });
         return collectionTechniques
     };
+
+    async getSuggestions(): Promise<Suggestions> {
+        const typeRepo = AppDataSource.getRepository(TechniqueType);
+        const positionRepo = AppDataSource.getRepository(Position);
+        const openGuardRepo = AppDataSource.getRepository(OpenGuard);
+        const collectionRepo = AppDataSource.getRepository(Collection);
+
+        const type = await typeRepo.find({ select: ["title"] }).then(returned => returned.map(type => type.title))
+        const position = await positionRepo.find({ select: ["title"] }).then(returned => returned.map(position => position.title))
+        const openguard = await openGuardRepo.find({ select: ["title"] }).then(returned => returned.map(openGuard => openGuard.title))
+        const title = await collectionRepo.find({ select: ["title"] }).then(returned => returned.map(technique => technique.title))
+
+        return {
+            type, position, openguard, title, gi: ['Yes Gi', 'No Gi', 'Both'], hierarchy: ['Top', 'Bottom']
+        }
+    }
 };

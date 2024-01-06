@@ -1,9 +1,10 @@
-import { Box, CardContent, CircularProgress, Typography, styled } from '@mui/material';
+import { User } from '@auth0/auth0-react';
+import { Box, CardContent, Typography, styled } from '@mui/material';
 import MuiCard from '@mui/material/Card';
 import { Collection, TechniqueStatus } from 'common';
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import React from 'react';
+import { useGetSelectedStudentTechniquesQuery } from '../../services/syllabusTrackerApi';
+import Pageloader from '../Base/PageLoader';
 import StudentCollectionList from './Base Lists/StudentCollectionList';
 import CollectionFilter, { useHandleCollectionFilterChange } from './List Filters/CollectionFilter';
 
@@ -19,6 +20,7 @@ const Card = styled(MuiCard)({
 
 interface StudentCollectionListWithFiltersProps {
     editable: boolean;
+    selectedStudent: User;
 }
 
 StudentCollectionListWithFilters.defaultProps = {
@@ -26,11 +28,10 @@ StudentCollectionListWithFilters.defaultProps = {
 }
 
 export function StudentCollectionListWithFilters(props: StudentCollectionListWithFiltersProps): JSX.Element {
-    const [placeholderContent, setPlaceholderContent] = useState('');
-    const { collections, loading } = useSelector((state: RootState) => state.collections);
-    const { selectedStudentTechniques } = useSelector((state: RootState) => state.student);
+    const selectedStudent = props.selectedStudent
+    const { data: selectedStudentTechniques, isLoading, isSuccess, isError, error } = useGetSelectedStudentTechniquesQuery(selectedStudent.user_id)
 
-    const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collections);
+    const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange();
 
     const [showAssignedCollections, setShowAssignedCollections] = React.useState(false)
 
@@ -41,28 +42,25 @@ export function StudentCollectionListWithFilters(props: StudentCollectionListWit
     const [assignedFilteredCollections, setAssignedFilteredCollections] = React.useState<Collection[]>([]);
 
     React.useEffect(() => {
-        const filterCollectionsByAssignedTechniques = () => {
-            const assignedCollections = filteredCollections.filter(collection =>
-                collection.collectionTechniques && collection.collectionTechniques.length > 0 &&
-                collection.collectionTechniques.some(collectionTechnique =>
-                    selectedStudentTechniques.some(studentTechnique =>
-                        studentTechnique.technique.techniqueId === collectionTechnique.technique.techniqueId &&
-                        (studentTechnique.status === TechniqueStatus.NotYetStarted ||
-                            studentTechnique.status === TechniqueStatus.Started ||
-                            studentTechnique.status === TechniqueStatus.Passed)
+        if (isSuccess) {
+            const filterCollectionsByAssignedTechniques = () => {
+                const assignedCollections = filteredCollections.filter(collection =>
+                    collection.collectionTechniques && collection.collectionTechniques.length > 0 &&
+                    collection.collectionTechniques.some(collectionTechnique =>
+                        selectedStudentTechniques.some(studentTechnique =>
+                            studentTechnique.technique.techniqueId === collectionTechnique.technique.techniqueId &&
+                            (studentTechnique.status === TechniqueStatus.NotYetStarted ||
+                                studentTechnique.status === TechniqueStatus.Started ||
+                                studentTechnique.status === TechniqueStatus.Passed)
+                        )
                     )
-                )
-            );
-            setAssignedFilteredCollections(assignedCollections)
-        };
+                );
+                setAssignedFilteredCollections(assignedCollections)
+            };
 
-        filterCollectionsByAssignedTechniques();
-    }, [filteredCollections, selectedStudentTechniques]);
-
-    React.useEffect(() => {
-        showAssignedCollections ? setPlaceholderContent('No assigned collections with current filters')
-            : setPlaceholderContent('No collections with current filters')
-    }, [showAssignedCollections])
+            filterCollectionsByAssignedTechniques();
+        }
+    }, [filteredCollections, selectedStudentTechniques, isSuccess]);
 
     return (
         <>
@@ -74,22 +72,24 @@ export function StudentCollectionListWithFilters(props: StudentCollectionListWit
                 />
             </Card>
             <Card>
-                {loading ? (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-                        <CircularProgress />
-                    </Box>
-                ) : filteredCollections.length === 0 ? (
-                    <CardContent>
-                        <Typography>{placeholderContent || (<CircularProgress />)}</Typography>
-                    </CardContent>
-                ) : (
-                    <Box>
-                        <StudentCollectionList
-                            filteredCollections={showAssignedCollections ? assignedFilteredCollections : filteredCollections}
-                            editable={props.editable}
-                        />
-                    </Box>
-                )}
+                {isLoading ? <Pageloader />
+                    : isSuccess ?
+                        <Box>
+                            <StudentCollectionList
+                                filteredCollections={showAssignedCollections ? assignedFilteredCollections : filteredCollections}
+                                editable={props.editable}
+                                selectedStudent={selectedStudent}
+                            />
+                        </Box>
+                        : isError ?
+                            <CardContent>
+                                <Typography>{`Failed to fetch selected student collections: ${error}`}</Typography>
+                            </CardContent>
+                            :
+                            <CardContent>
+                                <Typography>No collections available for selected filters.</Typography>
+                            </CardContent>
+                }
             </Card>
         </>
     )

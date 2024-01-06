@@ -1,15 +1,16 @@
 import { User } from '@auth0/auth0-react';
 import MuiCard from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Pageloader from '../../../components/Base/PageLoader';
 import StudentList from '../../../components/Lists/Base Lists/StudentList';
-import { fetchStudentsAsync, selectStudent } from '../../../slices/student';
-import { AppDispatch, RootState } from '../../../store/store';
+import { useGetStudentsQuery } from '../../../services/syllabusTrackerApi';
+import { selectStudent } from '../../../slices/student';
+import { AppDispatch } from '../../../store/store';
 
 
 const Card = styled(MuiCard)({
@@ -30,21 +31,14 @@ const CoachStudents: React.FC = () => {
         navigate('/student')
     }
 
-    const { students, loading } = useSelector((state: RootState) => state.student)
-
-    React.useEffect(() => {
-        if (students.length < 1) {
-            dispatch(fetchStudentsAsync());
-        };
-    },[dispatch, students]);
+    const { data: students, isLoading, isSuccess, error } = useGetStudentsQuery()
 
     return (
         <div>
-            {!loading ?
-                students.length > 0 ?
-                    <Card><StudentList students={students} onSelectStudent={handleNavigateToSelectedStudentHome} /></Card>
-                    : <Card><CardContent><Typography>Empty student data received (this probably shouldn't happen)</Typography></CardContent></Card>
-                : <Card><Pageloader/></Card>}
+            {isLoading ? <Card><Pageloader /></Card>
+                : isSuccess ? <Card><StudentList students={students} onSelectStudent={handleNavigateToSelectedStudentHome} /></Card>
+                    : <Card><CardContent><Typography>{`Student data failed to fetch: ${error}`}</Typography></CardContent></Card>
+            }
         </div>
     )
 }

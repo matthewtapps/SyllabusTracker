@@ -1,4 +1,4 @@
-import { NewTechnique, UpdateTechnique } from 'common';
+import { NewTechnique, Suggestions, UpdateTechnique } from 'common';
 import { AppDataSource } from '../data-source';
 import { CollectionTechnique } from '../entities/CollectionTechnique';
 import { OpenGuard } from '../entities/OpenGuard';
@@ -6,6 +6,8 @@ import { Position } from '../entities/Position';
 import { Technique } from '../entities/Technique';
 import { TechniqueType } from '../entities/TechniqueType';
 import { StudentTechnique } from '../entities/StudentTechnique';
+import { Descriptions } from 'common';
+
 
 export class TechniqueService {
     async createTechnique(newTechnique: NewTechnique): Promise<Technique> {
@@ -168,4 +170,48 @@ export class TechniqueService {
         const openGuardRepo = AppDataSource.getRepository(OpenGuard);
         return await openGuardRepo.find({ select: ["title", "description"] })
     };
+
+    async getDescriptions(): Promise<Descriptions> {
+        const typeRepo = AppDataSource.getRepository(TechniqueType);
+        const positionRepo = AppDataSource.getRepository(Position);
+        const openGuardRepo = AppDataSource.getRepository(OpenGuard);
+        
+        const types = await typeRepo.find({ select: ["title", "description"] })
+        const positions = await positionRepo.find({ select: ["title", "description"] })
+        const openGuards = await openGuardRepo.find({ select: ["title", "description"] })
+
+        let descriptions: Descriptions = {
+            position: {},
+            type: {},
+            openGuard: {}
+        };
+
+        positions.forEach(position => {
+            descriptions.position[position.title] = {description: position.description, id: position.positionId};
+        });
+        types.forEach(type => {
+            descriptions.type[type.title] = {description: type.description, id: type.typeId};
+        });
+        openGuards.forEach(openGuard => {
+            descriptions.openGuard[openGuard.title] = {description: openGuard.description, id: openGuard.openGuardId};
+        });
+
+        return descriptions
+    };
+
+    async getSuggestions(): Promise<Suggestions> {
+        const typeRepo = AppDataSource.getRepository(TechniqueType);
+        const positionRepo = AppDataSource.getRepository(Position);
+        const openGuardRepo = AppDataSource.getRepository(OpenGuard);
+        const techniqueRepo = AppDataSource.getRepository(Technique);
+
+        const type = await typeRepo.find({ select: ["title"] }).then(returned => returned.map(type => type.title))
+        const position = await positionRepo.find({ select: ["title"] }).then(returned => returned.map(position => position.title))
+        const openguard = await openGuardRepo.find({ select: ["title"] }).then(returned => returned.map(openGuard => openGuard.title))
+        const title = await techniqueRepo.find({ select: ["title"] }).then(returned => returned.map(technique => technique.title))
+
+        return {
+            type, position, openguard, title, gi: ['Yes Gi', 'No Gi', 'Both'], hierarchy: ['Top', 'Bottom']
+        }
+    }
 };

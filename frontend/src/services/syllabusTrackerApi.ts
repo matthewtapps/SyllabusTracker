@@ -1,8 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { Collection, CollectionSet, CollectionTechnique, StudentTechnique, Technique, TechniqueStatus } from 'common'
+import { Collection, CollectionSet, CollectionTechnique, Descriptions, StudentTechnique, Suggestions, Technique, TechniqueStatus } from 'common'
 import { RootState } from '../store/store'
-import { User } from '@auth0/auth0-react'
+import { User as Auth0User } from '@auth0/auth0-react'
+import { sec } from '../store/security';
 
+
+interface User extends Auth0User {
+    user_id: string | undefined;
+}
 
 const baseUrl = `${process.env.REACT_APP_API_SERVER_URL}`
 if (!baseUrl) throw new Error(`Error with baseURL - is env variable set?`)
@@ -11,14 +16,27 @@ export const syllabusTrackerApi = createApi({
     reducerPath: 'syllabbusTrackerApi',
     baseQuery: fetchBaseQuery({
         baseUrl: baseUrl,
-        prepareHeaders: (headers, { getState }) => {
-            const token = (getState() as RootState).auth.accessToken
+        prepareHeaders: async (headers, { getState }) => {
+            const token = await sec.getAccessTokenSilently()();
             if (token) { headers.set('Authorization', `Bearer ${token}`) }
             headers.set('Content-Type', 'application/json')
             return headers
         }
     }),
-    tagTypes: ['Techniques', 'Types', 'Positions', 'OpenGuards', 'Collections', 'CollectionTechniques', 'Students', 'StudentTechniques', 'CollectionSets'],
+    tagTypes: [
+        'Techniques',
+        'Types',
+        'Positions',
+        'OpenGuards',
+        'Collections',
+        'CollectionTechniques',
+        'Students',
+        'StudentTechniques',
+        'CollectionSets',
+        'Descriptions',
+        'TechniqueSuggestions',
+        'CollectionSuggestions'
+    ],
     endpoints: (build) => ({
         // Technique queries and mutations
         getTechniques: build.query<Technique[], void>({
@@ -37,7 +55,7 @@ export const syllabusTrackerApi = createApi({
                 method: 'POST',
                 body: technique
             }),
-            invalidatesTags: [{ type: 'Techniques', id: 'LIST' }]
+            invalidatesTags: [{ type: 'Techniques', id: 'LIST' }, 'Descriptions']
         }),
         editTechnique: build.mutation<Technique, Partial<Technique>>({
             query: technique => ({
@@ -49,7 +67,8 @@ export const syllabusTrackerApi = createApi({
                 { type: 'Techniques', id: 'LIST' },
                 { type: 'Types', id: 'LIST' },
                 { type: 'Positions', id: 'LIST' },
-                { type: 'OpenGuards', id: 'LIST' }
+                { type: 'OpenGuards', id: 'LIST' },
+                'Descriptions'
             ]
         }),
         deleteTechnique: build.mutation<void, string>({
@@ -117,7 +136,8 @@ export const syllabusTrackerApi = createApi({
                 { type: 'Collections', id: 'LIST' },
                 { type: 'Types', id: 'LIST' },
                 { type: 'Positions', id: 'LIST' },
-                { type: 'OpenGuards', id: 'LIST' }
+                { type: 'OpenGuards', id: 'LIST' },
+                'Descriptions'
             ]
         }),
         editCollection: build.mutation<Collection, Partial<Collection>>({
@@ -130,7 +150,8 @@ export const syllabusTrackerApi = createApi({
                 { type: 'Collections', id: 'LIST' },
                 { type: 'Types', id: 'LIST' },
                 { type: 'Positions', id: 'LIST' },
-                { type: 'OpenGuards', id: 'LIST' }
+                { type: 'OpenGuards', id: 'LIST' },
+                'Descriptions'
             ]
         }),
         deleteCollection: build.mutation<void, string>({
@@ -174,7 +195,8 @@ export const syllabusTrackerApi = createApi({
                 return response.map(user => {
                     return {
                         ...user,
-                        sub: user.sub?.replace("auth0|", "")
+                        sub:  user.user_id?.replace("auth0|", "") || user.sub?.replace("auth0|", ""),
+                        user_id:  user.user_id?.replace("auth0|", "") || user.sub?.replace("auth0|", "")
                     }
                 })
             },
@@ -275,8 +297,70 @@ export const syllabusTrackerApi = createApi({
             invalidatesTags: [
                 { type: 'CollectionSets', id: 'LIST' },
             ]
-        })
+        }),
+
+        // Descriptions query
+        getDescriptions: build.query<Descriptions, void>({
+            query: () => `technique/descriptions`,
+            providesTags: ['Descriptions']
+        }),
+
+        // Technique suggestions query
+        getTechniqueSuggestions: build.query<Suggestions, void>({
+            query: () => `technique/suggestions`,
+            providesTags: ['TechniqueSuggestions']
+        }),
+
+        // Collection suggestions query
+        getCollectionSuggestions: build.query<Suggestions, void>({
+            query: () => `collection/suggestions`,
+            providesTags: ['CollectionSuggestions']
+        }),
+
     }),
 })
 
-export const { useGetCollectionSetsQuery } = syllabusTrackerApi
+export const {
+    // Techniques exports
+    useGetTechniquesQuery,
+    useEditTechniqueMutation,
+    usePostNewTechniqueMutation,
+    useDeleteTechniqueMutation,
+
+    // Additional technique information exports
+    useGetTypesQuery,
+    useGetPositionsQuery,
+    useGetOpenGuardsQuery,
+
+    // Collections exports
+    useGetCollectionsQuery,
+    useEditCollectionMutation,
+    usePostNewCollectionMutation,
+    useDeleteCollectionMutation,
+
+    // Collection technique exports
+    useGetCollectionTechniquesQuery,
+    useSetCollectionTechniquesMutation,
+
+    // Student exports
+    useGetStudentsQuery,
+    useGetSelectedStudentTechniquesQuery,
+    useGetAllStudentTechniquesQuery,
+    useEditStudentTechniqueMutation,
+    useDeleteStudentTechniqueMutation,
+    usePostStudentTechniquesMutation,
+
+    // Collection set exports
+    useGetCollectionSetsQuery,
+    useEditCollectionSetMutation,
+    usePostCollectionSetMutation,
+    useDeleteCollectionSetMutation,
+
+    // Descriptions exports
+    useGetDescriptionsQuery,
+
+    // Suggestions exports
+    useGetCollectionSuggestionsQuery,
+    useGetTechniqueSuggestionsQuery
+
+} = syllabusTrackerApi

@@ -74,4 +74,15 @@ export class CollectionController {
             res.status(400).json({error: error.message})
         }
     }
+
+    static async getSuggestions(req: Request, res: Response) {
+        const collectionService = new CollectionService();
+        try {
+            const suggestions = await collectionService.getSuggestions();
+            res.status(200).json(suggestions)
+        } catch (error) {
+            res.status(400).json({ error: error.message })
+        }
+    }
+
 }

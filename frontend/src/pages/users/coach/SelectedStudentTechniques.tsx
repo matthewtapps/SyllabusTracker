@@ -18,6 +18,7 @@ function SelectedStudentTechniques(): JSX.Element {
     return (
         <StudentTechniqueListWithFilters
             editable
+            selectedStudent={selectedStudent!}
         />
     );
 };

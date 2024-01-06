@@ -1,8 +1,8 @@
-import { Box, CardContent, CircularProgress, Typography, styled } from "@mui/material";
+import { Box, CardContent, Typography, styled } from "@mui/material";
 import MuiCard from '@mui/material/Card';
 import { Collection, Technique } from "common";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { useGetCollectionsQuery } from "../../services/syllabusTrackerApi";
+import Pageloader from "../Base/PageLoader";
 import CollectionList from "./Base Lists/CollectionList";
 import CollectionFilter, { useHandleCollectionFilterChange } from "./List Filters/CollectionFilter";
 
@@ -25,11 +25,11 @@ interface CollectionListWithFiltersProps {
     onTechniqueEditClick?: (technique: Technique) => void;
     onCollectionTechniqueEditClick?: (collection: Collection) => void;
     onCollectionEditClick?: (collection: Collection) => void;
-    dragDropTechniques?: {index: number, technique: Technique}[] | null;
-    onReorderDragDropTechniques?: (newOrder: {index: number, technique: Technique}[]) => void;
+    dragDropTechniques?: { index: number, technique: Technique }[] | null;
+    onReorderDragDropTechniques?: (newOrder: { index: number, technique: Technique }[]) => void;
     onDragDropSaveClick?: (collectionId: string) => void;
     onDragDropCancelClick?: () => void;
-    onDragDropDeleteClick?: (deletedTechnique: {index: number, technique: Technique}) => void;
+    onDragDropDeleteClick?: (deletedTechnique: { index: number, technique: Technique }) => void;
     onOpenAddTechniqueDialogue?: () => void;
 }
 
@@ -39,8 +39,9 @@ CollectionListWithFilters.defaultProps = {
 }
 
 export function CollectionListWithFilters(props: CollectionListWithFiltersProps): JSX.Element {
-    const { collections, loading } = useSelector((state: RootState) => state.collections);
-    const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange(collections)
+    const { isLoading, isSuccess, isError, error } = useGetCollectionsQuery()
+
+    const { filteredCollections, handleCollectionFilterChange } = useHandleCollectionFilterChange()
 
     return (
         <>
@@ -50,36 +51,38 @@ export function CollectionListWithFilters(props: CollectionListWithFiltersProps)
                 />
             </Card>
             <Card>
-                {loading ? (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-                        <CircularProgress />
-                    </Box>
-                ) : filteredCollections.length === 0 ? (
-                    <CardContent>
-                        <Typography>No collections available for given filters</Typography>
-                    </CardContent>
-                ) : (
-                    <Box>
-                        <CollectionList
-                            editableCollection={props.editable}
-                            filteredCollections={filteredCollections}
-                            editableTechniques={props.editable}
-                            onTechniqueEditClick={props.onTechniqueEditClick}
-                            editingTechniquesCollection={props.editingTechniquesCollection}
-                            lastAddedCollectionId={props.lastAddedCollectionId}
-                            onAccordionChange={props.onAccordionChange}
-                            onCollectionTechniqueEditClick={props.onCollectionTechniqueEditClick}
-                            onCollectionEditClick={props.onCollectionEditClick}
+                {isLoading ? <Pageloader />
+                    : isSuccess ?
+                        <Box>
+                            <CollectionList
+                                editableCollection={props.editable}
+                                filteredCollections={filteredCollections}
+                                editableTechniques={props.editable}
+                                onTechniqueEditClick={props.onTechniqueEditClick}
+                                editingTechniquesCollection={props.editingTechniquesCollection}
+                                lastAddedCollectionId={props.lastAddedCollectionId}
+                                onAccordionChange={props.onAccordionChange}
+                                onCollectionTechniqueEditClick={props.onCollectionTechniqueEditClick}
+                                onCollectionEditClick={props.onCollectionEditClick}
 
-                            onReorderDragDropTechniques={props.onReorderDragDropTechniques}
-                            dragDropTechniques={props.dragDropTechniques}
-                            onDragDropSaveClick={props.onDragDropSaveClick}
-                            onDragDropCancelClick={props.onDragDropCancelClick}
-                            onAddNewTechniqueClick={props.onOpenAddTechniqueDialogue}
-                            onDragDropDeleteClick={props.onDragDropDeleteClick} />
-                    </Box>
-                )}
+                                onReorderDragDropTechniques={props.onReorderDragDropTechniques}
+                                dragDropTechniques={props.dragDropTechniques}
+                                onDragDropSaveClick={props.onDragDropSaveClick}
+                                onDragDropCancelClick={props.onDragDropCancelClick}
+                                onAddNewTechniqueClick={props.onOpenAddTechniqueDialogue}
+                                onDragDropDeleteClick={props.onDragDropDeleteClick} />
+                        </Box>
+                        : isError ?
+                            <CardContent>
+                                <Typography>{`Failed to fetch collections: ${error}`}</Typography>
+                            </CardContent>
+                            :
+                            <CardContent>
+                                <Typography>No collections available for selected filters.</Typography>
+                            </CardContent>
+                }
             </Card>
         </>
+
     )
 };

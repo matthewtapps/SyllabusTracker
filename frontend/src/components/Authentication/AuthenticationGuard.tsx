@@ -4,19 +4,17 @@ import Pageloader from "../Base/PageLoader";
 
 
 interface AuthenticationGuardProps {
-  component: ComponentType;
+    component: ComponentType;
 }
 
-export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({
-  component,
-}) => {
-  const Component = withAuthenticationRequired(component, {
-    onRedirecting: () => (
-      <div className="page-layout">
-        <Pageloader />
-      </div>
-    ),
-  });
+export const AuthenticationGuard: React.FC<AuthenticationGuardProps> = (props: AuthenticationGuardProps) => {
+    const Component = withAuthenticationRequired(props.component, {
+        onRedirecting: () => (
+            <div className="page-layout">
+                <Pageloader />
+            </div>
+        ),
+    });
 
-  return <Component />;
+    return <Component/>;
 };

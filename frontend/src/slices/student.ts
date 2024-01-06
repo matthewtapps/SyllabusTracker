@@ -2,7 +2,7 @@ import { User } from "@auth0/auth0-react";
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { StudentTechnique, Technique, TechniqueStatus } from "common";
 import { RootState } from "../store/store";
-import { deleteStudentTechnique, fetchStudentTechniques, fetchStudents, postStudentTechniques, stripAuth0FromUserId, updateStudentTechnique } from "../util/Utilities";
+import { deleteStudentTechnique, fetchStudentTechniques, fetchStudents, postStudentTechniques, updateStudentTechnique } from "../util/Utilities";
 
 
 interface StudentState {
@@ -129,17 +129,6 @@ const studentSlice = createSlice({
     reducers: {
         selectStudent: (state, action: PayloadAction<User>) => {
             state.selectedStudent = action.payload
-            if (state.selectedStudent.user_id) {
-                state.selectedStudent = {
-                    ...state.selectedStudent,
-                    user_id: stripAuth0FromUserId(state.selectedStudent.user_id)
-                }
-            } else if (state.selectedStudent.sub) {
-                state.selectedStudent = {
-                    ...state.selectedStudent,
-                    user_id: stripAuth0FromUserId(state.selectedStudent.sub)
-                }
-            } else throw new Error(`Failed to strip user ID from given user object`)
         },
     },
     extraReducers: (builder) => {

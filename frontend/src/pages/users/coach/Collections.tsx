@@ -1,18 +1,15 @@
 import AddIcon from '@mui/icons-material/Add'
+import { Card, CardContent, Typography } from '@mui/material'
 import Fab from '@mui/material/Fab'
 import { Collection, CollectionTechnique, Technique } from 'common'
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import Pageloader from '../../../components/Base/PageLoader'
 import { AddTechniqueToCollectionDialog } from '../../../components/Dialogs/AddTechniqueToCollectionDialog'
 import { EditCollectionDialog } from '../../../components/Dialogs/EditCollectionDialog'
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
 import { NewCollectionDialog } from '../../../components/Dialogs/NewCollectionDialog'
 import { CollectionListWithFilters } from '../../../components/Lists/CollectionListWithFilters'
-import { postCollectionTechniquesAsync } from '../../../slices/collectionTechniques'
-import { deleteCollectionAsync, postCollectionAsync, updateCollectionAsync } from '../../../slices/collections'
-import { updateTechniqueAsync } from '../../../slices/techniques'
-import { AppDispatch, RootState } from '../../../store/store'
+import { useDeleteCollectionMutation, useEditCollectionMutation, useEditTechniqueMutation, useGetCollectionTechniquesQuery, usePostNewCollectionMutation, useSetCollectionTechniquesMutation } from '../../../services/syllabusTrackerApi'
 import { transformCollectionForPost, transformCollectionForPut, transformTechniqueForPut } from '../../../util/Utilities'
 
 
@@ -47,9 +44,12 @@ const emptyTechniqueDTO: TechniqueDTO = {
 }
 
 function CoachCollections(): JSX.Element {
-    const dispatch = useDispatch<AppDispatch>();
-
-    const { collectionTechniques } = useSelector((state: RootState) => state.collectionTechniques)
+    const { data: collectionTechniques, isLoading, isSuccess, error } = useGetCollectionTechniquesQuery()
+    const [postCollectionTechniques] = useSetCollectionTechniquesMutation()
+    const [updateCollection] = useEditCollectionMutation()
+    const [deleteCollection] = useDeleteCollectionMutation()
+    const [editTechnique] = useEditTechniqueMutation()
+    const [postCollection] = usePostNewCollectionMutation()
 
     // Technique editing states for in-place technique editing
     const [editingTechniqueId, setEditingTechniqueId] = React.useState<string>("");
@@ -119,7 +119,7 @@ function CoachCollections(): JSX.Element {
         const fieldValues = Object.fromEntries(formData.entries())
         const validTechnique = transformTechniqueForPut(fieldValues);
 
-        dispatch(updateTechniqueAsync(validTechnique))
+        editTechnique(validTechnique)
         setEditingTechniqueDialogOpen(false);
         setShowNewCollectionFab(true);
     }
@@ -164,11 +164,10 @@ function CoachCollections(): JSX.Element {
     }
 
     const handleDragDropSaveClick = async (collectionId: string) => {
-        dispatch(postCollectionTechniquesAsync({
+        postCollectionTechniques({
             collectionId: collectionId,
             collectionTechniques: dragDropTechniques
-        }))
-
+        })
         setEditingTechniquesCollection(null);
         setDragDropTechniques([]);
         setShowNewCollectionFab(true)
@@ -208,13 +207,13 @@ function CoachCollections(): JSX.Element {
         }
         const validCollection = transformCollectionForPut(fieldValuesWithId);
 
-        dispatch(updateCollectionAsync(validCollection))
+        updateCollection(validCollection)
         setEditingCollectionDialogOpen(false);
         setShowNewCollectionFab(true);
     }
 
     const handleCollectionDeleteClick = () => {
-        dispatch(deleteCollectionAsync(editingCollectionId))
+        deleteCollection(editingCollectionId)
         setEditingCollectionDialogOpen(false);
         setShowNewCollectionFab(true);
     };
@@ -238,7 +237,7 @@ function CoachCollections(): JSX.Element {
         const fieldValues = Object.fromEntries(formData.entries())
         const validCollection = transformCollectionForPost(fieldValues);
 
-        dispatch(postCollectionAsync(validCollection))
+        await postCollection(validCollection)
             .unwrap()
             .then(postedCollection => {
                 setNewCollectionDialogOpen(false);
@@ -254,25 +253,11 @@ function CoachCollections(): JSX.Element {
         setLastAddedCollectionId(null);
     }
 
-    const { loading } = useSelector((state: RootState) => state.collections)
-    const { collectionSuggestionsLoading } = useSelector((state: RootState) => state.suggestions)
-    const { techniqueSuggestionsLoading } = useSelector((state: RootState) => state.suggestions)
-    const { techniquesLoading } = useSelector((state: RootState) => state.techniques)
-    const { loading: descriptionsLoading } = useSelector((state: RootState) => state.descriptions)
-    const { loading: selectedStudentTechniquesLoading } = useSelector((state: RootState) => state.student)
-    const { loading: collectionTechniquesLoading } = useSelector((state: RootState) => state.collectionTechniques)
-
     return (
         <div>
-            {(loading ||
-                collectionSuggestionsLoading ||
-                techniqueSuggestionsLoading ||
-                techniquesLoading ||
-                descriptionsLoading ||
-                selectedStudentTechniquesLoading ||
-                collectionTechniquesLoading)
+            {isLoading
                 ? <Pageloader />
-                : (
+                : isSuccess ?
                     <>
                         <CollectionListWithFilters
                             editable
@@ -336,7 +321,8 @@ function CoachCollections(): JSX.Element {
                             </Fab>
                         )}
                     </>
-                )}
+                    : <Card><CardContent><Typography>{`Collection technique data failed to fetch: ${error}`}</Typography></CardContent></Card>
+            }
         </div>
     );
 };

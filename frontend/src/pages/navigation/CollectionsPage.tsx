@@ -1,87 +1,24 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Role } from 'common';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import BaseLayout from '../../components/Base/BaseLayout';
-import { setAccessToken, shouldRefreshToken } from '../../slices/auth';
-import { fetchCollectionsIfOld } from '../../slices/collections';
-import { fetchDescriptionsIfOld } from '../../slices/descriptions';
-import { fetchCollectionSuggestionsIfOld, fetchTechniqueSuggestionsIfOld } from '../../slices/suggestions';
-import { fetchTechniquesIfOld } from '../../slices/techniques';
-import { AppDispatch, RootState } from '../../store/store';
-import { decodeAndAddRole } from '../../util/Utilities';
 import CoachCollections from '../users/coach/Collections';
 import StudentCollections from '../users/student/Collections';
-import { fetchCollectionTechniquesIfOld } from '../../slices/collectionTechniques';
-import { fetchSelectedStudentTechniquesIfOld, selectStudent } from '../../slices/student';
+import { decodeAndAddRole } from '../../util/Utilities';
 
 
 const CollectionsPage: React.FC = () => {
-    let { user } = useAuth0();
-
-    const { getAccessTokenSilently } = useAuth0();
-    const dispatch = useDispatch<AppDispatch>();
-    const state = useSelector((state: RootState) => state.auth);
-
-    React.useEffect(() => {
-        const getAccessToken = async () => {
-            try {
-                if (shouldRefreshToken(state)) {
-                    const token = await getAccessTokenSilently();
-                    dispatch(setAccessToken(token))
-                }
-
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        getAccessToken();
-    }, [getAccessTokenSilently, dispatch, state]);
-
-    React.useEffect(() => {
-        dispatch(fetchCollectionsIfOld());
-        dispatch(fetchCollectionSuggestionsIfOld());
-        dispatch(fetchTechniqueSuggestionsIfOld());
-        dispatch(fetchTechniquesIfOld());
-        dispatch(fetchDescriptionsIfOld());
-        dispatch(fetchSelectedStudentTechniquesIfOld())
-        dispatch(fetchCollectionTechniquesIfOld());
-    }, [dispatch]);
-
-    if (user) { user = decodeAndAddRole(user) }
-
-    if (!user) {
-        return null;
-    }
-
-    let content: React.ReactNode = <div></div>
-
-    switch (user.role) {
-        case Role.Student:
-            dispatch(selectStudent(user))
-            content = <StudentCollections />
-            break;
-
-        case Role.Coach:
-            content = <CoachCollections />
-            break;
-
-        case Role.Admin:
-            content = (
-                <div>
-                    <p>Hello Admin!</p>
-                    <p>Collections page placeholder</p>
-                </div>
-            )
-            break;
-    }
+    const { user } = useAuth0()
+    const enhancedUser = user && decodeAndAddRole(user)
 
     return (
         <BaseLayout text="Collections">
-            <div className="home-container">
-                {content}
-            </div>
+            {enhancedUser && (
+                enhancedUser.role === Role.Student ? <StudentCollections />
+                : enhancedUser.role === Role.Coach ? <CoachCollections />
+                : enhancedUser.role === Role.Admin && <p>Admin Collections page placeholder</p>
+            )}
+
         </BaseLayout>
     );
 }

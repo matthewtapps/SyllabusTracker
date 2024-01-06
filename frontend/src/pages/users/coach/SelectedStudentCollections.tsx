@@ -18,6 +18,7 @@ function SelectedStudentCollections(): JSX.Element {
     return (
         <StudentCollectionListWithFilters
             editable
+            selectedStudent={selectedStudent!}
         />
     );
 };

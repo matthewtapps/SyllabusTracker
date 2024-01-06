@@ -7,9 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Collection, Technique } from 'common';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { postTechniqueAsync } from '../../slices/techniques';
-import { AppDispatch, RootState } from '../../store/store';
+import { usePostNewTechniqueMutation } from '../../services/syllabusTrackerApi';
 import { transformTechniqueForPost } from '../../util/Utilities';
 import TechniqueList from '../Lists/Base Lists/TechniqueList';
 import TechniqueFilter, { useHandleTechniqueFilterChange } from '../Lists/List Filters/TechniqueFilter';
@@ -39,15 +37,15 @@ interface AddTechniqueToCollectionDialogProps {
 };
 
 export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDialogProps) => {
-    const dispatch = useDispatch<AppDispatch>();
     const [selectedTechniques, setSelectedTechniques] = React.useState<{ index: number, technique: Technique }[]>([])
-    const { techniques } = useSelector((state: RootState) => state.techniques)
     const [cleanedTechniques, setCleanedTechniques] = React.useState<Technique[]>([]);
-    const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange(cleanedTechniques)
+    const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange()
+    const [postTechnique] = usePostNewTechniqueMutation()
 
     React.useEffect(() => {
-        setCleanedTechniques(techniques.filter(t => !props.editingTechniquesCollection?.collectionTechniques?.some(ct => ct.technique.techniqueId === t.techniqueId)));
-    }, [techniques, setCleanedTechniques, props.editingTechniquesCollection?.collectionTechniques])
+
+        setCleanedTechniques(filteredTechniques.filter(t => !props.editingTechniquesCollection?.collectionTechniques?.some(ct => ct.technique.techniqueId === t.techniqueId)));
+    }, [filteredTechniques, setCleanedTechniques, props.editingTechniquesCollection?.collectionTechniques])
 
     const handleTechniqueCheck = (techniqueId: string) => {
         setSelectedTechniques(prevSelectedTechniques => {
@@ -55,7 +53,7 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
             if (foundTechnique) {
                 return prevSelectedTechniques.filter(item => item.technique.techniqueId !== techniqueId);
             } else {
-                const techniqueToAdd = techniques.find(technique => technique.techniqueId === techniqueId);
+                const techniqueToAdd = cleanedTechniques!.find(technique => technique.techniqueId === techniqueId);
                 if (techniqueToAdd) {
                     return [...prevSelectedTechniques, { index: prevSelectedTechniques.length, technique: techniqueToAdd }];
                 } else {
@@ -63,6 +61,7 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
                 }
             }
         });
+
     };
 
     interface filtersObject {
@@ -117,8 +116,7 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
         const formData = new FormData(event.currentTarget)
         const fieldValues = Object.fromEntries(formData.entries())
         const validTechnique = transformTechniqueForPost(fieldValues);
-
-        dispatch(postTechniqueAsync(validTechnique))
+        postTechnique(validTechnique)
         setNewTechniqueDialogOpen(false)
     }
 
@@ -155,7 +153,7 @@ export const AddTechniqueToCollectionDialog = (props: AddTechniqueToCollectionDi
                 <DialogContent dividers={true} sx={{ padding: "0px" }}>
                     <Card>
                         <TechniqueList
-                            filteredTechniques={filteredTechniques}
+                            filteredTechniques={cleanedTechniques ?? filteredTechniques}
                             checkbox
                             elevation={1}
                             checkedTechniques={selectedTechniques}

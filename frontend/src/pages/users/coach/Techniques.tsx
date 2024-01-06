@@ -2,12 +2,10 @@ import AddIcon from '@mui/icons-material/Add'
 import Fab from '@mui/material/Fab'
 import { Technique } from 'common'
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import { EditTechniqueDialog } from '../../../components/Dialogs/EditTechniqueDialog'
 import { NewTechniqueDialog } from '../../../components/Dialogs/NewTechniqueDialog'
 import { TechniqueListWithFilters } from '../../../components/Lists/TechniquesListWithFilters'
-import { deleteTechniqueAsync, postTechniqueAsync, updateTechniqueAsync } from '../../../slices/techniques'
-import { AppDispatch } from '../../../store/store'
+import { useDeleteTechniqueMutation, useEditTechniqueMutation, usePostNewTechniqueMutation } from '../../../services/syllabusTrackerApi'
 import { transformTechniqueForPost, transformTechniqueForPut } from '../../../util/Utilities'
 
 
@@ -42,7 +40,9 @@ const emptyTechniqueDTO: TechniqueDTO = {
 }
 
 function CoachTechniques(): JSX.Element {
-    const dispatch = useDispatch<AppDispatch>();
+    const [postTechnique] = usePostNewTechniqueMutation()
+    const [deleteTechnique] = useDeleteTechniqueMutation()
+    const [updateTechnique] = useEditTechniqueMutation()
 
     const [showFab, setShowFab] = React.useState(true)
 
@@ -83,9 +83,7 @@ function CoachTechniques(): JSX.Element {
             techniqueId: editingTechniqueId
         }
         const validTechnique = transformTechniqueForPut(fieldValuesWithId);
-
-        dispatch(updateTechniqueAsync(validTechnique))
-    
+        updateTechnique(validTechnique)
         setEditingTechniqueDialogOpen(false)
     }
     
@@ -95,7 +93,7 @@ function CoachTechniques(): JSX.Element {
     }
 
     const handleDeleteClick = (techniqueId: string) => {
-        dispatch(deleteTechniqueAsync(techniqueId))
+        deleteTechnique(techniqueId)
         setEditingTechniqueDialogOpen(false)
         setShowFab(true);
     }
@@ -114,7 +112,7 @@ function CoachTechniques(): JSX.Element {
         const fieldValues = Object.fromEntries(formData.entries())
         const validTechnique = transformTechniqueForPost(fieldValues);
 
-        dispatch(postTechniqueAsync(validTechnique))
+        postTechnique(validTechnique)
         setNewTechniqueDialogOpen(false)
         setShowFab(true);
     }

@@ -1,9 +1,9 @@
+import { User } from "@auth0/auth0-react";
 import { Box, CardContent, Typography, styled } from "@mui/material";
 import MuiCard from '@mui/material/Card';
 import { Technique, TechniqueStatus } from "common";
 import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { useGetSelectedStudentTechniquesQuery } from "../../services/syllabusTrackerApi";
 import Pageloader from "../Base/PageLoader";
 import StudentTechniqueList from "./Base Lists/StudentTechniqueList";
 import TechniqueFilter, { useHandleTechniqueFilterChange } from "./List Filters/TechniqueFilter";
@@ -22,6 +22,7 @@ const Card = styled(MuiCard)({
 interface StudentTechniqueListWithFiltersProps {
     editable: boolean,
     elevation: number,
+    selectedStudent: User,
 }
 
 StudentTechniqueListWithFilters.defaultProps = {
@@ -30,33 +31,35 @@ StudentTechniqueListWithFilters.defaultProps = {
 }
 
 export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithFiltersProps): JSX.Element {
-    const { techniques, techniquesLoading, checkingAge } = useSelector((state: RootState) => state.techniques);
-    const { selectedStudentTechniques } = useSelector((state: RootState) => state.student)
+    const selectedStudent = props.selectedStudent
 
-    const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange(techniques)
+    const { data: selectedStudentTechniques, isLoading, isSuccess, isError, error } = useGetSelectedStudentTechniquesQuery(selectedStudent.user_id)
+
+    const { filteredTechniques, handleTechniqueFilterChange } = useHandleTechniqueFilterChange()
+
     const [showAssignedTechniques, setShowAssignedTechniques] = React.useState(false)
 
-    const handleAssignedFiltersCheck = () => {
-        showAssignedTechniques ? setShowAssignedTechniques(false) : setShowAssignedTechniques(true)
-    }
+    const handleAssignedFiltersCheck = () => { setShowAssignedTechniques(!showAssignedTechniques) }
 
     const [assignedFilteredTechniques, setAssignedFilteredTechniques] = React.useState<Technique[]>([]);
 
     React.useEffect(() => {
-        const filterTechniquesByAssigned = () => {
-            const assignedTechniques = filteredTechniques.filter(technique =>
-                selectedStudentTechniques.some(studentTechnique =>
-                    studentTechnique.technique.techniqueId === technique.techniqueId &&
-                    (studentTechnique.status === TechniqueStatus.NotYetStarted ||
-                        studentTechnique.status === TechniqueStatus.Started ||
-                        studentTechnique.status === TechniqueStatus.Passed)
-                )
-            );
-            setAssignedFilteredTechniques(assignedTechniques);
-        };
+        if (isSuccess) {
+            const filterTechniquesByAssigned = () => {
+                const assignedTechniques = filteredTechniques.filter(technique =>
+                    selectedStudentTechniques.some(studentTechnique =>
+                        studentTechnique.technique.techniqueId === technique.techniqueId &&
+                        (studentTechnique.status === TechniqueStatus.NotYetStarted ||
+                            studentTechnique.status === TechniqueStatus.Started ||
+                            studentTechnique.status === TechniqueStatus.Passed)
+                    )
+                );
+                setAssignedFilteredTechniques(assignedTechniques);
+            };
 
-        filterTechniquesByAssigned();
-    }, [filteredTechniques, selectedStudentTechniques]);
+            filterTechniquesByAssigned();
+        }
+    }, [filteredTechniques, selectedStudentTechniques, isSuccess]);
 
     return (
         <>
@@ -65,23 +68,27 @@ export function StudentTechniqueListWithFilters(props: StudentTechniqueListWithF
                     onTechniqueFiltersChange={handleTechniqueFilterChange}
                     showAssignedTechniques={showAssignedTechniques}
                     onAssignedFiltersCheck={handleAssignedFiltersCheck}
-                    />
+                />
             </Card>
             <Card>
-                {(techniquesLoading || checkingAge) ? (
-                    <Pageloader />
-                ) : filteredTechniques.length === 0 ? (
-                    <CardContent>
-                        <Typography>No techniques found with current filters</Typography>
-                    </CardContent>
-                ) : (
-                    <Box>
-                        <StudentTechniqueList
-                            filteredTechniques={showAssignedTechniques ? assignedFilteredTechniques : filteredTechniques}
-                            editable={props.editable}
-                        />
-                    </Box>
-                )}
+                {isLoading ? <Pageloader />
+                    : isSuccess ?
+                        <Box>
+                            <StudentTechniqueList
+                                filteredTechniques={showAssignedTechniques ? assignedFilteredTechniques : filteredTechniques}
+                                editable={props.editable}
+                                selectedStudent={selectedStudent}
+                            />
+                        </Box>
+                        : isError ?
+                        <CardContent>
+                            <Typography>{`Failed to fetch selected student techniques: ${error}`}</Typography>
+                        </CardContent>
+                        :
+                        <CardContent>
+                            <Typography>No techniques available for selected filters.</Typography>
+                        </CardContent>
+                }
             </Card>
         </>
     )

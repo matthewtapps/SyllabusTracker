@@ -11,19 +11,15 @@ export class StudentTechniqueService {
             studentTechnique.userId = studentId;
             studentTechnique.technique = technique;
             studentTechnique.status = status;
-            studentTechnique.studentNotes = '';
-            studentTechnique.coachNotes = '';
-            studentTechnique.lastUpdated = new Date();
-            studentTechnique.created = new Date();
             return studentTechnique;
         });
 
         return await studentTechniqueRepository.save(newStudentTechniques);
     }
 
-    async updateStudentTechnique(studentId: string, techniqueId: string, updatedData: Partial<StudentTechnique>): Promise<StudentTechnique> {
+    async updateOrPostStudentTechnique(studentId: string, techniqueId: string, updatedData: Partial<StudentTechnique>): Promise<StudentTechnique> {
         const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
-        const studentTechnique = await studentTechniqueRepository.findOne({
+        const selectedStudentTechnique = await studentTechniqueRepository.findOne({
             where: {
                 userId: studentId,
                 technique: { techniqueId: techniqueId }
@@ -31,16 +27,29 @@ export class StudentTechniqueService {
             relations: ["technique"]
         });
 
-        if (!studentTechnique) {
-            throw new Error('Student technique not found');
-        }
+        try {
 
-        await studentTechniqueRepository.update(studentTechnique.studentTechniqueId, {
-            ...updatedData,
-            lastUpdated: new Date()
-        });
+            if (selectedStudentTechnique) {
 
-        return studentTechniqueRepository.findOne({ where: { studentTechniqueId: studentTechnique.studentTechniqueId } });
+                await studentTechniqueRepository.update(selectedStudentTechnique.studentTechniqueId, {
+                    ...updatedData,
+                    lastUpdated: new Date()
+                });
+
+                return studentTechniqueRepository.findOne({ where: { studentTechniqueId: selectedStudentTechnique.studentTechniqueId } });
+
+            } else {
+                const newStudentTechnique = new StudentTechnique();
+                newStudentTechnique.coachNotes = updatedData.coachNotes
+                newStudentTechnique.status = updatedData.status
+                newStudentTechnique.studentNotes = updatedData.studentNotes
+                newStudentTechnique.technique = updatedData.technique
+                newStudentTechnique.userId = studentId
+
+                return studentTechniqueRepository.save(newStudentTechnique)
+            }
+
+        } catch (error) { console.error(`Error updating or creating student technique: ${error}`) }
     }
 
     async fetchStudentTechniques(userId: string): Promise<{ status: number, res: StudentTechnique[] | { message: string } }> {
@@ -65,13 +74,13 @@ export class StudentTechniqueService {
         return responseData
     }
 
-    async deleteStudentTechnique(data: { studentTechniqueId: string }) {
+    async deleteStudentTechnique(studentTechniqueId: string) {
         const studentTechniqueRepository = AppDataSource.getRepository(StudentTechnique);
 
-        console.log("Deleting student technique with ID:", data.studentTechniqueId);
+        console.log("Deleting student technique with ID:", studentTechniqueId);
 
         try {
-            const studentTechnique = await studentTechniqueRepository.findOneBy({ studentTechniqueId: data.studentTechniqueId });
+            const studentTechnique = await studentTechniqueRepository.findOneBy({ studentTechniqueId: studentTechniqueId });
 
             if (!studentTechnique) {
                 console.log("Failed to find studentTechnique when deleting");
@@ -79,7 +88,7 @@ export class StudentTechniqueService {
                 await studentTechniqueRepository.createQueryBuilder()
                     .delete()
                     .from(StudentTechnique)
-                    .where("studentTechniqueId = :studentTechniqueId", { studentTechniqueId: data.studentTechniqueId })
+                    .where("studentTechniqueId = :studentTechniqueId", { studentTechniqueId: studentTechniqueId })
                     .execute();
             }
         } catch (error) {

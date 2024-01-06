@@ -6,20 +6,20 @@ import { AppDataSource } from "../data-source";
 
 
 export class CollectionSetService {
-    async setCollections(data: { collectionSetId: string, collections: Collection[] }): Promise<CollectionSet> {
+    async setCollections(collectionSetId: string, collections: Collection[]): Promise<CollectionSet> {
         const collectionSetRepo = AppDataSource.getRepository(CollectionSet)
 
-        const collectionSet = await collectionSetRepo.findOne({ where: { collectionSetId: data.collectionSetId } })
+        const collectionSet = await collectionSetRepo.findOne({ where: { collectionSetId: collectionSetId } })
 
         if (collectionSet) {
             await collectionSetRepo.update(collectionSet.collectionSetId, {
                 ...collectionSet,
-                collections: data.collections
+                collections: collections
             });
         }
 
         return await collectionSetRepo.findOne({
-            where: { collectionSetId: data.collectionSetId },
+            where: { collectionSetId: collectionSetId },
             relations: ["collections",
                 "collections.collectionTechniques",
                 "collections.collectionTechniques.technique",
@@ -29,29 +29,29 @@ export class CollectionSetService {
         })
     }
 
-    async createCollectionSet(data: { collectionSet: Partial<CollectionSet> }): Promise<CollectionSet> {
+    async createCollectionSet(collectionSet: Partial<CollectionSet>): Promise<CollectionSet> {
         const collectionSetRepo = AppDataSource.getRepository(CollectionSet)
 
         const newSet = new CollectionSet();
 
-        newSet.title = data.collectionSet.title
-        newSet.collections = data.collectionSet.collections
-        newSet.description = data.collectionSet.description
+        newSet.title = collectionSet.title
+        newSet.collections = collectionSet.collections
+        newSet.description = collectionSet.description
 
         return await collectionSetRepo.save(newSet)
     }
 
-    async deleteCollectionSet(data: { collectionSetId: string }) {
+    async deleteCollectionSet(collectionSetId: string) {
         const collectionSetRepo = AppDataSource.getRepository(CollectionSet)
 
-        const collectionSet = await collectionSetRepo.findOne({ where: { collectionSetId: data.collectionSetId } })
+        const collectionSet = await collectionSetRepo.findOne({ where: { collectionSetId: collectionSetId } })
 
         if (collectionSet) {
             try {
                 await collectionSetRepo.createQueryBuilder()
                     .delete()
                     .from(CollectionSet)
-                    .where("collectionSetId = :collectionSetId", { collectionSetId: data.collectionSetId })
+                    .where("collectionSetId = :collectionSetId", { collectionSetId: collectionSetId })
                     .execute()
             } catch (error) {
                 console.log(error)

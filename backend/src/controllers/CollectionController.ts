@@ -24,8 +24,9 @@ export class CollectionController {
 
     static async setCollectionTechniques(req: Request, res: Response) {
         const collectionService = new CollectionService()
+        const collectionId = req.params.collectionId
         try {
-            const collectionTechniques = await collectionService.setCollectionTechniques(req.body);
+            const collectionTechniques = await collectionService.setCollectionTechniques(collectionId, req.body);
             res.json(collectionTechniques);
         } catch (error) {
             res.status(400).json({ error: error.message })
@@ -35,8 +36,9 @@ export class CollectionController {
 
     static async deleteCollection(req: Request, res: Response) {
         const collectionService = new CollectionService()
+        const collectionId = req.params.collectionId
         try {
-            await collectionService.deleteCollection(req.body)
+            await collectionService.deleteCollection(collectionId)
             res.status(200).json({ message: 'Collection deleted successfully' });
         } catch (error) {
             res.status(400).json({error: error.message})

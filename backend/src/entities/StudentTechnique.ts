@@ -18,10 +18,10 @@ export class StudentTechnique implements StudentTechniqueInterface {
     @Column()
     status: TechniqueStatus;
 
-    @Column()
+    @Column({nullable: true})
     studentNotes: string;
 
-    @Column()
+    @Column({nullable: true})
     coachNotes: string;
 
     @UpdateDateColumn()

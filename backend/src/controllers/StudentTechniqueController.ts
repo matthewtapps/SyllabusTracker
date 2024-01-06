@@ -6,7 +6,8 @@ export class StudentTechniqueController {
     static async addStudentTechniques(req: Request, res: Response) {
         const studentTechniqueService = new StudentTechniqueService();
         try {
-            const { techniques, status, studentId } = req.body;
+            const studentId = req.params.userId
+            const { techniques, status } = req.body;
             const newStudentTechniques = await studentTechniqueService.addStudentTechniques(techniques, status, studentId);
             res.status(201).json(newStudentTechniques);
         } catch (error) {
@@ -14,11 +15,13 @@ export class StudentTechniqueController {
         }
     }
 
-    static async updateStudentTechnique(req: Request, res: Response) {
+    static async updateOrPostStudentTechnique(req: Request, res: Response) {
         const studentTechniqueService = new StudentTechniqueService();
         try {
-            const { studentId, techniqueId, updatedData } = req.body;
-            const updatedStudentTechnique = await studentTechniqueService.updateStudentTechnique(studentId, techniqueId, updatedData);
+            const studentId = req.params.userId
+            const techniqueId = req.params.techniqueId
+            const { updatedData } = req.body;
+            const updatedStudentTechnique = await studentTechniqueService.updateOrPostStudentTechnique(studentId, techniqueId, updatedData);
             res.status(200).json(updatedStudentTechnique);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -48,8 +51,9 @@ export class StudentTechniqueController {
 
     static async deleteStudentTechnique(req: Request, res: Response) {
         const studentTechniqueService = new StudentTechniqueService();
+        const studentTechniqueId = req.params.techniqueId
         try {
-            await studentTechniqueService.deleteStudentTechnique(req.body)
+            await studentTechniqueService.deleteStudentTechnique(studentTechniqueId)
             res.status(200).json({ message: 'Student technique deleted successfully' });
         } catch (error) {
             res.status(400).json({error: error.message})

@@ -7,35 +7,34 @@ import { CollectionSetController } from './controllers/CollectionSetController';
 
 const router = Router();
 
-router.post('/technique', TechniqueController.createTechnique);
-router.put('/technique', TechniqueController.updateTechnique);
 router.get('/technique', TechniqueController.getAllTechniques);
-router.delete('/technique', TechniqueController.deleteTechnique);
+router.post('/technique', TechniqueController.createTechnique);
+router.put('/technique/:techniqueId', TechniqueController.updateTechnique);
+router.delete('/technique/:techniqueId', TechniqueController.deleteTechnique);
 
 router.get('/type', TechniqueController.getAllTypes);
 router.get('/technique/titles', TechniqueController.getAllTechniqueTitlesWithDescriptions)
 router.get('/position', TechniqueController.getAllPositions);
 router.get('/openguard', TechniqueController.getAllOpenGuards);
 
-router.post('/collection', CollectionController.createCollection);
-router.put('/collection', CollectionController.updateCollection);
 router.get('/collection', CollectionController.getAllCollections);
-router.delete('/collection', CollectionController.deleteCollection);
-router.get('/collection/titles', CollectionController.getAllCollectionTitles);
+router.post('/collection', CollectionController.createCollection);
+router.put('/collection/:collectionId', CollectionController.updateCollection);
+router.delete('/collection/:collectionId', CollectionController.deleteCollection);
 
-router.post('/collectiontechnique', CollectionController.setCollectionTechniques);
 router.get('/collectiontechnique', CollectionController.getCollectionTechniques);
+router.post('/collectiontechnique/:collectionId', CollectionController.setCollectionTechniques);
 
-router.get('/students', StudentController.fetchStudents);
+router.get('/student', StudentController.fetchStudents);
+router.get('/student/:userId/technique', StudentTechniqueController.fetchStudentTechniques)
+router.post('/student/:userId/technique', StudentTechniqueController.addStudentTechniques)
+router.put('/student/:userId/technique/:techniqueId', StudentTechniqueController.updateOrPostStudentTechnique)
+router.get('/student/technique', StudentTechniqueController.fetchAllStudentTechniques)
+router.delete('/student/technique/:techniqueId', StudentTechniqueController.deleteStudentTechnique)
 
-router.post('/studenttechnique', StudentTechniqueController.addStudentTechniques)
-router.put('/studenttechnique/:userId/:techniqueId', StudentTechniqueController.updateStudentTechnique)
-router.get('/studenttechnique/:userId', StudentTechniqueController.fetchStudentTechniques)
-router.get('/studenttechnique', StudentTechniqueController.fetchAllStudentTechniques)
-router.delete('/studenttechnique', StudentTechniqueController.deleteStudentTechnique)
-
+router.get('/collectionset', CollectionSetController.getCollectionSets)
 router.post('/collectionset', CollectionSetController.createCollectionSet)
-router.put('/collectionset', CollectionSetController.setCollections)
-router.delete('collectionset', CollectionSetController.deleteCollectionSet)
+router.put('/collectionset/:collectionSetId', CollectionSetController.setCollections)
+router.delete('collectionset/:collectionSetId', CollectionSetController.deleteCollectionSet)
 
 export default router;

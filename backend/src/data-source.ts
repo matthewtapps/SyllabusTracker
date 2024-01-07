@@ -45,7 +45,6 @@ const initializeDataSource = async () => {
 };
 
 initializeDataSource().catch(err => {
-    console.log(postgresUser, postgresHostname, postgresPass, postgresDB)
     console.error(err);
     process.exit(1);
 });

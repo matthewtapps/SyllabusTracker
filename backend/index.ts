@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import 'dotenv/config';
 
 const app = express();
+app.use(cors())
 
 const jwtAudience = process.env.JWT_AUDIENCE
 const issuerBaseURL = process.env.ISSUER_BASE_URL
@@ -17,9 +18,6 @@ const jwtCheck = auth({
     tokenSigningAlg: 'RS256',
   });
 
-// Enable cors to be able to reach the backend on localhost:3000 while running React.js in dev mode on localhost:3001
-// You might want to disbale this on production.
-app.use(cors());
 app.use(express.json());
 app.use(morgan('combined', {immediate: true}));
 app.use('/api', jwtCheck, router);
@@ -35,7 +33,7 @@ const PORT = process.env.PORT || 3000;
 AppDataSource.initialize()
     .then(() => {
         app.listen(PORT, () => {
-            console.log(`Server started on http://localhost:${PORT}`);
+            console.log(`Server started on port ${PORT}`);
         });
     })
     .catch(error => {

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Generated } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Generated, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class OpenGuard {
@@ -11,4 +11,10 @@ export class OpenGuard {
 
     @Column()
     description: string;
+
+    @UpdateDateColumn()
+    lastUpdated: Date;
+
+    @CreateDateColumn()
+    created: Date;
 }

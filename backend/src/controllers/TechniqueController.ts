@@ -2,11 +2,22 @@ import { Request, Response } from 'express';
 import { TechniqueService } from '../services/TechniqueService';
 
 export class TechniqueController {
-    static async createOrUpdateTechnique(req: Request, res: Response) {
+    static async createTechnique(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const technique = await techniqueService.createOrUpdateTechnique(req.body);
+            const technique = await techniqueService.createTechnique(req.body);
             res.json(technique);
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({ error: error });
+        }
+    }
+
+    static async updateTechnique(req: Request, res: Response) {
+        const techniqueService = new TechniqueService();
+        try {
+            const technique = await techniqueService.updateTechnique(req.body);
+            res.status(200).json(technique);
         } catch (error) {
             console.log(error)
             res.status(400).json({ error: error });
@@ -16,8 +27,9 @@ export class TechniqueController {
     static async deleteTechnique(req: Request, res: Response) {
         const techniqueService = new TechniqueService()
         try {
-            await techniqueService.deleteTechnique(req.body)
-            res.status(200)
+            const techniqueId = req.params.techniqueId
+            await techniqueService.deleteTechnique(techniqueId)
+            res.status(200).json({ message: 'Technique deleted successfully' });
         } catch (error) {
             res.status(400).json({error: error.message})
         }
@@ -27,48 +39,69 @@ export class TechniqueController {
         const techniqueService = new TechniqueService();
         try {
             const techniques = await techniqueService.getAllTechniques();
-            res.json(techniques);
+            res.status(200).json(techniques);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
     }
 
-    static async getAllTechniqueTitles(req: Request, res: Response) {
+    static async getAllTechniqueTitlesWithDescriptions(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniqueTitles = await techniqueService.getAllTechniqueTitles();
-            res.json(techniqueTitles);
+            const techniqueTitles = await techniqueService.getAllTechniqueTitlesWithDescriptions();
+            res.status(200).json(techniqueTitles);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
     }    
-    static async getAllTechniqueTypes(req: Request, res: Response) {
+    static async getAllTypes(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniqueTypes = await techniqueService.getAllTechniqueTypes();
-            res.json(techniqueTypes);
+            const techniqueTypes = await techniqueService.getAllTypes();
+            res.status(200).json(techniqueTypes);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
     }
 
-    static async getAllTechniquePositions(req: Request, res: Response) {
+    static async getAllPositions(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniquePositions = await techniqueService.getAllTechniquePositions();
-            res.json(techniquePositions);
+            const techniquePositions = await techniqueService.getAllPositions();
+            res.status(200).json(techniquePositions);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
     }
 
-    static async getAllTechniqueOpenGuards(req: Request, res: Response) {
+    static async getAllOpenGuards(req: Request, res: Response) {
         const techniqueService = new TechniqueService();
         try {
-            const techniqueOpenGuards = await techniqueService.getAllTechniqueOpenGuards();
-            res.json(techniqueOpenGuards);
+            const techniqueOpenGuards = await techniqueService.getAllOpenGuards();
+            res.status(200).json(techniqueOpenGuards);
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
     }
+
+    static async getDescriptions(req: Request, res: Response) {
+        const techniqueService = new TechniqueService();
+        try {
+            const descriptions = await techniqueService.getDescriptions();
+            res.status(200).json(descriptions)
+        } catch (error) {
+            res.status(400).json({ error: error.message })
+        }
+    }
+
+    static async getSuggestions(req: Request, res: Response) {
+        const techniqueService = new TechniqueService();
+        try {
+            const suggestions = await techniqueService.getSuggestions();
+            res.status(200).json(suggestions)
+        } catch (error) {
+            res.status(400).json({ error: error.message })
+        }
+    }
+
 }

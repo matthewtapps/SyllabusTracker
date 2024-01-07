@@ -1,50 +1,29 @@
+import { useAuth0 } from '@auth0/auth0-react';
+import { Role } from 'common';
 import React from 'react';
-import { Role } from 'common'
-import StudentDashboard from '../users/student/Home';
-import CoachDashboard from '../users/coach/Home';
-import { useAuth0 } from '@auth0/auth0-react'
-import BaseLayout from '../../components/BaseLayout';
+import BaseLayout from '../../components/Base/BaseLayout';
 import { decodeAndAddRole } from '../../util/Utilities';
+import CoachDashboard from '../users/coach/Dashboard';
+import StudentDashboard from '../users/student/Dashboard';
+import { sec } from '../../store/security';
 
 
 const DashboardPage: React.FC = () => {
-    
-    let { user } = useAuth0();
-
-    if (user) {user = decodeAndAddRole(user)}
-
-    if (!user) {
-      return null;
-    }
-    
-    let content: React.ReactNode = <div></div>
-
-    switch(user.role) {
-        case Role.Student:
-        content = <StudentDashboard/>
-        break;
-
-        case Role.Coach:
-            content = <CoachDashboard/>
-        break;
-
-        case Role.Admin:
-            content = (
-                <div>
-                    <p>Hello Admin!</p>
-                    <p>Home page placeholder</p>
-                </div>
-        )
-        break;
-    }
+    const { getAccessTokenSilently } = useAuth0();
+    sec.setAccessTokenSilently(getAccessTokenSilently);
+    const { user } = useAuth0()
+    const enhancedUser = user && decodeAndAddRole(user)
 
     return (
         <BaseLayout text="Dashboard">
-            <div className="home-container">
-                {content}
-            </div>
+            {enhancedUser && (
+                enhancedUser.role === Role.Student ? <StudentDashboard />
+                : enhancedUser.role === Role.Coach ? <CoachDashboard />
+                : enhancedUser.role === Role.Admin && <p>Admin dashboard page placeholder</p>
+            )}
+
         </BaseLayout>
-    );
+    )
 };
 
 export default DashboardPage;

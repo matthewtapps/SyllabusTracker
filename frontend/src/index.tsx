@@ -6,7 +6,9 @@ import './css/main.css';
 import './css/fonts.css'
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Auth0ProviderWithNavigate } from './components/Auth0ProviderWithNavigate';
+import { Auth0ProviderWithNavigate } from './components/Authentication/Auth0ProviderWithNavigate';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 
 const root = ReactDOM.createRoot(
@@ -16,7 +18,9 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Auth0ProviderWithNavigate>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </Auth0ProviderWithNavigate>
     </BrowserRouter>
   </React.StrictMode>

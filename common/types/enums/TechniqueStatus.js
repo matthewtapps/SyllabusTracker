@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringToTechniqueStatus = exports.TechniqueStatus = void 0;
 var TechniqueStatus;
 (function (TechniqueStatus) {
+    TechniqueStatus["Unassigned"] = "Unassigned";
     TechniqueStatus["Passed"] = "Passed";
     TechniqueStatus["Started"] = "Started";
     TechniqueStatus["NotYetStarted"] = "Not Yet Started";

@@ -12,7 +12,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = (props) => {
       <div>
         <NavBar 
         text={props.text} />
-        <Box sx={{paddingTop: "60px"}}>{props.children}</Box>
+        <Box sx={{paddingTop: "70px"}}>{props.children}</Box>
       </div>
     );
   }

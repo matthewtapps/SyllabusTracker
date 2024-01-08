@@ -9,7 +9,10 @@ import { decodeAndAddRole } from '../../util/Utilities';
 
 const CollectionsPage: React.FC = () => {
     const { user } = useAuth0()
-    const enhancedUser = user && decodeAndAddRole(user)
+
+    if (!user) return null
+
+    const enhancedUser =  decodeAndAddRole(user)
 
     return (
         <BaseLayout text="Collections">

@@ -11,9 +11,15 @@ import SelectedStudentTechniquesPage from './pages/navigation/SelectedStudentTec
 import StudentsPage from './pages/navigation/StudentsPage';
 import TechniquesPage from "./pages/navigation/TechniquesPage";
 import theme from "./theme/Theme";
+import { useAuth0 } from "@auth0/auth0-react";
+import Pageloader from "./components/Base/PageLoader";
 
 
 function App() {
+    const { isLoading } = useAuth0();
+
+    if (isLoading) return <Pageloader />
+
     return (
         <>
             <ThemeProvider theme={theme}>

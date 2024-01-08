@@ -4,10 +4,9 @@ import { User as Auth0User } from '@auth0/auth0-react'
 
 const API_SERVER_URL = process.env.REACT_APP_API_SERVER_URL
 
-export const decodeAndAddRole = (userToken: Auth0User) => {
+export const decodeAndAddRole = (userToken: Auth0User): Auth0User => {
     if (!Object.values(Role).includes(userToken[`https://syllabustracker.matthewtapps.com/roles`][0])) {
-        alert('Invalid user role attached to id token')
-        return undefined
+        throw new Error('Invalid user role attached to id token')
     }
 
     const user = {
